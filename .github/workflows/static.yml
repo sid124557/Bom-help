@@ -1,0 +1,68 @@
+name: Deploy Latest Updated Branch to GitHub Pages
+
+on:
+  push:
+    branches:
+      - '**'   # Trigger on all branches
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # Checkout repository with full history
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Important to fetch all commits
+
+      # Fetch all remote branches
+      - name: Fetch all branches
+        run: |
+          git fetch --all
+
+      # Find latest updated branch by commit date
+      - name: Determine latest updated branch
+        id: latest_branch
+        run: |
+          LATEST_BRANCH=$(git for-each-ref \
+            --sort=-committerdate \
+            --format='%(refname:short)' \
+            refs/remotes/origin/ | grep -v HEAD | head -n 1 | sed 's|origin/||')
+
+          echo "Latest branch is: $LATEST_BRANCH"
+          echo "branch=$LATEST_BRANCH" >> $GITHUB_OUTPUT
+
+      # Checkout the latest branch
+      - name: Checkout latest branch
+        run: |
+          git checkout ${{ steps.latest_branch.outputs.branch }}
+
+      # Setup GitHub Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      # Upload entire repo as artifact
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      # Deploy
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
