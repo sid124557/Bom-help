@@ -3,355 +3,617 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BOM Architect</title>
+  <title>SAP BOM Architect</title>
   <style>
     :root {
       --bg: #0b1020;
       --panel: #121a30;
+      --panel2: #0b1228;
       --text: #e8ecff;
-      --muted: #9aa6cf;
-      --accent: #6ea8ff;
+      --muted: #a2acd5;
+      --line: #2a3764;
+      --accent: #7caeff;
       --good: #2ecc71;
-      --bad: #ff5b6e;
-      --line: #273154;
+      --warn: #ffc857;
+      --bad: #ff6b6b;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       background: linear-gradient(180deg, #0b1020, #0f1730);
       color: var(--text);
-      font-family: Inter, Segoe UI, Roboto, sans-serif;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
     }
-    .app {
-      display: grid;
-      grid-template-rows: auto 1fr;
-      min-height: 100vh;
-      gap: 12px;
-      padding: 12px;
-    }
-    .top {
+    .app { display: grid; grid-template-rows: auto auto 1fr; min-height: 100vh; gap: 10px; padding: 10px; }
+    .top, .filters, .workspace > * {
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 2fr auto auto auto;
-      gap: 10px;
-      align-items: start;
-    }
-    textarea {
-      width: 100%;
-      min-height: 130px;
-      background: #0b1228;
-      color: var(--text);
-      border: 1px solid var(--line);
-      border-radius: 8px;
       padding: 10px;
-      resize: vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
-      font-size: 12px;
     }
-    button {
-      background: #1b2950;
-      color: var(--text);
-      border: 1px solid #31457d;
-      border-radius: 8px;
-      padding: 10px 12px;
-      cursor: pointer;
-      height: fit-content;
+    .top { display: grid; grid-template-columns: 2fr auto auto auto auto; gap: 8px; }
+    textarea {
+      width: 100%; min-height: 140px; resize: vertical;
+      background: var(--panel2); color: var(--text);
+      border: 1px solid var(--line); border-radius: 8px; padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; font-size: 12px;
     }
-    .workspace {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 12px;
-      min-height: 0;
+    button, select, input {
+      background: var(--panel2); color: var(--text);
+      border: 1px solid var(--line); border-radius: 8px; padding: 8px;
     }
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px;
-      min-height: 0;
-      overflow: auto;
-    }
-    .title { margin: 0 0 10px; font-size: 16px; }
+    button { cursor: pointer; }
+    .filters { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; align-items: end; }
+    .filters label { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
+    .workspace { display: grid; grid-template-columns: 1.3fr 1fr; gap: 10px; min-height: 0; }
+    .left, .right { overflow: auto; min-height: 0; }
+    .section-title { margin: 0 0 8px; font-size: 15px; }
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+    .kpi { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+    .kpi .v { font-size: 20px; font-weight: 700; }
+    .kpi .l { font-size: 11px; color: var(--muted); }
     .tree-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: 18px auto auto auto auto auto;
       gap: 8px;
       align-items: center;
       padding: 6px 8px;
-      border-radius: 8px;
       border: 1px solid transparent;
-      padding-left: calc(var(--level) * 20px + 8px);
+      border-radius: 8px;
       margin: 2px 0;
+      padding-left: calc(var(--level) * 20px + 8px);
+      user-select: none;
     }
-    .tree-row:hover { background: #172241; }
-    .tree-row.selected { border-color: var(--accent); background: #1a2d57; }
-    .tree-row.ancestor { border-color: #4f6fbf; }
-    .lvl1 { font-weight: 700; }
-    .badge {
-      font-size: 11px;
-      border-radius: 999px;
-      padding: 2px 8px;
-      font-weight: 700;
-    }
-    .halb { background: #2d77ff3d; color: #8cb7ff; border: 1px solid #3a74da; }
-    .roh { background: #2ecc7130; color: #81f0af; border: 1px solid #37b668; }
-    .cost-flash-up { animation: flash-up .7s ease; }
-    .cost-flash-down { animation: flash-down .7s ease; }
-    @keyframes flash-up { from { color: var(--bad);} to { color: var(--text);} }
-    @keyframes flash-down { from { color: var(--good);} to { color: var(--text);} }
-    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    input, select {
-      width:100%; background:#0b1228; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px;
-    }
-    table { width:100%; border-collapse: collapse; margin-top: 8px; }
-    th, td { border-bottom:1px solid var(--line); text-align:left; padding:6px; font-size: 13px; }
-    .tabs { display:flex; gap:8px; margin-bottom: 8px; }
-    .tabs button.active { background:#2a3e72; }
-    #graph { width: 100%; height: 420px; background:#0b1228; border:1px solid var(--line); border-radius:10px; }
+    .tree-row:hover { background: #182548; }
+    .tree-row.selected { border-color: var(--accent); background: #1f3160; }
+    .tree-row.ancestor { border-color: #546eaf; }
+    .tree-row.dup { box-shadow: inset 0 0 0 1px var(--warn); }
+    .level-1 { font-weight: 800; }
+    .level-2,.level-3 { font-weight: 600; }
+    .level-4 { font-weight: 500; opacity: .94; }
+    .level-5,.level-6 { font-weight: 400; opacity: .88; }
+    .badge { font-size: 10px; font-weight: 700; border-radius: 999px; padding: 2px 7px; }
+    .halb { background: #2d77ff40; color: #9bc2ff; border: 1px solid #4f87ef; }
+    .roh { background: #2ecc7140; color: #94f2ba; border: 1px solid #4fc47e; }
+    .fert { background: #9266ff3a; color: #c7afff; border: 1px solid #8d70de; }
     .muted { color: var(--muted); font-size: 12px; }
+    .small { font-size: 11px; color: var(--muted); }
+    .tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+    .tabs button.active { border-color: var(--accent); background: #22396f; }
+    .pane { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 6px; text-align: left; }
+    .danger { color: var(--bad); }
+    .ok { color: var(--good); }
+    .warn { color: var(--warn); }
+    #graph { width: 100%; height: 400px; border: 1px solid var(--line); border-radius: 8px; background: #0a1125; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
     <textarea id="raw"></textarea>
-    <button id="autoMap">Auto-Map + Parse</button>
-    <button id="visualize">Visualize</button>
-    <button id="toggleView">Switch to Exploded View</button>
+    <button id="btnParse">Auto-Map + Parse</button>
+    <button id="btnVisualize">Visualize</button>
+    <button id="btnExport">Export CSV</button>
+    <button id="btnMode">View: Tree</button>
+  </div>
+
+  <div class="filters">
+    <label>Plant
+      <select id="plantFilter"></select>
+    </label>
+    <label>Header Material
+      <select id="headerFilter"></select>
+    </label>
+    <label>Search
+      <input id="search" placeholder="component / description / material / UOM" />
+    </label>
+    <label>Cost Source
+      <select id="costMode">
+        <option value="rollup">Calculate Rollup</option>
+        <option value="sap">Use SAP Moving Price</option>
+      </select>
+    </label>
+    <label>Duplicate View
+      <select id="dupMode">
+        <option value="highlight">Highlight duplicates</option>
+        <option value="aggregate">Aggregated view</option>
+      </select>
+    </label>
+    <label>Commonality
+      <select id="crossPlant">
+        <option value="all">All components</option>
+        <option value="cross">Common across plants only</option>
+      </select>
+    </label>
   </div>
 
   <div class="workspace">
-    <div class="panel">
-      <h3 class="title">Navigation Tree</h3>
-      <p class="muted">HALB 🔵 expandable · ROH 🟢 leaf · Hover highlights parents.</p>
+    <div class="left">
+      <h3 class="section-title">BOM Tree (Component-centric)</h3>
+      <p class="small">Grouped as Plant → Header Material → Components. IDs use Plant + Header + Component + Level + rowRef.</p>
       <div id="tree"></div>
     </div>
 
-    <div class="panel">
+    <div class="right">
+      <div class="kpis" id="kpis"></div>
       <div class="tabs">
-        <button class="active" id="detailsTab">Detail & Edit</button>
-        <button id="commonTab">Commonality Report</button>
+        <button id="tabDetail" class="active">Detail</button>
+        <button id="tabCommon">Commonality</button>
+        <button id="tabWhere">Where-Used</button>
+        <button id="tabGraph">Graph</button>
       </div>
-      <div id="detailPane"></div>
-      <div id="commonPane" style="display:none"></div>
-      <svg id="graph" style="display:none"></svg>
+      <div id="paneDetail" class="pane"></div>
+      <div id="paneCommon" class="pane hidden"></div>
+      <div id="paneWhere" class="pane hidden"></div>
+      <svg id="graph" class="hidden"></svg>
     </div>
   </div>
 </div>
 
 <script>
-const seed = `Level,Material,Description,Type,Qty,Price,UOM
-0,LAMP-001,Finished Headlamp Assembly,FERT,1,0,EA
-1,HSG-100,Plastic Housing Sub-Assy,HALB,1,12,EA
-2,SCRW-99,Mounting Screw M5,ROH,4,0.2,EA
-2,SEAL-02,Rubber Gasket,ROH,1,0.8,EA
-1,OPTIC-200,Reflector Module,HALB,1,15,EA
-2,MIRROR-X,Chrome Inner Lens,HALB,1,7,EA
-3,BMC-RAW,Bulk Molding Compound,ROH,0.5,6,KG
-3,COAT-UV,UV Protective Coating,ROH,10,0.05,G
-1,BULB-H7,Halogen Bulb 24V,ROH,1,5,EA`;
+const sample = `Plant,Header Material,Header Description,Level,Component,Component Description,Material Type,Comp Qty(CUn),Comp Qty(BUn),UOM,Base Unit,BasQty (Next Level),Moving Price
+5600,LAMP-001,Finished Headlamp,1,HSG-100,Plastic Housing Sub-Assy,HALB,1,1,EA,EA,1,12
+5600,LAMP-001,Finished Headlamp,2,SCRW-99,Mounting Screw M5,ROH,4,4,EA,EA,1,0.2
+5600,LAMP-001,Finished Headlamp,2,SEAL-02,Rubber Gasket,ROH,1,1,EA,EA,1,0.8
+5600,LAMP-001,Finished Headlamp,1,OPTIC-200,Reflector Module,HALB,1,1,EA,EA,1,15
+5600,LAMP-001,Finished Headlamp,2,MIRROR-X,Chrome Inner Lens,HALB,1,1,EA,EA,1,7
+5600,LAMP-001,Finished Headlamp,3,BMC-RAW,Bulk Molding Compound,ROH,0.5,0.5,KG,KG,1,6
+5600,LAMP-001,Finished Headlamp,3,COAT-UV,UV Protective Coating,ROH,10,10,G,G,1,0.05
+5600,LAMP-001,Finished Headlamp,1,BULB-H7,Halogen Bulb 24V,ROH,1,1,EA,EA,1,5
+5400,LAMP-002,Finished Headlamp Variant,1,HSG-200,Plastic Housing Gen2,HALB,1,1,EA,EA,1,14
+5400,LAMP-002,Finished Headlamp Variant,2,SCRW-99,Mounting Screw M5,ROH,6,6,EA,EA,1,0.2
+5400,LAMP-002,Finished Headlamp Variant,2,BO01610125,Heat Shield Clip,ROH,2,2,EA,EA,1,0.4
+5400,LAMP-002,Finished Headlamp Variant,2,BO01610125,Heat Shield Clip,ROH,1,1,EA,EA,1,0.4
+5400,LAMP-002,Finished Headlamp Variant,1,OPTIC-250,Reflector Module X,HALB,1,1,EA,EA,1,16
+5400,LAMP-002,Finished Headlamp Variant,2,BO01610226,Adjuster Screw,ROH,2,2,EA,EA,1,0.6
+5400,LAMP-002,Finished Headlamp Variant,2,BO01610226,Adjuster Screw,ROH,1,1,EA,EA,1,0.6`;
+document.getElementById('raw').value = sample;
 
-const state = { rows: [], roots: [], selected: null, view: 'tree' };
-const raw = document.getElementById('raw'); raw.value = seed;
+const s = {
+  rows: [],
+  grouped: new Map(),
+  roots: [],
+  flatCache: [],
+  nodeById: new Map(),
+  selectedId: null,
+  mode: 'tree'
+};
 
-function parseDelimited(text) {
-  const lines = text.trim().split(/\r?\n/).filter(Boolean);
+function cleanNumber(val) {
+  if (val === undefined || val === null) return 0;
+  let x = String(val).trim();
+  if (!x) return 0;
+  x = x.replace(/\s/g, '');
+  if (/^-?\d{1,3}(\.\d{3})+,\d+$/.test(x)) x = x.replace(/\./g, '').replace(',', '.');
+  else if (/^-?\d+,\d+$/.test(x)) x = x.replace(',', '.');
+  else x = x.replace(/,/g, '');
+  const n = Number(x);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function splitLine(line, sep) {
+  const out = []; let cur = ''; let q = false;
+  for (let i=0;i<line.length;i++) {
+    const ch = line[i];
+    if (ch === '"') q = !q;
+    else if (ch === sep && !q) { out.push(cur.trim()); cur=''; }
+    else cur += ch;
+  }
+  out.push(cur.trim());
+  return out.map(v => v.replace(/^"|"$/g,''));
+}
+
+function parseRaw(text) {
+  const lines = text.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+  if (!lines.length) return [];
   const sep = lines[0].includes('\t') ? '\t' : ',';
-  const headers = lines[0].split(sep).map(h => h.trim().toLowerCase());
+  const head = splitLine(lines[0], sep).map(h => h.toLowerCase());
+  const idx = (...keys) => head.findIndex(h => keys.includes(h));
   const map = {
-    level: headers.findIndex(h => ['level','lvl','bom_level'].includes(h)),
-    material: headers.findIndex(h => ['material','matnr','part','code'].includes(h)),
-    description: headers.findIndex(h => ['description','desc'].includes(h)),
-    type: headers.findIndex(h => ['type','material type','mattype'].includes(h)),
-    qty: headers.findIndex(h => ['qty','quantity','component_qty'].includes(h)),
-    price: headers.findIndex(h => ['price','moving price','moving_price'].includes(h)),
-    uom: headers.findIndex(h => ['uom','unit'].includes(h)),
+    plant: idx('plant','werks'),
+    header: idx('header material','material','header'),
+    headerDesc: idx('header description','material description','header desc'),
+    level: idx('level','lvl','bom_level'),
+    comp: idx('component','component code','item'),
+    compDesc: idx('component description','description','component desc'),
+    type: idx('material type','type','mtart'),
+    qtyC: idx('comp qty(cun)','comp qty cun','qty'),
+    qtyB: idx('comp qty(bun)','comp qty bun','base qty'),
+    uom: idx('uom','component uom'),
+    baseUom: idx('base unit','base uom'),
+    basQty: idx('basqty (next level)','basqty','next level qty'),
+    price: idx('moving price','price')
   };
-  return lines.slice(1).map((line, i) => {
-    const c = line.split(sep).map(x => x.trim());
+  return lines.slice(1).map((ln, i) => {
+    const c = splitLine(ln, sep);
+    const plant = c[map.plant] || 'UNKNOWN';
+    const header = c[map.header] || 'UNKNOWN_HEADER';
+    const level = Math.max(1, cleanNumber(c[map.level] || 1));
+    const comp = c[map.comp] || header;
     return {
-      id: `${c[map.material] || 'row'}-${i}`,
-      level: Number(c[map.level] || 0),
-      material: c[map.material] || '',
-      description: c[map.description] || '',
-      type: c[map.type] || 'ROH',
-      qty: Number(c[map.qty] || 0),
-      price: Number(c[map.price] || 0),
+      id: [plant, header, comp, level, i].join('|'),
+      rowRef: i,
+      plant,
+      header,
+      headerDesc: c[map.headerDesc] || '',
+      level,
+      component: comp,
+      compDesc: c[map.compDesc] || '',
+      type: (c[map.type] || (level === 1 ? 'HALB' : 'ROH')).toUpperCase(),
+      qtyCUn: cleanNumber(c[map.qtyC]),
+      qtyBUn: cleanNumber(c[map.qtyB]),
       uom: c[map.uom] || 'EA',
+      baseUom: c[map.baseUom] || c[map.uom] || 'EA',
+      basQty: cleanNumber(c[map.basQty]),
+      movingPrice: cleanNumber(c[map.price]),
       children: [],
       parentId: null,
       expanded: true
-    }
-  });
-}
-
-function buildHierarchy(rows) {
-  const roots = [];
-  const stack = [];
-  rows.forEach(node => {
-    while (stack.length && stack[stack.length - 1].level >= node.level) stack.pop();
-    if (stack.length === 0) roots.push(node);
-    else {
-      node.parentId = stack[stack.length - 1].id;
-      stack[stack.length - 1].children.push(node);
-    }
-    stack.push(node);
-  });
-  return roots;
-}
-
-function flatten(nodes, out=[]) {
-  nodes.forEach(n => { out.push(n); if (n.expanded !== false) flatten(n.children, out); });
-  return out;
-}
-
-function pathToRoot(id) {
-  const map = new Map(flatten(state.roots).map(n => [n.id,n]));
-  const path = [];
-  let n = map.get(id);
-  while (n) { path.push(n.id); n = map.get(n.parentId); }
-  return new Set(path);
-}
-
-function nodeCost(node) {
-  if (!node.children.length) return node.qty * node.price;
-  return node.children.reduce((s,c) => s + nodeCost(c), 0);
-}
-
-function renderTree() {
-  const tree = document.getElementById('tree'); tree.innerHTML = '';
-  const selectedAnc = state.selected ? pathToRoot(state.selected.id) : new Set();
-  flatten(state.roots).forEach(n => {
-    const row = document.createElement('div');
-    row.className = `tree-row ${n.level===1?'lvl1':''} ${state.selected?.id===n.id?'selected':''} ${selectedAnc.has(n.id)&&state.selected?.id!==n.id?'ancestor':''}`;
-    row.style.setProperty('--level', n.level);
-    const icon = n.type === 'HALB' ? (n.children.length ? (n.expanded ? '▼' : '▶') : '•') : '•';
-    row.innerHTML = `<span>${icon}</span><span class="badge ${n.type==='HALB'?'halb':'roh'}">${n.type}</span><span>${n.material}</span><span class="muted">${n.description}</span>`;
-    row.onmouseenter = () => { if (state.selected?.id !== n.id) { state.selected = n; renderTree(); renderDetail(); }};
-    row.onclick = () => {
-      if (n.type==='HALB' && n.children.length) n.expanded = !n.expanded;
-      state.selected = n; renderTree(); renderDetail();
     };
-    tree.appendChild(row);
   });
 }
 
-function renderDetail() {
-  const pane = document.getElementById('detailPane');
-  const n = state.selected || flatten(state.roots)[0];
-  if (!n) return;
-  state.selected = n;
-  const oldCost = Number(pane.dataset.cost || nodeCost(state.roots[0]));
-  const newCost = nodeCost(state.roots[0]);
-  const flash = newCost > oldCost ? 'cost-flash-up' : newCost < oldCost ? 'cost-flash-down' : '';
-  pane.dataset.cost = newCost;
+function groupRows(rows) {
+  const grouped = new Map();
+  rows.forEach(r => {
+    if (!grouped.has(r.plant)) grouped.set(r.plant, new Map());
+    const hm = grouped.get(r.plant);
+    if (!hm.has(r.header)) hm.set(r.header, []);
+    hm.get(r.header).push(r);
+  });
+  return grouped;
+}
 
-  pane.innerHTML = `
-    <h3 class="title">${n.material} <span class="muted">(${n.type})</span></h3>
-    <div class="grid2">
-      <label>Description<input id="desc" value="${n.description}"></label>
-      <label>UOM<input id="uom" value="${n.uom}"></label>
-      <label>Qty<input id="qty" type="number" step="0.01" value="${n.qty}"></label>
-      <label>Moving Price<input id="price" type="number" step="0.01" value="${n.price}"></label>
-    </div>
-    <p class="${flash}"><b>Assembly Roll-up Cost:</b> ${newCost.toFixed(2)}</p>
+function buildHeaderTree(rows, plant, header) {
+  const sorted = rows.slice().sort((a,b) => a.rowRef - b.rowRef);
+  const root = {
+    id: `${plant}|${header}|ROOT`,
+    plant, header, level: 0,
+    component: header,
+    compDesc: sorted[0]?.headerDesc || 'Header Material',
+    type: 'FERT', qtyCUn: 1, qtyBUn: 1, uom: 'EA', baseUom: 'EA', basQty: 1,
+    movingPrice: sorted[0]?.movingPrice || 0,
+    children: [], parentId: null, expanded: true
+  };
+
+  const stack = [root];
+  sorted.forEach(n => {
+    n.children = [];
+    n.parentId = null;
+    while (stack.length && stack[stack.length - 1].level >= n.level) stack.pop();
+    const parent = stack[stack.length - 1] || root;
+    n.parentId = parent.id;
+    parent.children.push(n);
+    stack.push(n);
+  });
+  return root;
+}
+
+function currentRoot() {
+  const p = document.getElementById('plantFilter').value;
+  const h = document.getElementById('headerFilter').value;
+  const headers = s.grouped.get(p);
+  if (!headers) return null;
+  const rows = headers.get(h) || [];
+  return buildHeaderTree(rows, p, h);
+}
+
+function flattenCached(root) {
+  const out = [];
+  const rec = (n) => {
+    out.push(n);
+    if (n.expanded !== false) n.children.forEach(rec);
+  };
+  rec(root);
+  s.flatCache = out;
+  s.nodeById = new Map(out.map(n => [n.id, n]));
+}
+
+function getAncestors(id) {
+  const set = new Set();
+  let cur = s.nodeById.get(id);
+  while (cur) { set.add(cur.id); cur = s.nodeById.get(cur.parentId); }
+  return set;
+}
+
+function convertToBase(q, from, to) {
+  if (from === to) return q;
+  const map = {
+    'KG->G': 1000,
+    'G->KG': 0.001
+  };
+  const factor = map[`${from}->${to}`] || 1;
+  return q * factor;
+}
+
+function nodeRollupCost(node) {
+  if (!node.children.length) return node.qtyBUn * node.movingPrice;
+  return node.children.reduce((sum, c) => sum + nodeRollupCost(c), 0);
+}
+
+function activeCost(root) {
+  const mode = document.getElementById('costMode').value;
+  return mode === 'sap' ? root.movingPrice : nodeRollupCost(root);
+}
+
+function duplicateSet(root) {
+  const m = new Map();
+  s.flatCache.forEach(n => {
+    if (n.level === 0) return;
+    const k = n.component;
+    if (!m.has(k)) m.set(k, 0);
+    m.set(k, m.get(k)+1);
+  });
+  return new Set([...m.entries()].filter(([,c]) => c>1).map(([k]) => k));
+}
+
+function renderFilters() {
+  const plantSel = document.getElementById('plantFilter');
+  const headerSel = document.getElementById('headerFilter');
+  const plants = [...s.grouped.keys()].sort();
+  plantSel.innerHTML = plants.map(p => `<option>${p}</option>`).join('');
+  if (!plants.length) return;
+  if (!plants.includes(plantSel.value)) plantSel.value = plants[0];
+  const headers = [...(s.grouped.get(plantSel.value)?.keys() || [])].sort();
+  headerSel.innerHTML = headers.map(h => `<option>${h}</option>`).join('');
+  if (!headers.includes(headerSel.value)) headerSel.value = headers[0] || '';
+}
+
+function renderKpis(root) {
+  let roh = 0, halb = 0, kg = 0, fasteners = 0;
+  s.flatCache.forEach(n => {
+    if (n.level === 0) return;
+    if (n.type === 'ROH') roh++;
+    if (n.type === 'HALB') halb++;
+    if ((n.baseUom || '').toUpperCase() === 'KG') kg += convertToBase(n.qtyBUn, 'KG', 'KG');
+    if ((n.component || '').toUpperCase().includes('SCRW') || (n.compDesc || '').toLowerCase().includes('screw')) fasteners += n.qtyBUn;
+  });
+  const total = activeCost(root);
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="v">${roh}</div><div class="l">Total ROH Count</div></div>
+    <div class="kpi"><div class="v">${halb}</div><div class="l">Total HALB Count</div></div>
+    <div class="kpi"><div class="v">${kg.toFixed(2)}</div><div class="l">Total Raw Weight (KG)</div></div>
+    <div class="kpi"><div class="v">${fasteners.toFixed(0)}</div><div class="l">Total Fasteners</div></div>
+    <div class="kpi"><div class="v">${total.toFixed(2)}</div><div class="l">Total Assembly Cost</div></div>
+    <div class="kpi"><div class="v">${document.getElementById('costMode').value === 'sap' ? 'SAP' : 'ROLLUP'}</div><div class="l">Cost Mode</div></div>
   `;
-  ['desc','uom','qty','price'].forEach(id => {
-    pane.querySelector('#'+id).oninput = (e) => {
-      if (id==='desc') n.description=e.target.value;
-      if (id==='uom') n.uom=e.target.value;
-      if (id==='qty') n.qty=Number(e.target.value);
-      if (id==='price') n.price=Number(e.target.value);
-      renderTree(); renderDetail(); renderCommonality(); if (state.view==='graph') renderGraph();
-    }
-  })
+}
+
+function renderTree(root) {
+  const tree = document.getElementById('tree');
+  const search = document.getElementById('search').value.trim().toLowerCase();
+  const dupMode = document.getElementById('dupMode').value;
+  const dups = duplicateSet(root);
+  const anc = s.selectedId ? getAncestors(s.selectedId) : new Set();
+
+  if (dupMode === 'aggregate') {
+    const agg = new Map();
+    s.flatCache.forEach(n => {
+      if (n.level === 0) return;
+      if (!agg.has(n.component)) agg.set(n.component, { n, qty: 0, count: 0, plants: new Set() });
+      const a = agg.get(n.component);
+      a.qty += n.qtyBUn;
+      a.count += 1;
+      a.plants.add(n.plant);
+    });
+    const rows = [...agg.values()]
+      .filter(a => !search || [a.n.component,a.n.compDesc,a.n.header,a.n.uom].join(' ').toLowerCase().includes(search))
+      .map(a => `<div class="tree-row" style="--level:1"><span>•</span><span class="badge ${a.n.type==='HALB'?'halb':'roh'}">${a.n.type}</span><span>${a.n.component}</span><span class="muted">${a.n.compDesc}</span><span>${a.qty} ${a.n.baseUom}</span><span class="warn">used ${a.count}x</span></div>`)
+      .join('');
+    tree.innerHTML = rows || '<p class="muted">No rows.</p>';
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  s.flatCache.forEach(n => {
+    const text = [n.component, n.compDesc, n.header, n.uom, n.baseUom].join(' ').toLowerCase();
+    if (search && !text.includes(search)) return;
+    const row = document.createElement('div');
+    row.className = `tree-row level-${Math.min(n.level,6)} ${s.selectedId===n.id?'selected':''} ${anc.has(n.id)&&s.selectedId!==n.id?'ancestor':''} ${(dups.has(n.component)&&n.level>0)?'dup':''}`;
+    row.style.setProperty('--level', n.level);
+    row.dataset.id = n.id;
+    const icon = n.children?.length ? (n.expanded ? '▼' : '▶') : '•';
+    const typeClass = n.type === 'HALB' ? 'halb' : n.type === 'ROH' ? 'roh' : 'fert';
+    const dupMark = dups.has(n.component) && n.level>0 ? '⚠ dup' : '';
+    row.innerHTML = `
+      <span>${icon}</span>
+      <span class="badge ${typeClass}">${n.type}</span>
+      <span>${n.component}</span>
+      <span class="muted">${n.compDesc}</span>
+      <span>${n.qtyCUn} CUn | ${n.qtyBUn} BUn (${n.baseUom})</span>
+      <span class="small">${dupMark}</span>`;
+    frag.appendChild(row);
+  });
+  tree.innerHTML = '';
+  tree.appendChild(frag);
+}
+
+function renderDetail(root) {
+  const pane = document.getElementById('paneDetail');
+  const node = s.nodeById.get(s.selectedId) || root;
+  if (!node) return;
+  s.selectedId = node.id;
+  const total = activeCost(root);
+  const contribution = total ? ((node.qtyBUn * node.movingPrice) / total * 100) : 0;
+  const conv = `${node.qtyCUn || 0} ${node.uom} → ${node.qtyBUn || 0} ${node.baseUom}`;
+  pane.innerHTML = `
+    <h3 class="section-title">${node.component} <span class="muted">(${node.type})</span></h3>
+    <div class="grid2">
+      <label class="small">Description<input id="dDesc" value="${node.compDesc || ''}" /></label>
+      <label class="small">Moving Price<input id="dPrice" type="number" step="0.001" value="${node.movingPrice || 0}" /></label>
+      <label class="small">Comp Qty(CUn)<input id="dC" type="number" step="0.001" value="${node.qtyCUn || 0}" /></label>
+      <label class="small">Comp Qty(BUn)<input id="dB" type="number" step="0.001" value="${node.qtyBUn || 0}" /></label>
+      <label class="small">UOM<input id="dU" value="${node.uom || ''}" /></label>
+      <label class="small">Base UOM<input id="dBU" value="${node.baseUom || ''}" /></label>
+    </div>
+    <p class="small">Conversion: ${conv} ${node.uom!==node.baseUom ? '(tooltip: 1 KG = 1000 G supported)' : ''}</p>
+    <p><b>Active Assembly Cost:</b> ${total.toFixed(2)}</p>
+    <p><b>Component Cost Contribution %:</b> ${contribution.toFixed(2)}%</p>
+  `;
+
+  const bind = (id, fn) => pane.querySelector('#'+id).addEventListener('input', e => { fn(e.target.value); refresh(); });
+  bind('dDesc', v => node.compDesc = v);
+  bind('dPrice', v => node.movingPrice = cleanNumber(v));
+  bind('dC', v => node.qtyCUn = cleanNumber(v));
+  bind('dB', v => node.qtyBUn = cleanNumber(v));
+  bind('dU', v => node.uom = v);
+  bind('dBU', v => node.baseUom = v);
 }
 
 function renderCommonality() {
-  const pane = document.getElementById('commonPane');
-  const map = new Map();
-  flatten(state.roots).forEach(n => {
-    if (n.type !== 'ROH') return;
-    if (!map.has(n.material)) map.set(n.material, { demand: 0, count: 0, uom: n.uom });
-    const r = map.get(n.material);
-    r.demand += n.qty; r.count += 1;
+  const pane = document.getElementById('paneCommon');
+  const rows = s.rows;
+  const byComp = new Map();
+  rows.forEach(r => {
+    if (!byComp.has(r.component)) byComp.set(r.component, { type: r.type, demand: 0, headers: new Set(), plants: new Set() });
+    const e = byComp.get(r.component);
+    e.demand += r.qtyBUn;
+    e.headers.add(r.header);
+    e.plants.add(r.plant);
   });
-  const rows = [...map.entries()].map(([mat, v]) => `<tr><td>${mat}</td><td>${v.demand}</td><td>${v.uom}</td><td>${v.count}</td></tr>`).join('');
-  pane.innerHTML = `<h3 class="title">Commonality Report</h3><table><thead><tr><th>Material</th><th>Total Demand</th><th>UOM</th><th>Where Used</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const mode = document.getElementById('crossPlant').value;
+  const data = [...byComp.entries()]
+    .filter(([,e]) => mode === 'all' ? true : e.plants.size > 1)
+    .sort((a,b) => b[1].headers.size - a[1].headers.size);
+
+  pane.innerHTML = `<table><thead><tr><th>Component</th><th>Used In Headers</th><th>Total Demand</th><th>Plants</th><th>Type</th></tr></thead><tbody>${
+    data.map(([c,e]) => `<tr><td>${c}</td><td>${e.headers.size}</td><td>${e.demand}</td><td>${[...e.plants].join(', ')}</td><td>${e.type}</td></tr>`).join('')
+  }</tbody></table>`;
 }
 
-function renderGraph() {
+function renderWhereUsed() {
+  const pane = document.getElementById('paneWhere');
+  const node = s.nodeById.get(s.selectedId);
+  if (!node) { pane.innerHTML = '<p class="muted">Select a component.</p>'; return; }
+  const comp = node.component;
+  const hits = s.rows.filter(r => r.component === comp);
+  pane.innerHTML = `<h3 class="section-title">Where-Used: ${comp}</h3><table><thead><tr><th>Plant</th><th>Header</th><th>Level</th><th>Qty(BUn)</th></tr></thead><tbody>${
+    hits.map(h => `<tr><td>${h.plant}</td><td>${h.header}</td><td>${h.level}</td><td>${h.qtyBUn}</td></tr>`).join('')
+  }</tbody></table>`;
+}
+
+function renderGraph(root) {
   const svg = document.getElementById('graph');
-  const nodes = flatten(state.roots);
-  const cx = 350, cy = 210;
-  const byLevel = {};
-  nodes.forEach(n => { byLevel[n.level] = byLevel[n.level] || []; byLevel[n.level].push(n); });
+  const nodes = s.flatCache;
+  const w = 760, h = 390, cx = 350, cy = 190;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  const byLevel = new Map();
+  nodes.forEach(n => {
+    if (!byLevel.has(n.level)) byLevel.set(n.level, []);
+    byLevel.get(n.level).push(n);
+  });
   const pos = new Map();
-  let content = '';
-  Object.entries(byLevel).forEach(([lvl, arr]) => {
-    const level = Number(lvl);
-    const radius = level * 70;
+  [...byLevel.entries()].forEach(([lvl, arr]) => {
+    const r = lvl * 52;
     arr.forEach((n, i) => {
-      const ang = (2*Math.PI*i)/arr.length;
-      const x = cx + (radius || 0) * Math.cos(ang);
-      const y = cy + (radius || 0) * Math.sin(ang);
-      pos.set(n.id, {x,y});
+      const a = (2*Math.PI*i)/Math.max(arr.length,1);
+      pos.set(n.id, {x: cx + r*Math.cos(a), y: cy + r*Math.sin(a)});
     });
   });
+  const duplicate = duplicateSet(root);
+  let out = '';
   nodes.forEach(n => {
-    if (n.parentId) {
-      const a = pos.get(n.id), b = pos.get(n.parentId);
-      content += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#4a5a90"/>`;
-    }
+    if (!n.parentId) return;
+    const p1 = pos.get(n.id), p2 = pos.get(n.parentId);
+    out += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#415488" />`;
   });
   nodes.forEach(n => {
     const p = pos.get(n.id);
-    const c = n.type==='HALB' ? '#4b90ff' : '#34d47d';
-    content += `<circle cx="${p.x}" cy="${p.y}" r="15" fill="${c}" /><text x="${p.x+18}" y="${p.y+4}" fill="#d9e1ff" font-size="11">${n.material}</text>`;
+    const col = n.type === 'HALB' ? '#4e8fff' : n.type === 'ROH' ? '#39d17e' : '#b390ff';
+    const ring = duplicate.has(n.component) && n.level>0 ? '#ffc857' : 'none';
+    out += `<circle cx="${p.x}" cy="${p.y}" r="12" fill="${col}" stroke="${ring}" stroke-width="3" />`;
+    out += `<text x="${p.x+14}" y="${p.y+4}" fill="#dce6ff" font-size="10">${n.component}</text>`;
   });
-  svg.innerHTML = content;
+  svg.innerHTML = out;
 }
 
-function load() {
-  state.rows = parseDelimited(raw.value).map(r => ({...r}));
-  state.roots = buildHierarchy(state.rows);
-  state.selected = flatten(state.roots)[0] || null;
-  renderTree(); renderDetail(); renderCommonality(); renderGraph();
+function refresh() {
+  const root = currentRoot();
+  if (!root) return;
+  flattenCached(root);
+  if (!s.selectedId || !s.nodeById.has(s.selectedId)) s.selectedId = root.id;
+  renderKpis(root);
+  renderTree(root);
+  renderDetail(root);
+  renderCommonality();
+  renderWhereUsed();
+  renderGraph(root);
 }
 
-document.getElementById('autoMap').onclick = load;
-document.getElementById('visualize').onclick = load;
+function parseAndInit() {
+  s.rows = parseRaw(document.getElementById('raw').value);
+  s.grouped = groupRows(s.rows);
+  renderFilters();
+  refresh();
+}
 
-document.getElementById('toggleView').onclick = () => {
-  state.view = state.view === 'tree' ? 'graph' : 'tree';
-  const graph = document.getElementById('graph');
-  graph.style.display = state.view === 'graph' ? 'block' : 'none';
-  document.getElementById('detailPane').style.display = state.view === 'graph' ? 'none' : 'block';
-  document.getElementById('commonPane').style.display = 'none';
-  document.getElementById('detailsTab').classList.add('active');
-  document.getElementById('commonTab').classList.remove('active');
-  document.getElementById('toggleView').textContent = state.view === 'graph' ? 'Switch to Detail View' : 'Switch to Exploded View';
-  if (state.view === 'graph') renderGraph();
+function setPane(tab) {
+  ['paneDetail','paneCommon','paneWhere','graph'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  ['tabDetail','tabCommon','tabWhere','tabGraph'].forEach(id => document.getElementById(id).classList.remove('active'));
+  if (tab === 'detail') { document.getElementById('paneDetail').classList.remove('hidden'); document.getElementById('tabDetail').classList.add('active'); }
+  if (tab === 'common') { document.getElementById('paneCommon').classList.remove('hidden'); document.getElementById('tabCommon').classList.add('active'); }
+  if (tab === 'where') { document.getElementById('paneWhere').classList.remove('hidden'); document.getElementById('tabWhere').classList.add('active'); }
+  if (tab === 'graph') { document.getElementById('graph').classList.remove('hidden'); document.getElementById('tabGraph').classList.add('active'); }
+}
+
+// Event delegation for tree performance.
+document.getElementById('tree').addEventListener('click', (e) => {
+  const row = e.target.closest('.tree-row');
+  if (!row) return;
+  const id = row.dataset.id;
+  const node = s.nodeById.get(id);
+  if (!node) return;
+  if (node.children?.length) node.expanded = !node.expanded;
+  s.selectedId = id;
+  refresh();
+});
+
+document.getElementById('tree').addEventListener('mouseover', (e) => {
+  const row = e.target.closest('.tree-row');
+  if (!row) return;
+  const id = row.dataset.id;
+  if (id && id !== s.selectedId) {
+    s.selectedId = id;
+    refresh();
+  }
+});
+
+['plantFilter','headerFilter','search','costMode','dupMode','crossPlant'].forEach(id => {
+  document.getElementById(id).addEventListener('input', refresh);
+});
+
+document.getElementById('btnParse').onclick = parseAndInit;
+document.getElementById('btnVisualize').onclick = refresh;
+document.getElementById('tabDetail').onclick = () => setPane('detail');
+document.getElementById('tabCommon').onclick = () => setPane('common');
+document.getElementById('tabWhere').onclick = () => setPane('where');
+document.getElementById('tabGraph').onclick = () => setPane('graph');
+
+document.getElementById('btnMode').onclick = () => {
+  s.mode = s.mode === 'tree' ? 'graph' : 'tree';
+  document.getElementById('btnMode').textContent = `View: ${s.mode === 'tree' ? 'Tree' : 'Graph'}`;
+  setPane(s.mode === 'tree' ? 'detail' : 'graph');
 };
 
-document.getElementById('detailsTab').onclick = () => {
-  document.getElementById('detailPane').style.display = 'block';
-  document.getElementById('commonPane').style.display = 'none';
-  document.getElementById('graph').style.display = 'none';
-  document.getElementById('detailsTab').classList.add('active');
-  document.getElementById('commonTab').classList.remove('active');
-};
-document.getElementById('commonTab').onclick = () => {
-  document.getElementById('detailPane').style.display = 'none';
-  document.getElementById('commonPane').style.display = 'block';
-  document.getElementById('graph').style.display = 'none';
-  document.getElementById('detailsTab').classList.remove('active');
-  document.getElementById('commonTab').classList.add('active');
+document.getElementById('btnExport').onclick = () => {
+  const lines = ['Plant,Header,Component,Level,Type,QtyBUn,UOM,MovingPrice'];
+  s.flatCache.forEach(n => {
+    if (n.level===0) return;
+    lines.push([n.plant,n.header,n.component,n.level,n.type,n.qtyBUn,n.baseUom,n.movingPrice].join(','));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'sap-bom-export.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
 };
 
-load();
+parseAndInit();
 </script>
 </body>
 </html>
