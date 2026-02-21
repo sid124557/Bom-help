@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOM Architect</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a30;
+      --text: #e8ecff;
+      --muted: #9aa6cf;
+      --accent: #6ea8ff;
+      --good: #2ecc71;
+      --bad: #ff5b6e;
+      --line: #273154;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #0b1020, #0f1730);
+      color: var(--text);
+      font-family: Inter, Segoe UI, Roboto, sans-serif;
+    }
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+      gap: 12px;
+      padding: 12px;
+    }
+    .top {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 2fr auto auto auto;
+      gap: 10px;
+      align-items: start;
+    }
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      background: #0b1228;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      font-size: 12px;
+    }
+    button {
+      background: #1b2950;
+      color: var(--text);
+      border: 1px solid #31457d;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      height: fit-content;
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 0;
+      overflow: auto;
+    }
+    .title { margin: 0 0 10px; font-size: 16px; }
+    .tree-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      padding-left: calc(var(--level) * 20px + 8px);
+      margin: 2px 0;
+    }
+    .tree-row:hover { background: #172241; }
+    .tree-row.selected { border-color: var(--accent); background: #1a2d57; }
+    .tree-row.ancestor { border-color: #4f6fbf; }
+    .lvl1 { font-weight: 700; }
+    .badge {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-weight: 700;
+    }
+    .halb { background: #2d77ff3d; color: #8cb7ff; border: 1px solid #3a74da; }
+    .roh { background: #2ecc7130; color: #81f0af; border: 1px solid #37b668; }
+    .cost-flash-up { animation: flash-up .7s ease; }
+    .cost-flash-down { animation: flash-down .7s ease; }
+    @keyframes flash-up { from { color: var(--bad);} to { color: var(--text);} }
+    @keyframes flash-down { from { color: var(--good);} to { color: var(--text);} }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    input, select {
+      width:100%; background:#0b1228; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px;
+    }
+    table { width:100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { border-bottom:1px solid var(--line); text-align:left; padding:6px; font-size: 13px; }
+    .tabs { display:flex; gap:8px; margin-bottom: 8px; }
+    .tabs button.active { background:#2a3e72; }
+    #graph { width: 100%; height: 420px; background:#0b1228; border:1px solid var(--line); border-radius:10px; }
+    .muted { color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <textarea id="raw"></textarea>
+    <button id="autoMap">Auto-Map + Parse</button>
+    <button id="visualize">Visualize</button>
+    <button id="toggleView">Switch to Exploded View</button>
+  </div>
+
+  <div class="workspace">
+    <div class="panel">
+      <h3 class="title">Navigation Tree</h3>
+      <p class="muted">HALB 🔵 expandable · ROH 🟢 leaf · Hover highlights parents.</p>
+      <div id="tree"></div>
+    </div>
+
+    <div class="panel">
+      <div class="tabs">
+        <button class="active" id="detailsTab">Detail & Edit</button>
+        <button id="commonTab">Commonality Report</button>
+      </div>
+      <div id="detailPane"></div>
+      <div id="commonPane" style="display:none"></div>
+      <svg id="graph" style="display:none"></svg>
+    </div>
+  </div>
+</div>
+
+<script>
+const seed = `Level,Material,Description,Type,Qty,Price,UOM
+0,LAMP-001,Finished Headlamp Assembly,FERT,1,0,EA
+1,HSG-100,Plastic Housing Sub-Assy,HALB,1,12,EA
+2,SCRW-99,Mounting Screw M5,ROH,4,0.2,EA
+2,SEAL-02,Rubber Gasket,ROH,1,0.8,EA
+1,OPTIC-200,Reflector Module,HALB,1,15,EA
+2,MIRROR-X,Chrome Inner Lens,HALB,1,7,EA
+3,BMC-RAW,Bulk Molding Compound,ROH,0.5,6,KG
+3,COAT-UV,UV Protective Coating,ROH,10,0.05,G
+1,BULB-H7,Halogen Bulb 24V,ROH,1,5,EA`;
+
+const state = { rows: [], roots: [], selected: null, view: 'tree' };
+const raw = document.getElementById('raw'); raw.value = seed;
+
+function parseDelimited(text) {
+  const lines = text.trim().split(/\r?\n/).filter(Boolean);
+  const sep = lines[0].includes('\t') ? '\t' : ',';
+  const headers = lines[0].split(sep).map(h => h.trim().toLowerCase());
+  const map = {
+    level: headers.findIndex(h => ['level','lvl','bom_level'].includes(h)),
+    material: headers.findIndex(h => ['material','matnr','part','code'].includes(h)),
+    description: headers.findIndex(h => ['description','desc'].includes(h)),
+    type: headers.findIndex(h => ['type','material type','mattype'].includes(h)),
+    qty: headers.findIndex(h => ['qty','quantity','component_qty'].includes(h)),
+    price: headers.findIndex(h => ['price','moving price','moving_price'].includes(h)),
+    uom: headers.findIndex(h => ['uom','unit'].includes(h)),
+  };
+  return lines.slice(1).map((line, i) => {
+    const c = line.split(sep).map(x => x.trim());
+    return {
+      id: `${c[map.material] || 'row'}-${i}`,
+      level: Number(c[map.level] || 0),
+      material: c[map.material] || '',
+      description: c[map.description] || '',
+      type: c[map.type] || 'ROH',
+      qty: Number(c[map.qty] || 0),
+      price: Number(c[map.price] || 0),
+      uom: c[map.uom] || 'EA',
+      children: [],
+      parentId: null,
+      expanded: true
+    }
+  });
+}
+
+function buildHierarchy(rows) {
+  const roots = [];
+  const stack = [];
+  rows.forEach(node => {
+    while (stack.length && stack[stack.length - 1].level >= node.level) stack.pop();
+    if (stack.length === 0) roots.push(node);
+    else {
+      node.parentId = stack[stack.length - 1].id;
+      stack[stack.length - 1].children.push(node);
+    }
+    stack.push(node);
+  });
+  return roots;
+}
+
+function flatten(nodes, out=[]) {
+  nodes.forEach(n => { out.push(n); if (n.expanded !== false) flatten(n.children, out); });
+  return out;
+}
+
+function pathToRoot(id) {
+  const map = new Map(flatten(state.roots).map(n => [n.id,n]));
+  const path = [];
+  let n = map.get(id);
+  while (n) { path.push(n.id); n = map.get(n.parentId); }
+  return new Set(path);
+}
+
+function nodeCost(node) {
+  if (!node.children.length) return node.qty * node.price;
+  return node.children.reduce((s,c) => s + nodeCost(c), 0);
+}
+
+function renderTree() {
+  const tree = document.getElementById('tree'); tree.innerHTML = '';
+  const selectedAnc = state.selected ? pathToRoot(state.selected.id) : new Set();
+  flatten(state.roots).forEach(n => {
+    const row = document.createElement('div');
+    row.className = `tree-row ${n.level===1?'lvl1':''} ${state.selected?.id===n.id?'selected':''} ${selectedAnc.has(n.id)&&state.selected?.id!==n.id?'ancestor':''}`;
+    row.style.setProperty('--level', n.level);
+    const icon = n.type === 'HALB' ? (n.children.length ? (n.expanded ? '▼' : '▶') : '•') : '•';
+    row.innerHTML = `<span>${icon}</span><span class="badge ${n.type==='HALB'?'halb':'roh'}">${n.type}</span><span>${n.material}</span><span class="muted">${n.description}</span>`;
+    row.onmouseenter = () => { if (state.selected?.id !== n.id) { state.selected = n; renderTree(); renderDetail(); }};
+    row.onclick = () => {
+      if (n.type==='HALB' && n.children.length) n.expanded = !n.expanded;
+      state.selected = n; renderTree(); renderDetail();
+    };
+    tree.appendChild(row);
+  });
+}
+
+function renderDetail() {
+  const pane = document.getElementById('detailPane');
+  const n = state.selected || flatten(state.roots)[0];
+  if (!n) return;
+  state.selected = n;
+  const oldCost = Number(pane.dataset.cost || nodeCost(state.roots[0]));
+  const newCost = nodeCost(state.roots[0]);
+  const flash = newCost > oldCost ? 'cost-flash-up' : newCost < oldCost ? 'cost-flash-down' : '';
+  pane.dataset.cost = newCost;
+
+  pane.innerHTML = `
+    <h3 class="title">${n.material} <span class="muted">(${n.type})</span></h3>
+    <div class="grid2">
+      <label>Description<input id="desc" value="${n.description}"></label>
+      <label>UOM<input id="uom" value="${n.uom}"></label>
+      <label>Qty<input id="qty" type="number" step="0.01" value="${n.qty}"></label>
+      <label>Moving Price<input id="price" type="number" step="0.01" value="${n.price}"></label>
+    </div>
+    <p class="${flash}"><b>Assembly Roll-up Cost:</b> ${newCost.toFixed(2)}</p>
+  `;
+  ['desc','uom','qty','price'].forEach(id => {
+    pane.querySelector('#'+id).oninput = (e) => {
+      if (id==='desc') n.description=e.target.value;
+      if (id==='uom') n.uom=e.target.value;
+      if (id==='qty') n.qty=Number(e.target.value);
+      if (id==='price') n.price=Number(e.target.value);
+      renderTree(); renderDetail(); renderCommonality(); if (state.view==='graph') renderGraph();
+    }
+  })
+}
+
+function renderCommonality() {
+  const pane = document.getElementById('commonPane');
+  const map = new Map();
+  flatten(state.roots).forEach(n => {
+    if (n.type !== 'ROH') return;
+    if (!map.has(n.material)) map.set(n.material, { demand: 0, count: 0, uom: n.uom });
+    const r = map.get(n.material);
+    r.demand += n.qty; r.count += 1;
+  });
+  const rows = [...map.entries()].map(([mat, v]) => `<tr><td>${mat}</td><td>${v.demand}</td><td>${v.uom}</td><td>${v.count}</td></tr>`).join('');
+  pane.innerHTML = `<h3 class="title">Commonality Report</h3><table><thead><tr><th>Material</th><th>Total Demand</th><th>UOM</th><th>Where Used</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderGraph() {
+  const svg = document.getElementById('graph');
+  const nodes = flatten(state.roots);
+  const cx = 350, cy = 210;
+  const byLevel = {};
+  nodes.forEach(n => { byLevel[n.level] = byLevel[n.level] || []; byLevel[n.level].push(n); });
+  const pos = new Map();
+  let content = '';
+  Object.entries(byLevel).forEach(([lvl, arr]) => {
+    const level = Number(lvl);
+    const radius = level * 70;
+    arr.forEach((n, i) => {
+      const ang = (2*Math.PI*i)/arr.length;
+      const x = cx + (radius || 0) * Math.cos(ang);
+      const y = cy + (radius || 0) * Math.sin(ang);
+      pos.set(n.id, {x,y});
+    });
+  });
+  nodes.forEach(n => {
+    if (n.parentId) {
+      const a = pos.get(n.id), b = pos.get(n.parentId);
+      content += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#4a5a90"/>`;
+    }
+  });
+  nodes.forEach(n => {
+    const p = pos.get(n.id);
+    const c = n.type==='HALB' ? '#4b90ff' : '#34d47d';
+    content += `<circle cx="${p.x}" cy="${p.y}" r="15" fill="${c}" /><text x="${p.x+18}" y="${p.y+4}" fill="#d9e1ff" font-size="11">${n.material}</text>`;
+  });
+  svg.innerHTML = content;
+}
+
+function load() {
+  state.rows = parseDelimited(raw.value).map(r => ({...r}));
+  state.roots = buildHierarchy(state.rows);
+  state.selected = flatten(state.roots)[0] || null;
+  renderTree(); renderDetail(); renderCommonality(); renderGraph();
+}
+
+document.getElementById('autoMap').onclick = load;
+document.getElementById('visualize').onclick = load;
+
+document.getElementById('toggleView').onclick = () => {
+  state.view = state.view === 'tree' ? 'graph' : 'tree';
+  const graph = document.getElementById('graph');
+  graph.style.display = state.view === 'graph' ? 'block' : 'none';
+  document.getElementById('detailPane').style.display = state.view === 'graph' ? 'none' : 'block';
+  document.getElementById('commonPane').style.display = 'none';
+  document.getElementById('detailsTab').classList.add('active');
+  document.getElementById('commonTab').classList.remove('active');
+  document.getElementById('toggleView').textContent = state.view === 'graph' ? 'Switch to Detail View' : 'Switch to Exploded View';
+  if (state.view === 'graph') renderGraph();
+};
+
+document.getElementById('detailsTab').onclick = () => {
+  document.getElementById('detailPane').style.display = 'block';
+  document.getElementById('commonPane').style.display = 'none';
+  document.getElementById('graph').style.display = 'none';
+  document.getElementById('detailsTab').classList.add('active');
+  document.getElementById('commonTab').classList.remove('active');
+};
+document.getElementById('commonTab').onclick = () => {
+  document.getElementById('detailPane').style.display = 'none';
+  document.getElementById('commonPane').style.display = 'block';
+  document.getElementById('graph').style.display = 'none';
+  document.getElementById('detailsTab').classList.remove('active');
+  document.getElementById('commonTab').classList.add('active');
+};
+
+load();
+</script>
+</body>
+</html>
