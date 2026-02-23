@@ -1,947 +1,516 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SAP BOM Architect</title>
-  <style>
-    :root {
-      --bg: #0b1020;
-      --panel: #121a30;
-      --panel2: #0b1228;
-      --text: #e8ecff;
-      --muted: #a2acd5;
-      --line: #2a3764;
-      --accent: #7caeff;
-      --good: #2ecc71;
-      --warn: #ffc857;
-      --bad: #ff6b6b;
-      --sidebar: #0e1628;
-      --chip-bg: #1a2540;
-      --indent-1: #4e8fff;
-      --indent-2: #2ecc71;
-      --indent-3: #ffc857;
-      --indent-4: #ff6b6b;
-      --indent-5: #b390ff;
-      --indent-6: #a2acd5;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOM Converter v2 — Sheet 1 → Sheet 2</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #141720;
+    --surface2: #1c2030;
+    --border: #2a2f42;
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --success: #00c896;
+    --warn: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .container { position: relative; z-index: 1; max-width: 1500px; margin: 0 auto; padding: 36px 24px; }
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      background: linear-gradient(180deg, #0b1020, #0f1730);
-      color: var(--text);
-      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
-      font-size: 13px;
-      overflow: hidden;
-    }
+  header { margin-bottom: 36px; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(0,229,255,0.4); padding: 4px 12px; margin-bottom: 14px; }
+  h1 { font-family: 'Syne', sans-serif; font-size: clamp(26px, 3.5vw, 46px); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  .subtitle { margin-top: 10px; color: var(--muted); font-size: 12px; letter-spacing: 0.05em; }
 
-    button, select, input, textarea {
-      background: var(--panel2);
-      color: var(--text);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 12px;
-    }
-    .hidden { display: none !important; }
+  .instructions {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+  .instructions strong { color: var(--text); }
+  .instructions .key { color: var(--accent); font-weight: 600; }
 
-    .app {
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      height: 100vh;
-      overflow: hidden;
-      gap: 8px;
-      padding: 8px;
-    }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 20px; }
+  .panel-header { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .panel-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-blue { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .dot-green { background: var(--success); box-shadow: 0 0 6px var(--success); }
+  .col-hint { margin-left: auto; font-size: 9px; color: var(--muted); }
 
-    .topbar {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .title-wrap { display: flex; align-items: center; gap: 8px; }
-    .logo {
-      width: 26px;
-      height: 26px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      display: grid;
-      place-items: center;
-      background: var(--panel2);
-    }
-    h1 { margin: 0; font-size: 16px; }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  textarea {
+    width: 100%; height: 320px;
+    background: transparent; border: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; line-height: 1.6;
+    padding: 18px; resize: vertical; outline: none; font-weight: 300;
+  }
+  textarea::placeholder { color: var(--muted); font-style: italic; }
+  textarea:focus { background: rgba(0,229,255,0.015); }
 
-    .filters-row {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 8px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 8px;
-      overflow: auto;
-      max-height: 190px;
-    }
-    .filters-row label { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
-    .filters-row input, .filters-row select { width: 100%; }
+  .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 11px 24px; border: none; cursor: pointer; border-radius: 2px;
+    transition: all 0.15s ease;
+  }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { background: #00c8e0; box-shadow: 0 0 20px rgba(0,229,255,0.25); }
+  .btn-secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-secondary:hover { color: var(--text); border-color: var(--muted); }
+  .btn-success { background: var(--success); color: #000; }
+  .btn-success:hover { box-shadow: 0 0 20px rgba(0,200,150,0.25); }
 
-    .workspace {
-      display: grid;
-      grid-template-columns: 3fr 2fr;
-      gap: 10px;
-      overflow: hidden;
-      min-height: 0;
-    }
+  .notif { display: none; align-items: center; gap: 10px; padding: 11px 18px; font-size: 11px; border-radius: 2px; margin-bottom: 16px; animation: slide-in 0.2s ease; }
+  @keyframes slide-in { from { opacity:0; transform: translateY(-5px); } to { opacity:1; transform: translateY(0); } }
+  .notif.error { display: flex; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+  .notif.success { display: flex; background: rgba(0,200,150,0.1); border: 1px solid rgba(0,200,150,0.3); color: #6ee7b7; }
 
-    .left, .right {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--panel);
-      min-height: 0;
-    }
+  .stats-bar { display: flex; gap: 20px; flex-wrap: wrap; padding: 12px 18px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 20px; font-size: 11px; }
+  .stat { display: flex; align-items: center; gap: 8px; }
+  .stat-val { color: var(--accent); font-weight: 700; }
+  .stat-key { color: var(--muted); }
 
-    .left {
-      overflow-y: auto;
-      max-height: calc(100vh - 220px);
-      padding: 8px;
-    }
+  .output-panel { display: none; }
+  .output-panel.visible { display: block; }
 
-    .right {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow: hidden;
-      padding: 8px;
-    }
+  .table-wrap { overflow-x: auto; max-height: 560px; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 10.5px; white-space: nowrap; }
+  th {
+    background: var(--surface2); color: var(--accent);
+    font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 9px 13px; text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 2; font-size: 9px;
+  }
+  td { padding: 7px 13px; border-bottom: 1px solid rgba(42,47,66,0.5); font-weight: 300; }
+  tr:hover td { background: rgba(0,229,255,0.025); }
+  .type-halb { color: var(--accent2); font-weight: 600; }
+  .type-roh { color: var(--success); font-weight: 600; }
+  .parent-cell { color: var(--accent); font-weight: 600; }
+  .sep-row td { background: rgba(0,229,255,0.04); color: var(--muted); font-style: italic; font-size: 10px; text-align: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 
-    .section-title { margin: 0 0 8px; font-size: 14px; }
-
-    #tree { min-height: 0; }
-    #tree:empty::before {
-      content: 'Paste your SAP BOM data above and click Parse';
-      color: var(--muted);
-      display: block;
-      text-align: center;
-      padding: 28px;
-      border: 1px dashed var(--line);
-      border-radius: 10px;
-    }
-
-    .root-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 10px;
-      border-radius: 10px;
-      background: #1d3c78;
-      border: 1px solid #436dc0;
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .root-row .desc { color: #d7e5ff; margin-left: 8px; }
-    .plant-badge {
-      background: #17376e;
-      border: 1px solid #5f87d8;
-      border-radius: 999px;
-      padding: 2px 8px;
-      font-size: 11px;
-    }
-
-    .tree-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 32px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border-left: 2px solid transparent;
-      margin: 2px 0;
-      position: relative;
-      overflow: hidden;
-    }
-    .tree-row:hover { background: #1a2648; }
-    .tree-row.selected { background: #213563; }
-    .tree-row .indent {
-      display: inline-block;
-      flex-shrink: 0;
-      position: relative;
-      height: 20px;
-    }
-    .tree-row .indent::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: -4px;
-      bottom: -4px;
-      width: 1px;
-      background: var(--indent-color, var(--indent-1));
-      opacity: .7;
-    }
-
-    .expander-btn {
-      width: 16px;
-      flex: 0 0 16px;
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-      padding: 0;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
-    .badge {
-      font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 11px;
-      width: 36px;
-      text-align: center;
-      padding: 2px 0;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      text-transform: uppercase;
-      flex-shrink: 0;
-    }
-    .halb { background: #2d77ff40; color: #9bc2ff; border-color: #4f87ef; }
-    .roh { background: #2ecc7140; color: #94f2ba; border-color: #4fc47e; }
-    .fert { background: #9266ff3a; color: #c7afff; border-color: #8d70de; }
-    .dup-badge { color: #ffdda0; border: 1px solid #a9812f; background: #563f11; border-radius: 999px; padding: 2px 6px; font-size: 10px; }
-
-    .comp-code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .comp-code:hover { color: #b5ccff; }
-
-    .desc {
-      color: var(--muted);
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 80px;
-    }
-    .qty {
-      margin-left: auto;
-      min-width: 120px;
-      text-align: right;
-      white-space: nowrap;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      flex-shrink: 0;
-    }
-    .kpi {
-      background: var(--chip-bg);
-      border: 1px solid #3d538e;
-      border-radius: 10px;
-      padding: 8px;
-    }
-    .kpi .v { font-size: 14px; font-weight: 700; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
-    .kpi .l { font-size: 11px; color: var(--muted); }
-    .warn-b { font-size: 10px; background: #ffc8572b; border: 1px solid #cc9c39; color: #ffd98f; border-radius: 999px; padding: 2px 6px; }
-
-    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tabs button.active { border-color: var(--accent); background: #22396f; }
-
-    .pane {
-      flex: 1;
-      overflow-y: auto;
-      min-height: 0;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: var(--panel2);
-      padding: 10px;
-    }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .path { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
-    .progress { width: 100%; height: 8px; background: #1b2a4e; border-radius: 999px; overflow: hidden; }
-    .progress > span { display: block; height: 100%; background: linear-gradient(90deg, #58a6ff, #2ecc71); }
-
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th, td { border-bottom: 1px solid var(--line); padding: 6px; text-align: left; }
-    .ok { color: var(--good); font-weight: 700; }
-
-    #graph { min-height: 260px; }
-    #graphSvg { width: 100%; height: 100%; min-height: 250px; }
-
-    @media (max-width: 1000px) {
-      .workspace { grid-template-columns: 1fr; }
-      .left { max-height: none; }
-    }
-  </style>
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
 </head>
 <body>
-<div class="app">
-  <header class="topbar">
-    <div class="title-wrap">
-      <div class="logo" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v4m0 10v4M4 12h4m8 0h4M7 7l2.5 2.5m5 5L17 17m0-10-2.5 2.5m-5 5L7 17" stroke="#8fb6ff" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="2.8" stroke="#8fb6ff" stroke-width="1.4"/></svg>
-      </div>
-      <h1>SAP BOM Architect</h1>
-    </div>
-    <div class="actions">
-      <button id="btnParse">Parse</button>
-      <button id="btnVisualize">Visualize</button>
-      <button id="btnExport">Export CSV</button>
-      <button id="btnMode">View: Tree</button>
-    </div>
+<div class="container">
+
+  <header>
+    <div class="badge">SAP BOM Converter v2</div>
+    <h1>Sheet 1 <span>→</span> Sheet 2<br>Full Hierarchy BOM</h1>
+    <p class="subtitle">Paste multi-level exploded BOM · Outputs flat single-level BOM per parent (all sub-assemblies included)</p>
   </header>
 
-  <section class="filters-row">
-    <label>Raw BOM Data<textarea id="raw" rows="2" placeholder="Paste BOM data..."></textarea></label>
-    <label>Plant<select id="plantFilter"></select></label>
-    <label>Header Material<select id="headerFilter"></select></label>
-    <label>Alternative BOM<select id="altFilter"></select></label>
-    <label>Platform<select id="platformFilter"></select></label>
-    <label>Side<select id="sideFilter"></select></label>
-    <label>Drive<select id="driveFilter"></select></label>
-    <label>Voltage<select id="voltageFilter"></select></label>
-    <label>Search<input id="search" placeholder="Component / Description / UOM" /></label>
-    <label>Cost Source<select id="costMode"><option value="sap">Use SAP Moving Price</option><option value="rollup">Calculate Rollup</option></select></label>
-    <label>Duplicate View<select id="dupMode"><option value="highlight">Highlight duplicates</option><option value="aggregate">Aggregated duplicate view</option></select></label>
-    <label><input id="xPlantOnly" type="checkbox" /> Commonality: cross-plant only</label>
-  </section>
+  <div class="instructions">
+    <strong>How it works:</strong> The tool reads the <span class="key">Level</span> column to reconstruct parent-child relationships at every level of the BOM hierarchy.<br>
+    — <span class="key">Level 1</span> rows → parent is the main <strong>Material</strong> column value<br>
+    — <span class="key">Level 2</span> rows → parent is the most recent Level-1 HALB component<br>
+    — <span class="key">Level 3</span> rows → parent is the most recent Level-2 HALB component<br>
+    — ...and so on for all levels. Each HALB component becomes a parent group in Sheet 2.<br>
+    <strong>Plant:</strong> Output uses <span class="key">5500/5600</span> format as seen in Sheet 2. <strong>Quantity:</strong> Uses <span class="key">Comp. Qty(CUn)</span> column (column 7, 0-indexed: col 6).
+  </div>
 
-  <section class="workspace">
-    <div class="left">
-      <h3 class="section-title">BOM Tree</h3>
-      <div id="tree"></div>
+  <div id="notif" class="notif"></div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="dot dot-blue"></div>
+      <span class="panel-label">Sheet 1 Input — Paste Here</span>
+      <span class="col-hint">Include header row · Tab-separated</span>
     </div>
+    <textarea id="input" placeholder="Paste Sheet 1 data here (with header row)...
 
-    <div class="right">
-      <div id="kpis" class="kpis"></div>
+Expected column order:
+Plant | Level | Material | Material Description | Component | Component Description | Comp.Qty(CUn) | Comp.Qty(BUn) | UOM | Material Type | Alternative BOM | Base Unit of Measure | BasQty(Next Level) | ..."></textarea>
+  </div>
 
-      <div class="tabs">
-        <button id="tabDetail" class="active">Detail</button>
-        <button id="tabCommon">Commonality</button>
-        <button id="tabWhere">Where-Used</button>
-        <button id="tabGraph">Graph</button>
-      </div>
+  <div class="controls">
+    <button class="btn btn-primary" onclick="convert()">▶ Convert to Sheet 2</button>
+    <button class="btn btn-secondary" onclick="clearAll()">✕ Clear</button>
+    <button id="btnCopy" class="btn btn-success" onclick="copyTSV()" style="display:none">⎘ Copy for Excel</button>
+    <button id="btnDL" class="btn btn-success" onclick="downloadCSV()" style="display:none">↓ Download CSV</button>
+  </div>
 
-      <div id="paneDetail" class="pane"></div>
-      <div id="paneCommon" class="pane hidden"></div>
-      <div id="paneWhere" class="pane hidden"></div>
-      <div id="graph" class="pane hidden"><svg id="graphSvg"></svg></div>
+  <div id="statsBar" class="stats-bar" style="display:none">
+    <div class="stat"><span class="stat-key">INPUT ROWS</span><span class="stat-val" id="sIn">0</span></div>
+    <div class="stat"><span class="stat-key">OUTPUT ROWS</span><span class="stat-val" id="sOut">0</span></div>
+    <div class="stat"><span class="stat-key">PARENT GROUPS</span><span class="stat-val" id="sPar">0</span></div>
+    <div class="stat"><span class="stat-key">DUPLICATES REMOVED</span><span class="stat-val" id="sDup">0</span></div>
+    <div class="stat"><span class="stat-key">ROH</span><span class="stat-val" id="sRoh">0</span></div>
+    <div class="stat"><span class="stat-key">HALB</span><span class="stat-val" id="sHalb">0</span></div>
+  </div>
+
+  <div id="outputPanel" class="output-panel panel">
+    <div class="panel-header">
+      <div class="dot dot-green"></div>
+      <span class="panel-label">Sheet 2 Output</span>
+      <span style="margin-left:auto; font-size:10px; color:var(--muted)" id="rowCount"></span>
     </div>
-  </section>
+    <div class="table-wrap">
+      <table id="outputTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Material</th>
+            <th>Material Description</th>
+            <th>Plant</th>
+            <th>Usage</th>
+            <th>Alternative</th>
+            <th>Base Qty</th>
+            <th>Component</th>
+            <th>Component Description</th>
+            <th>Material Type</th>
+            <th>Alt Text</th>
+            <th>Quantity</th>
+            <th>Component Unit</th>
+            <th>Prod.Stor.Loc.</th>
+          </tr>
+        </thead>
+        <tbody id="outputBody"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script>
-const seed = `Plant\tLevel\tMaterial\tMaterial Description\tComponent\tComponent Description\tComp. Qty(CUn)\tComp. Qty(BUn)\tUOM\tMaterial Type\tAlternative BOM\tBase Unit of Measure\tBasQty (Next Level)\tMoving price
-5600\t1\tLAMP-001\tHEADLAMP CONDOR RH RHD 24V\tHSG-100\tPlastic Housing Sub-Assy\t1\t1\tEA\tHALB\t01\tEA\t1\t128,50
-5600\t2\tLAMP-001\tHEADLAMP CONDOR RH RHD 24V\tSCRW-99\tMounting Screw M5\t4\t4\tEA\tROH\t01\tEA\t1\t1,000
-5600\t2\tLAMP-001\tHEADLAMP CONDOR RH RHD 24V\tSEAL-02\tRubber Gasket\t1\t1\tEA\tROH\t01\tEA\t1\t98,06
-5600\t1\tLAMP-001\tHEADLAMP CONDOR RH RHD 24V\tOPTIC-200\tReflector Module\t1\t1\tEA\tHALB\t01\tEA\t1\t638.520
-5600\t2\tLAMP-001\tHEADLAMP CONDOR RH RHD 24V\tMIRROR-X\tChrome Inner Lens\t1\t1\tEA\tHALB\t01\tEA\t1\t638.520
-5600\t3\tLAMP-001\tHEADLAMP CONDOR RH RHD 24V\tBMC-RAW\tBulk Molding Compound\t0,500\t0,500\tKG\tROH\t01\tKG\t1\t2,300.00
-5600\t3\tLAMP-001\tHEADLAMP CONDOR RH RHD 24V\tCOAT-UV\tUV Protective Coating\t10\t0,010\tG\tROH\t01\tKG\t1\t400`;
-
-document.getElementById('raw').value = seed;
-
-const s = {
-  rows: [],
-  grouped: new Map(),
-  flatCache: [],
-  nodeById: new Map(),
-  selectedId: null,
-  mode: 'tree'
+// ─── Column indices for Sheet 1 (0-based) ───────────────────────────────────
+// Plant(0) | Level(1) | Material(2) | MatDesc(3) | Component(4) | CompDesc(5)
+// Comp.Qty(CUn)(6) | Comp.Qty(BUn)(7) | UOM(8) | MatType(9) | AltBOM(10)
+// BaseUoM(11) | BasQty(12) | MovingPrice(13) | StdPrice(14) | ...
+const C = {
+  PLANT: 0, LEVEL: 1, MATERIAL: 2, MAT_DESC: 3,
+  COMPONENT: 4, COMP_DESC: 5,
+  QTY_CUN: 6,   // Comp. Qty(CUn) — this is what Sheet 2 uses as "Quantity"
+  QTY_BUN: 7,
+  UOM: 8,
+  MAT_TYPE: 9,
+  ALT_BOM: 10,
+  BASE_QTY: 12
 };
 
-function splitLine(line, sep) {
-  const out = [];
-  let cur = '';
-  let quote = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') quote = !quote;
-    else if (ch === sep && !quote) { out.push(cur.trim()); cur = ''; }
-    else cur += ch;
+const HEADERS = [
+  'Material','Material Description','Plant','Usage','Alternative',
+  'Base quantity','Component','Component Description','Material Type',
+  'Alt Text','Quantity','Component unit','Prod. Stor.Loc.'
+];
+
+let outputRows = [];
+let outputGroups = [];
+
+function g(cells, idx) { return (cells[idx] || '').trim(); }
+
+function parsePlant(raw) {
+  // Convert "5600" → "5500/5600" to match Sheet 2 format
+  const p = raw.trim();
+  if (p === '5600') return '5500/5600';
+  if (p === '5500') return '5500/5600';
+  return p;
+}
+
+function convert() {
+  const raw = document.getElementById('input').value.trim();
+  if (!raw) { showNotif('Please paste Sheet 1 data first.', 'error'); return; }
+
+  try {
+    const lines = raw.split('\n').map(l => l.trimEnd()).filter(l => l.trim());
+    if (lines.length < 2) throw new Error('Need at least a header row + 1 data row.');
+
+    const sep = lines[0].includes('\t') ? '\t' : '|';
+    const dataLines = lines.slice(1);
+
+    // ── Build rows with proper parent assignment using Level ──────────────
+    // parentStack[level] = { material, matDesc, plant }
+    // Level 1 rows: parent = main Material
+    // Level N rows: parent = the component of the most recent Level (N-1) HALB row
+
+    const parentStack = {}; // parentStack[level] = {material, matDesc, plant, altBom}
+
+    // We need to first read the main material info from level-1 rows
+    // and set parentStack[1] = main material before processing level-1 components
+
+    // First pass: get the top-level material info
+    let topMaterial = '', topMatDesc = '', topPlant = '', topAlt = '1';
+    for (const line of dataLines) {
+      const cells = line.split(sep);
+      if (cells.length < 10) continue;
+      if (g(cells, C.LEVEL) === '1') {
+        topMaterial = g(cells, C.MATERIAL);
+        topMatDesc  = g(cells, C.MAT_DESC);
+        topPlant    = parsePlant(g(cells, C.PLANT));
+        topAlt      = g(cells, C.ALT_BOM) || '1';
+        break;
+      }
+    }
+
+    if (!topMaterial) throw new Error('Could not find any Level 1 rows. Check your data.');
+
+    // parentStack[0] means "the main material is parent for level-1 rows"
+    parentStack[0] = { material: topMaterial, matDesc: topMatDesc, plant: topPlant, alt: topAlt };
+
+    // Track all groups: key = parent material
+    // groups[material] = { matDesc, plant, alt, children: [{component, compDesc, matType, qty, uom, baseQty}] }
+    const groups = {};
+    const seenKey = new Set(); // deduplication: parentMat + component
+
+    let dupes = 0;
+    let inputCount = 0;
+
+    for (const line of dataLines) {
+      const cells = line.split(sep);
+      if (cells.length < 10) continue;
+
+      const level     = parseInt(g(cells, C.LEVEL)) || 0;
+      const material  = g(cells, C.MATERIAL);
+      const matDesc   = g(cells, C.MAT_DESC);
+      const component = g(cells, C.COMPONENT);
+      const compDesc  = g(cells, C.COMP_DESC);
+      const matType   = g(cells, C.MAT_TYPE);
+      const qtyCun    = g(cells, C.QTY_CUN);
+      const uom       = g(cells, C.UOM);
+      const baseQty   = g(cells, C.BASE_QTY);
+      const plant     = parsePlant(g(cells, C.PLANT));
+      const altBom    = g(cells, C.ALT_BOM) || '1';
+
+      if (!component) continue;
+      inputCount++;
+
+      // Determine parent from stack at level-1
+      const parentLevel = level - 1;
+      const parent = parentStack[parentLevel];
+      if (!parent) continue; // orphan row, skip
+
+      const parentMat  = parent.material;
+      const parentDesc = parent.matDesc;
+      const parentPlant = parent.plant;
+      const parentAlt  = parent.alt;
+
+      // Dedup
+      const key = `${parentMat}||${component}`;
+      if (seenKey.has(key)) { dupes++; } else {
+        seenKey.add(key);
+
+        if (!groups[parentMat]) {
+          groups[parentMat] = { matDesc: parentDesc, plant: parentPlant, alt: parentAlt, children: [] };
+        }
+        groups[parentMat].children.push({ component, compDesc, matType, qty: qtyCun, uom, baseQty });
+      }
+
+      // Update parentStack for this level so children of this component know their parent
+      // Only update if this component is HALB (it becomes a parent in the next level)
+      // Actually we always update the stack — if a component is ROH it simply won't have children
+      parentStack[level] = { material: component, matDesc: compDesc, plant: plant, alt: altBom };
+
+      // Also update top-level tracking if this is a new top material
+      if (level === 1 && material !== topMaterial) {
+        // Multiple top-level materials in one paste — update parentStack[0]
+        parentStack[0] = { material, matDesc, plant, alt: altBom };
+        topMaterial = material;
+      }
+    }
+
+    // Flatten groups into ordered output rows, with separator rows between groups
+    outputGroups = groups;
+    const flatRows = [];
+    let rowNum = 0;
+    const parentOrder = Object.keys(groups);
+
+    for (const parentMat of parentOrder) {
+      const g2 = groups[parentMat];
+      for (const child of g2.children) {
+        rowNum++;
+        flatRows.push({
+          rowNum,
+          material: parentMat,
+          matDesc: g2.matDesc,
+          plant: g2.plant,
+          usage: '1',
+          alt: g2.alt,
+          baseQty: '1000',
+          component: child.component,
+          compDesc: child.compDesc,
+          matType: child.matType,
+          altText: '',
+          qty: child.qty,
+          uom: child.uom,
+          prodLoc: '',
+          _parentMat: parentMat
+        });
+      }
+    }
+
+    outputRows = flatRows;
+
+    // Stats
+    const roh = flatRows.filter(r => r.matType === 'ROH').length;
+    const halb = flatRows.filter(r => r.matType === 'HALB').length;
+    document.getElementById('sIn').textContent   = inputCount;
+    document.getElementById('sOut').textContent  = flatRows.length;
+    document.getElementById('sPar').textContent  = parentOrder.length;
+    document.getElementById('sDup').textContent  = dupes;
+    document.getElementById('sRoh').textContent  = roh;
+    document.getElementById('sHalb').textContent = halb;
+    document.getElementById('statsBar').style.display = 'flex';
+
+    renderTable(flatRows, parentOrder);
+    showNotif(`✓ Converted ${flatRows.length} rows across ${parentOrder.length} parent groups. ${dupes} duplicates removed.`, 'success');
+
+  } catch(e) {
+    showNotif('Error: ' + e.message, 'error');
+    console.error(e);
   }
-  out.push(cur.trim());
-  return out;
 }
 
-function pickHeaderIndex(headers, aliases) {
-  const normalize = (v) => v.toLowerCase().replace(/[^a-z0-9]/g, '');
-  const h = headers.map(normalize);
-  for (const a of aliases) {
-    const i = h.indexOf(normalize(a));
-    if (i >= 0) return i;
-  }
-  return -1;
-}
+function renderTable(rows, parentOrder) {
+  const tbody = document.getElementById('outputBody');
+  tbody.innerHTML = '';
 
-function cleanNumber(val) {
-  if (val === null || val === undefined) return 0;
-  let str = String(val).trim();
-  if (!str) return 0;
-  str = str.replace(/\s+/g, '');
-  if (/^-?\d+,\d{3}$/.test(str)) str = str.replace(',', '.');
-  else if (/^-?\d+,\d{1,2}$/.test(str)) str = str.replace(',', '.');
-  else if (str.includes(',') && str.includes('.')) {
-    if (str.lastIndexOf(',') > str.lastIndexOf('.')) str = str.replace(/\./g, '').replace(',', '.');
-    else str = str.replace(/,/g, '');
-  } else if (/^-?\d+\.\d{3}$/.test(str)) str = str.replace('.', '.');
-  else str = str.replace(/,/g, '');
-  const n = Number(str);
-  return Number.isFinite(n) ? n : 0;
-}
+  let lastParent = null;
+  let n = 0;
 
-function parseVariant(desc = '') {
-  const d = String(desc).toUpperCase();
-  const platform = ['CONDOR', 'VE3100', '2M UP', 'UD TRUCK', 'UDTS'].find(k => d.includes(k)) || 'NA';
-  const side = ['RH', 'LH'].find(k => new RegExp(`\\b${k}\\b`).test(d)) || 'NA';
-  const drive = ['RHD', 'LHD'].find(k => d.includes(k)) || 'NA';
-  const voltage = ['12V', '24V'].find(k => d.includes(k)) || 'NA';
-  return { platform, side, drive, voltage };
-}
-
-function parseRaw(text) {
-  const lines = text.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
-  if (!lines.length) return [];
-  const sep = lines[0].includes('\t') ? '\t' : ',';
-  const headers = splitLine(lines[0], sep).map(h => h.toLowerCase());
-  const idx = arr => pickHeaderIndex(headers, arr);
-  const map = {
-    plant: idx(['plant','werks']),
-    level: idx(['level','lvl','bom level']),
-    material: idx(['material']),
-    materialDesc: idx(['material description']),
-    component: idx(['component']),
-    componentDesc: idx(['component description']),
-    qtyC: idx(['comp. qty(cun)','comp qty(cun)']),
-    qtyB: idx(['comp. qty(bun)','comp qty(bun)']),
-    uom: idx(['uom']),
-    type: idx(['material type','type']),
-    altBom: idx(['alternative bom','alt bom']),
-    baseUom: idx(['base unit of measure']),
-    basQty: idx(['basqty (next level)','basqty']),
-    movingPrice: idx(['moving price'])
-  };
-
-  return lines.slice(1).map((ln, i) => {
-    const c = splitLine(ln, sep);
-    const header = c[map.material] || 'UNKNOWN_MAT';
-    const headerDesc = c[map.materialDesc] || '';
-    const variant = parseVariant(headerDesc);
-    const level = Math.max(1, Math.trunc(cleanNumber(c[map.level] || 1)));
-    const plant = c[map.plant] || 'UNKNOWN';
-    const component = c[map.component] || header;
-    const altBom = c[map.altBom] || '00';
-
-    return {
-      id: [plant, header, altBom, component, level, i].join('|'),
-      rowRef: i,
-      plant,
-      header,
-      altBom,
-      headerDesc,
-      level,
-      component,
-      compDesc: c[map.componentDesc] || '',
-      qtyCUn: cleanNumber(c[map.qtyC]),
-      qtyBUn: cleanNumber(c[map.qtyB]),
-      uom: c[map.uom] || 'EA',
-      type: (c[map.type] || (level === 1 ? 'HALB' : 'ROH')).toUpperCase(),
-      baseUom: c[map.baseUom] || c[map.uom] || 'EA',
-      basQty: cleanNumber(c[map.basQty] || 1),
-      movingPrice: cleanNumber(c[map.movingPrice]),
-      children: [],
-      parentId: null,
-      expanded: true,
-      ...variant
-    };
-  });
-}
-
-function groupRows(rows) {
-  const grouped = new Map();
   rows.forEach(r => {
-    if (!grouped.has(r.plant)) grouped.set(r.plant, new Map());
-    const p = grouped.get(r.plant);
-    const key = `${r.header}||${r.altBom}`;
-    if (!p.has(key)) p.set(key, []);
-    p.get(key).push(r);
-  });
-  return grouped;
-}
-
-function buildHeaderTree(rows, plant, key) {
-  const [header, altBom] = key.split('||');
-  const sorted = rows.slice().sort((a, b) => a.rowRef - b.rowRef);
-  const root = {
-    id: `${plant}|${header}|${altBom}|ROOT`,
-    rowRef: -1,
-    plant,
-    header,
-    altBom,
-    level: 0,
-    component: header,
-    compDesc: sorted[0]?.headerDesc || 'Header Material',
-    qtyCUn: 1,
-    qtyBUn: 1,
-    uom: 'EA',
-    type: 'FERT',
-    baseUom: 'EA',
-    basQty: 1,
-    movingPrice: sorted[0]?.movingPrice || 0,
-    children: [],
-    parentId: null,
-    expanded: true,
-    platform: sorted[0]?.platform || 'NA',
-    side: sorted[0]?.side || 'NA',
-    drive: sorted[0]?.drive || 'NA',
-    voltage: sorted[0]?.voltage || 'NA'
-  };
-
-  const stack = [root];
-  sorted.forEach(n => {
-    n.children = [];
-    n.parentId = null;
-    while (stack.length && stack[stack.length - 1].level >= n.level) stack.pop();
-    const parent = stack[stack.length - 1] || root;
-    n.parentId = parent.id;
-    parent.children.push(n);
-    stack.push(n);
-  });
-  return root;
-}
-
-function setupDropdown(id, vals, withAll = true) {
-  const el = document.getElementById(id);
-  const prev = el.value;
-  const items = withAll ? ['ALL', ...vals] : vals;
-  el.innerHTML = items.map(v => `<option value="${v}">${v}</option>`).join('');
-  if (items.includes(prev)) el.value = prev;
-}
-
-function getFilterValue(id) { return document.getElementById(id).value; }
-
-function renderFilters() {
-  const plants = [...s.grouped.keys()].sort();
-  setupDropdown('plantFilter', plants, false);
-  const plant = getFilterValue('plantFilter') || plants[0];
-  const keys = [...(s.grouped.get(plant)?.keys() || [])].sort();
-  setupDropdown('headerFilter', keys, false);
-  const alts = [...new Set(keys.map(k => k.split('||')[1]))].sort();
-  setupDropdown('altFilter', alts, true);
-
-  const rows = s.rows;
-  const uniq = (k) => [...new Set(rows.map(r => r[k]).filter(v => v && v !== 'NA'))].sort();
-  setupDropdown('platformFilter', uniq('platform'), true);
-  setupDropdown('sideFilter', uniq('side'), true);
-  setupDropdown('driveFilter', uniq('drive'), true);
-  setupDropdown('voltageFilter', uniq('voltage'), true);
-}
-
-function matchVariant(root) {
-  const checks = ['platform','side','drive','voltage'];
-  return checks.every(k => {
-    const v = getFilterValue(`${k}Filter`);
-    return v === 'ALL' || root[k] === v;
-  });
-}
-
-function currentRoot() {
-  const plant = getFilterValue('plantFilter');
-  const header = getFilterValue('headerFilter');
-  const alt = getFilterValue('altFilter');
-  const pMap = s.grouped.get(plant);
-  if (!pMap) return null;
-  const key = alt === 'ALL' ? header : `${header.split('||')[0]}||${alt}`;
-  const rows = pMap.get(key) || [];
-  if (!rows.length) return null;
-  const root = buildHeaderTree(rows, plant, key);
-  return matchVariant(root) ? root : null;
-}
-
-function flatten(root) {
-  const out = [];
-  const rec = (n) => {
-    out.push(n);
-    if (n.expanded !== false) n.children.forEach(rec);
-  };
-  rec(root);
-  s.flatCache = out;
-  s.nodeById = new Map(out.map(n => [n.id, n]));
-}
-
-function duplicateSet(root) {
-  const m = new Map();
-  s.flatCache.forEach(n => {
-    if (n.level === 0) return;
-    const k = `${n.component}|${n.level}`;
-    m.set(k, (m.get(k) || 0) + 1);
-  });
-  const dupComps = new Set();
-  m.forEach((count, key) => {
-    if (count > 1) dupComps.add(key.split('|')[0]);
-  });
-  return dupComps;
-}
-
-function subtreeUomSet(node, set = new Set()) {
-  if (node.level > 0) set.add((node.baseUom || node.uom || '').toUpperCase());
-  node.children.forEach(c => subtreeUomSet(c, set));
-  return set;
-}
-
-function nodeCost(node) {
-  if (!node.children.length) return node.qtyBUn * node.movingPrice;
-  return node.children.reduce((sum, c) => sum + nodeCost(c), 0);
-}
-
-function activeCost(root) {
-  return getFilterValue('costMode') === 'sap' ? root.movingPrice : nodeCost(root);
-}
-
-function renderKpis(root) {
-  let roh = 0, halb = 0, kg = 0, fasteners = 0, maxDepth = 0;
-  const prices = [];
-  s.flatCache.forEach(n => {
-    if (n.level === 0) return;
-    maxDepth = Math.max(maxDepth, n.level);
-    prices.push(n.movingPrice);
-    if (n.type === 'ROH') roh++;
-    if (n.type === 'HALB') halb++;
-    if ((n.baseUom || '').toUpperCase() === 'KG') kg += n.qtyBUn;
-    if ((n.component || '').toUpperCase().includes('SCRW') || (n.compDesc || '').toLowerCase().includes('screw')) fasteners += n.qtyBUn;
-  });
-  const total = activeCost(root);
-  const placeholder = prices.length && prices.every(v => v === prices[0]) && prices[0] > 0;
-  const uomMixWarn = subtreeUomSet(root).size > 2;
-
-  document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div class="v">${roh}</div><div class="l">Total ROH Count</div></div>
-    <div class="kpi"><div class="v">${halb}</div><div class="l">Total HALB Count</div></div>
-    <div class="kpi"><div class="v">${kg.toFixed(2)}</div><div class="l">Total Raw Weight (KG)</div></div>
-    <div class="kpi"><div class="v">${fasteners.toFixed(0)}</div><div class="l">Total Fasteners</div></div>
-    <div class="kpi"><div class="v">${total.toFixed(2)} ${placeholder ? '<span class="warn-b">⚠ Placeholder prices</span>' : ''}</div><div class="l">Total Assembly Cost</div></div>
-    <div class="kpi"><div class="v">${maxDepth}${uomMixWarn ? ' <span class="warn-b">⚠ UOM mix &gt; 2</span>' : ''}</div><div class="l">Max BOM Depth</div></div>
-  `;
-}
-
-function levelBorderColor(level) {
-  const levelColors = ['#4e8fff', '#2ecc71', '#ffc857', '#ff6b6b', '#b390ff'];
-  return levelColors[Math.min(level, 5) - 1] || '#b390ff';
-}
-
-function pathToRoot(node) {
-  const out = [];
-  let cur = node;
-  while (cur) {
-    out.push(cur.component);
-    cur = s.nodeById.get(cur.parentId);
-  }
-  return out.reverse().join(' › ');
-}
-
-function renderTree(root) {
-  const tree = document.getElementById('tree');
-  const search = getFilterValue('search').trim().toLowerCase();
-  const dupMode = getFilterValue('dupMode');
-  const dups = duplicateSet(root);
-
-  const rootRow = `<div class="root-row"><div><span>${root.component}</span><span class="desc">${root.compDesc || ''}</span></div><span class="plant-badge">Plant ${root.plant}</span></div>`;
-
-  if (dupMode === 'aggregate') {
-    const agg = new Map();
-    s.flatCache.forEach(n => {
-      if (n.level === 0) return;
-      const k = `${n.component}|${n.level}`;
-      if (!agg.has(k)) agg.set(k, { n, qty: 0, count: 0 });
-      const a = agg.get(k);
-      a.qty += n.qtyBUn;
-      a.count += 1;
-    });
-
-    const rows = [...agg.values()]
-      .filter(a => !search || [a.n.component, a.n.compDesc, a.n.baseUom].join(' ').toLowerCase().includes(search))
-      .map(a => `<div class="tree-row">
-          <span style="display:inline-block;width:${a.n.level * 20}px;flex-shrink:0" class="indent"></span>
-          <button class="expander-btn" disabled>•</button>
-          <span class="badge ${a.n.type === 'HALB' ? 'halb' : 'roh'}">${a.n.type}</span>
-          <span class="comp-code" data-code="${a.n.component}">${a.n.component}</span>
-          <span class="desc">${a.n.compDesc}</span>
-          <span class="qty">${a.qty} ${a.n.baseUom}</span>
-          ${a.count > 1 ? '<span class="dup-badge">dup</span>' : ''}
-      </div>`)
-      .join('');
-
-    tree.innerHTML = rootRow + (rows || '<div class="desc">No components match your search</div>');
-    return;
-  }
-
-  const html = [rootRow];
-  s.flatCache.forEach(n => {
-    if (n.level === 0) return;
-    const txt = [n.component, n.compDesc, n.header, n.uom, n.baseUom].join(' ').toLowerCase();
-    if (search && !txt.includes(search)) return;
-
-    const icon = n.children?.length ? (n.expanded ? '▼' : '▶') : '•';
-    const typeClass = n.type === 'HALB' ? 'halb' : n.type === 'ROH' ? 'roh' : 'fert';
-    const selected = s.selectedId === n.id ? 'selected' : '';
-    const warn = dups.has(n.component) ? '<span class="dup-badge">dup</span>' : '';
-
-    html.push(`<div class="tree-row ${selected}" data-id="${n.id}" style="border-left:2px solid ${levelBorderColor(n.level)}">
-      <span style="display:inline-block;width:${n.level * 20}px;flex-shrink:0" class="indent"></span>
-      <button class="expander-btn" data-expand-id="${n.id}">${icon}</button>
-      <span class="badge ${typeClass}">${n.type}</span>
-      <span class="comp-code" data-code="${n.component}">${n.component}</span>
-      <span class="desc">${n.compDesc}</span>
-      <span class="qty">${n.qtyBUn} ${n.baseUom}</span>
-      ${warn}
-    </div>`);
-  });
-
-  tree.innerHTML = html.join('');
-}
-
-function renderDetail(root) {
-  const pane = document.getElementById('paneDetail');
-  const node = s.nodeById.get(s.selectedId) || root;
-  const contribution = root && activeCost(root) ? Math.min(100, ((nodeCost(node) / activeCost(root)) * 100)) : 0;
-
-  pane.innerHTML = `
-    <div class="path">${pathToRoot(node)}</div>
-    <h3 style="margin:0 0 6px">${node.component}</h3>
-    <p class="desc">${node.compDesc || 'No description'}</p>
-    <div class="grid2">
-      <label>Qty (CUn)<input id="editC" type="number" value="${node.qtyCUn}" step="any"></label>
-      <label>Qty (BUn)<input id="editB" type="number" value="${node.qtyBUn}" step="any"></label>
-      <label>Moving Price<input id="editP" type="number" value="${node.movingPrice}" step="any"></label>
-      <label>Base UOM<input value="${node.baseUom}" disabled></label>
-    </div>
-    <p>Contribution: ${contribution.toFixed(1)}%</p>
-    <div class="progress"><span style="width:${contribution.toFixed(1)}%"></span></div>
-  `;
-
-  pane.querySelector('#editC')?.addEventListener('input', (e) => { node.qtyCUn = cleanNumber(e.target.value); refresh(); });
-  pane.querySelector('#editB')?.addEventListener('input', (e) => { node.qtyBUn = cleanNumber(e.target.value); refresh(); });
-  pane.querySelector('#editP')?.addEventListener('input', (e) => { node.movingPrice = cleanNumber(e.target.value); refresh(); });
-}
-
-function renderCommonality() {
-  const pane = document.getElementById('paneCommon');
-  const onlyCross = document.getElementById('xPlantOnly').checked;
-  const map = new Map();
-
-  s.rows.forEach(r => {
-    if (!map.has(r.component)) {
-      map.set(r.component, {
-        component: r.component,
-        type: r.type,
-        totalDemand: 0,
-        headers: new Set(),
-        plants: new Set()
-      });
+    // Insert separator row when parent changes
+    if (r._parentMat !== lastParent) {
+      if (lastParent !== null) {
+        const sep = document.createElement('tr');
+        sep.className = 'sep-row';
+        sep.innerHTML = `<td colspan="14">─── next parent group ───</td>`;
+        tbody.appendChild(sep);
+      }
+      lastParent = r._parentMat;
     }
-    const item = map.get(r.component);
-    item.totalDemand += r.qtyBUn;
-    item.headers.add(`${r.header}/${r.altBom}`);
-    item.plants.add(r.plant);
+    n++;
+    const tr = document.createElement('tr');
+    const tc = r.matType === 'HALB' ? 'type-halb' : (r.matType === 'ROH' ? 'type-roh' : '');
+    tr.innerHTML = `
+      <td style="color:var(--muted)">${n}</td>
+      <td class="parent-cell">${esc(r.material)}</td>
+      <td>${esc(r.matDesc)}</td>
+      <td>${esc(r.plant)}</td>
+      <td style="text-align:center">${r.usage}</td>
+      <td style="text-align:center">${esc(r.alt)}</td>
+      <td style="text-align:right">${r.baseQty}</td>
+      <td style="font-weight:600">${esc(r.component)}</td>
+      <td>${esc(r.compDesc)}</td>
+      <td class="${tc}">${esc(r.matType)}</td>
+      <td></td>
+      <td style="text-align:right">${esc(r.qty)}</td>
+      <td>${esc(r.uom)}</td>
+      <td></td>
+    `;
+    tbody.appendChild(tr);
   });
 
-  let rows = [...map.values()].filter(v => !onlyCross || v.plants.size > 1);
-  rows = rows.sort((a, b) => b.headers.size - a.headers.size || b.totalDemand - a.totalDemand);
-
-  pane.innerHTML = `<table>
-    <thead><tr><th>Component</th><th>Headers Used</th><th>Total Demand</th><th>Plants</th><th>Type</th><th>Savings Opportunity</th></tr></thead>
-    <tbody>${rows.map(r => `<tr>
-      <td>${r.component}</td>
-      <td>${r.headers.size}</td>
-      <td>${r.totalDemand.toFixed(3)}</td>
-      <td>${[...r.plants].join(', ')}</td>
-      <td>${r.type}</td>
-      <td>${r.headers.size >= 3 ? '<span class="ok">Standardization candidate</span>' : '-'}</td>
-    </tr>`).join('')}</tbody>
-  </table>`;
+  const panel = document.getElementById('outputPanel');
+  panel.classList.add('visible');
+  document.getElementById('rowCount').textContent = rows.length + ' rows · ' + parentOrder.length + ' groups';
+  document.getElementById('btnCopy').style.display = 'inline-block';
+  document.getElementById('btnDL').style.display   = 'inline-block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function renderWhereUsed() {
-  const pane = document.getElementById('paneWhere');
-  const node = s.nodeById.get(s.selectedId);
-  if (!node) { pane.innerHTML = '<p class="desc">Select a component.</p>'; return; }
-  const hits = s.rows.filter(r => r.component === node.component)
-    .map(r => `<li>${r.plant} / ${r.header} / ALT ${r.altBom} / L${r.level}</li>`)
-    .join('');
-  pane.innerHTML = `<h4>Where Used: ${node.component}</h4><ul>${hits || '<li>None</li>'}</ul>`;
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function typeColor(type) {
-  if (type === 'ROH') return '#39d17e';
-  if (type === 'HALB') return '#4e8fff';
-  return '#b390ff';
-}
-
-function toGraphData(node) {
-  return {
-    name: node.component,
-    type: node.type,
-    children: node.children.map(toGraphData)
-  };
-}
-
-function renderGraph(root) {
-  const svg = d3.select('#graphSvg');
-  if (!svg.node()) return;
-  svg.selectAll('*').remove();
-
-  const width = Math.max(600, document.getElementById('graph').clientWidth - 20);
-  const height = Math.max(260, document.getElementById('graph').clientHeight - 20);
-  svg.attr('width', width).attr('height', height);
-
-  const g = svg.append('g').attr('transform', 'translate(40,20)');
-  const h = d3.hierarchy(toGraphData(root));
-  const tree = d3.tree().nodeSize([30, 160]);
-  tree(h);
-
-  g.selectAll('path.link')
-    .data(h.links())
-    .enter()
-    .append('path')
-    .attr('class', 'link')
-    .attr('fill', 'none')
-    .attr('stroke', '#415488')
-    .attr('stroke-width', 1.2)
-    .attr('d', d3.linkHorizontal().x(d => d.y).y(d => d.x));
-
-  const n = g.selectAll('g.node')
-    .data(h.descendants())
-    .enter()
-    .append('g')
-    .attr('class', 'node')
-    .attr('transform', d => `translate(${d.y},${d.x})`);
-
-  n.append('circle').attr('r', 10).attr('fill', d => typeColor(d.data.type)).attr('stroke', '#1a2442');
-  n.append('text')
-    .attr('x', 14)
-    .attr('dy', '0.32em')
-    .style('font-size', '10px')
-    .style('fill', '#dce6ff')
-    .text(d => d.data.name.length > 18 ? `${d.data.name.slice(0, 18)}…` : d.data.name);
-}
-
-function refresh() {
-  const root = currentRoot();
-  if (!root) {
-    document.getElementById('tree').innerHTML = '';
-    document.getElementById('kpis').innerHTML = '';
-    document.getElementById('paneDetail').innerHTML = '<p class="desc">No data for selected filters.</p>';
-    document.getElementById('paneCommon').innerHTML = '';
-    document.getElementById('paneWhere').innerHTML = '';
-    document.getElementById('graphSvg').innerHTML = '';
-    return;
-  }
-
-  flatten(root);
-  if (!s.selectedId || !s.nodeById.has(s.selectedId)) s.selectedId = root.id;
-  renderKpis(root);
-  renderTree(root);
-  renderDetail(root);
-  renderCommonality();
-  renderWhereUsed();
-  renderGraph(root);
-}
-
-function parseAndInit() {
-  s.rows = parseRaw(document.getElementById('raw').value);
-  s.grouped = groupRows(s.rows);
-  renderFilters();
-  refresh();
-}
-
-function setPane(name) {
-  ['paneDetail','paneCommon','paneWhere','graph'].forEach(id => document.getElementById(id).classList.add('hidden'));
-  ['tabDetail','tabCommon','tabWhere','tabGraph'].forEach(id => document.getElementById(id).classList.remove('active'));
-  if (name === 'detail') { document.getElementById('paneDetail').classList.remove('hidden'); document.getElementById('tabDetail').classList.add('active'); }
-  if (name === 'common') { document.getElementById('paneCommon').classList.remove('hidden'); document.getElementById('tabCommon').classList.add('active'); }
-  if (name === 'where') { document.getElementById('paneWhere').classList.remove('hidden'); document.getElementById('tabWhere').classList.add('active'); }
-  if (name === 'graph') { document.getElementById('graph').classList.remove('hidden'); document.getElementById('tabGraph').classList.add('active'); }
-}
-
-function flashCode(el) {
-  const original = el.textContent;
-  el.textContent = '✓';
-  setTimeout(() => { el.textContent = original; }, 800);
-}
-
-document.getElementById('tree').addEventListener('click', async (e) => {
-  const expand = e.target.closest('.expander-btn[data-expand-id]');
-  if (expand) {
-    const n = s.nodeById.get(expand.dataset.expandId);
-    if (n && n.children?.length) {
-      n.expanded = !n.expanded;
-      refresh();
+function toTSV() {
+  const lines = [HEADERS.join('\t')];
+  let lastParent = null;
+  outputRows.forEach(r => {
+    // Add blank separator line between groups (like Sheet 2)
+    if (r._parentMat !== lastParent && lastParent !== null) {
+      lines.push('\t'.repeat(HEADERS.length - 1));
     }
-    e.stopPropagation();
-    return;
-  }
+    lastParent = r._parentMat;
+    lines.push([
+      r.material, r.matDesc, r.plant, r.usage, r.alt,
+      r.baseQty, r.component, r.compDesc, r.matType,
+      r.altText, r.qty, r.uom, r.prodLoc
+    ].join('\t'));
+  });
+  return lines.join('\n');
+}
 
-  const code = e.target.closest('.comp-code');
-  if (code) {
-    try { await navigator.clipboard.writeText(code.dataset.code); } catch (_) {}
-    flashCode(code);
-    e.stopPropagation();
-    return;
-  }
+function copyTSV() {
+  if (!outputRows.length) return;
+  navigator.clipboard.writeText(toTSV()).then(() => {
+    showNotif('✓ Copied! Paste directly into Excel — blank rows separate parent groups.', 'success');
+  }).catch(() => showNotif('Copy failed — use Download instead.', 'error'));
+}
 
-  const row = e.target.closest('.tree-row[data-id]');
-  if (!row) return;
-  s.selectedId = row.dataset.id;
-  refresh();
-});
-
-['plantFilter','headerFilter','altFilter','platformFilter','sideFilter','driveFilter','voltageFilter','search','costMode','dupMode','xPlantOnly']
-  .forEach(id => document.getElementById(id).addEventListener('input', refresh));
-
-document.getElementById('btnParse').onclick = parseAndInit;
-document.getElementById('btnVisualize').onclick = refresh;
-document.getElementById('tabDetail').onclick = () => setPane('detail');
-document.getElementById('tabCommon').onclick = () => setPane('common');
-document.getElementById('tabWhere').onclick = () => setPane('where');
-document.getElementById('tabGraph').onclick = () => setPane('graph');
-
-document.getElementById('btnMode').onclick = () => {
-  s.mode = s.mode === 'tree' ? 'graph' : 'tree';
-  document.getElementById('btnMode').textContent = `View: ${s.mode === 'tree' ? 'Tree' : 'Graph'}`;
-  setPane(s.mode === 'tree' ? 'detail' : 'graph');
-};
-
-document.getElementById('btnExport').onclick = () => {
-  const lines = ['Plant,Header,AlternativeBOM,Component,Level,Type,QtyBUn,UOM,MovingPrice'];
-  s.flatCache.forEach(n => {
-    if (n.level === 0) return;
-    lines.push([n.plant,n.header,n.altBom,n.component,n.level,n.type,n.qtyBUn,n.baseUom,n.movingPrice].join(','));
+function downloadCSV() {
+  if (!outputRows.length) return;
+  const lines = [HEADERS.map(h => `"${h}"`).join(',')];
+  let lastParent = null;
+  outputRows.forEach(r => {
+    if (r._parentMat !== lastParent && lastParent !== null) {
+      lines.push(','.repeat(HEADERS.length - 1));
+    }
+    lastParent = r._parentMat;
+    lines.push([
+      r.material, r.matDesc, r.plant, r.usage, r.alt,
+      r.baseQty, r.component, r.compDesc, r.matType,
+      r.altText, r.qty, r.uom, r.prodLoc
+    ].map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(','));
   });
   const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'sap-bom-export.csv';
+  a.download = 'sheet2_bom_output.csv';
   a.click();
-  URL.revokeObjectURL(a.href);
-};
+  showNotif('✓ Downloading CSV...', 'success');
+}
 
-parseAndInit();
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('outputBody').innerHTML = '';
+  document.getElementById('outputPanel').classList.remove('visible');
+  document.getElementById('statsBar').style.display = 'none';
+  document.getElementById('btnCopy').style.display = 'none';
+  document.getElementById('btnDL').style.display   = 'none';
+  document.getElementById('notif').className = 'notif';
+  outputRows = []; outputGroups = {};
+}
+
+function showNotif(msg, type) {
+  const el = document.getElementById('notif');
+  el.className = 'notif ' + type;
+  el.textContent = msg;
+  setTimeout(() => { el.className = 'notif'; }, 5000);
+}
 </script>
 </body>
 </html>
