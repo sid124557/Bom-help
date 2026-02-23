@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BOM Studio</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
   --bg: #f5f4f0;
@@ -587,6 +588,9 @@ table.output-tbl tbody tr.sep-row td {
 .tbl-comp { color: var(--text); font-weight: 500; }
 .tbl-halb { color: var(--halb); font-weight: 600; }
 .tbl-roh  { color: var(--roh); font-weight: 600; }
+
+/* ── Toast ── */
+#toast {
   position: fixed;
   bottom: 24px; right: 24px;
   background: var(--text);
@@ -799,6 +803,10 @@ Plant | Level | Material | Material Description | Component | Component Descript
           <div class="diff-legend-item"><div class="diff-dot diff-dot-unchanged"></div><span>Unchanged</span></div>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="exportDiffCSV()">Export Diff CSV</button>
+        <button class="btn btn-green btn-sm" onclick="exportExcel()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Excel (.xlsx)
+        </button>
       </div>
     </div>
 
@@ -1564,6 +1572,172 @@ function exportDiffCSV() {
   });
 
   downloadText(lines.join('\n'), 'bom_diff.csv', 'text/csv');
+}
+
+function exportExcel() {
+  if (!editedGroups || !originalGroups) { toast('No data to export','err'); return; }
+
+  const wb = XLSX.utils.book_new();
+
+  // ── SHEET 1: Edited BOM (Sheet 2 format) ─────────────────────────────────
+  const bomHeaders = ['Material','Material Description','Plant','Usage','Alternative',
+    'Base quantity','Component','Component Description','Material Type',
+    'Alt Text','Quantity','Component unit','Prod. Stor.Loc.'];
+
+  const bomRows = [bomHeaders];
+  let lastBomParent = null;
+
+  editedGroups.forEach((g, key) => {
+    const activeRows = g.rows.filter(r => !r._deleted);
+    if (!activeRows.length) return;
+    // blank separator row between groups (except first)
+    if (lastBomParent !== null) bomRows.push(new Array(bomHeaders.length).fill(''));
+    lastBomParent = key;
+    activeRows.forEach(r => {
+      bomRows.push([key, g.matDesc, g.plant, 1, g.alt, 1000,
+        r.component, r.compDesc, r.matType, '', r.qty, r.uom, '']);
+    });
+  });
+
+  const wsNew = XLSX.utils.aoa_to_sheet(bomRows);
+
+  // Column widths for BOM sheet
+  wsNew['!cols'] = [
+    {wch:18},{wch:42},{wch:12},{wch:7},{wch:11},{wch:10},
+    {wch:18},{wch:42},{wch:12},{wch:9},{wch:10},{wch:14},{wch:14}
+  ];
+
+  // Style header row bold + background
+  const bomRange = XLSX.utils.decode_range(wsNew['!ref']);
+  for (let C = bomRange.s.c; C <= bomRange.e.c; C++) {
+    const cell = wsNew[XLSX.utils.encode_cell({r:0, c:C})];
+    if (cell) {
+      cell.s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '2563A8' } },
+        alignment: { horizontal: 'center' }
+      };
+    }
+  }
+
+  XLSX.utils.book_append_sheet(wb, wsNew, 'New BOM');
+
+  // ── SHEET 2: Diff ────────────────────────────────────────────────────────
+  const diffHeaders = ['Status','Group (Parent)','Material Description',
+    'Component','Component Description','Mat Type',
+    'Qty (Original)','Qty (New)','UOM (Original)','UOM (New)',
+    'Base Qty (Original)','Base Qty (New)'];
+
+  const diffRows = [diffHeaders];
+
+  const allKeys = new Set([...originalGroups.keys(), ...editedGroups.keys()]);
+
+  allKeys.forEach(key => {
+    const og = originalGroups.get(key);
+    const eg = editedGroups.get(key);
+    const grp = eg || og;
+
+    if (!og) {
+      // New group — all rows added
+      (eg?.rows || []).forEach(r => {
+        diffRows.push(['ADDED', key, grp.matDesc,
+          r.component, r.compDesc, r.matType,
+          '', r.qty, '', r.uom, '', r.baseQty]);
+      });
+      return;
+    }
+
+    (eg?.rows || []).forEach(r => {
+      if (r._isNew) {
+        diffRows.push(['ADDED', key, grp.matDesc,
+          r.component, r.compDesc, r.matType,
+          '', r.qty, '', r.uom, '', r.baseQty]);
+        return;
+      }
+      if (r._deleted) {
+        const o = og.rows.find(x => x.id === r.id) || r;
+        diffRows.push(['REMOVED', key, grp.matDesc,
+          o.component, o.compDesc, o.matType,
+          o.qty, '', o.uom, '', o.baseQty, '']);
+        return;
+      }
+      const o = og.rows.find(x => x.id === r.id);
+      if (!o) {
+        diffRows.push(['ADDED', key, grp.matDesc,
+          r.component, r.compDesc, r.matType,
+          '', r.qty, '', r.uom, '', r.baseQty]);
+        return;
+      }
+      if (rowModified(r, o)) {
+        diffRows.push(['MODIFIED', key, grp.matDesc,
+          r.component, r.compDesc,
+          o.matType === r.matType ? r.matType : `${o.matType} → ${r.matType}`,
+          o.qty, r.qty, o.uom, r.uom, o.baseQty, r.baseQty]);
+      } else {
+        diffRows.push(['UNCHANGED', key, grp.matDesc,
+          r.component, r.compDesc, r.matType,
+          r.qty, r.qty, r.uom, r.uom, r.baseQty, r.baseQty]);
+      }
+    });
+  });
+
+  const wsDiff = XLSX.utils.aoa_to_sheet(diffRows);
+
+  // Column widths for diff sheet
+  wsDiff['!cols'] = [
+    {wch:11},{wch:18},{wch:38},{wch:18},{wch:38},
+    {wch:10},{wch:14},{wch:14},{wch:12},{wch:12},{wch:14},{wch:14}
+  ];
+
+  // Style header row
+  const diffRange = XLSX.utils.decode_range(wsDiff['!ref']);
+  for (let C = diffRange.s.c; C <= diffRange.e.c; C++) {
+    const cell = wsDiff[XLSX.utils.encode_cell({r:0, c:C})];
+    if (cell) {
+      cell.s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '374151' } },
+        alignment: { horizontal: 'center' }
+      };
+    }
+  }
+
+  // Color-code status column rows in diff sheet
+  const statusColors = {
+    'ADDED':     { bg: 'DCFCE7', fg: '166534' },
+    'REMOVED':   { bg: 'FEE2E2', fg: '991B1B' },
+    'MODIFIED':  { bg: 'FEF9C3', fg: '92400E' },
+    'UNCHANGED': { bg: 'F9FAFB', fg: '6B7280' },
+  };
+
+  for (let R = 1; R <= diffRange.e.r; R++) {
+    const statusCell = wsDiff[XLSX.utils.encode_cell({r:R, c:0})];
+    if (!statusCell) continue;
+    const status = statusCell.v;
+    const colors = statusColors[status];
+    if (!colors) continue;
+    statusCell.s = {
+      font: { bold: true, color: { rgb: colors.fg } },
+      fill: { fgColor: { rgb: colors.bg } },
+      alignment: { horizontal: 'center' }
+    };
+    // Light background on the rest of the row
+    for (let C = 1; C <= diffRange.e.c; C++) {
+      const c = wsDiff[XLSX.utils.encode_cell({r:R, c:C})];
+      if (c) c.s = { fill: { fgColor: { rgb: colors.bg } } };
+    }
+  }
+
+  XLSX.utils.book_append_sheet(wb, wsDiff, 'Changes (Diff)');
+
+  // ── Write and download ────────────────────────────────────────────────────
+  // Generate filename with timestamp
+  const now = new Date();
+  const ts = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  const filename = `BOM_Export_${ts}.xlsx`;
+
+  XLSX.writeFile(wb, filename, { bookType: 'xlsx', type: 'binary', cellStyles: true });
+  toast(`Downloaded ${filename}`, 'ok');
 }
 
 function downloadText(text, filename, mime) {
