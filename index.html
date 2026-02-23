@@ -367,6 +367,22 @@ select.cell-select:focus { background: var(--accent-bg); }
 .row-btn:hover { background: var(--surface3); color: var(--text); }
 .row-btn.del:hover { background: var(--red-bg); color: var(--red); }
 .row-btn.restore:hover { background: var(--green-bg); color: var(--green); }
+.row-btn.goto-child {
+  width: auto;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'DM Mono', monospace;
+  color: var(--halb);
+  border: 1px solid var(--halb-bg);
+  background: var(--halb-bg);
+  border-radius: 4px;
+  gap: 3px;
+  white-space: nowrap;
+}
+.row-btn.goto-child:hover { background: var(--halb); color: white; border-color: var(--halb); }
+.row-btn.goto-child.missing { color: var(--text3); background: var(--surface2); border-color: var(--border); font-style: italic; }
+.row-btn.goto-child.missing:hover { background: var(--surface3); color: var(--text); }
 
 .add-row-btn {
   width: 100%;
@@ -1188,16 +1204,39 @@ function buildRowHTML(groupKey, r, ri) {
   else if (isAdded) cls = 'row-added';
   else if (isModified) cls = 'row-modified';
 
-  const typeOpts = ['ROH','HALB','FERT','HALB'].filter((v,i,a)=>a.indexOf(v)===i);
   const typeSelect = `<select class="cell-select" onchange="cellChanged('${groupKey}','${r.id}','matType',this.value)" ${isDeleted?'disabled':''}>
     ${['ROH','HALB','FERT','ROH-SFG'].map(t=>`<option value="${t}" ${r.matType===t?'selected':''}>${t}</option>`).join('')}
   </select>`;
 
+  // HALB rows: show child group navigation button
+  // ROH rows: no children possible — no button
+  const isHalb = r.matType === 'HALB';
+  const childKey = r.component; // the component number IS the parent key of its children
+  const hasChildGroup = isHalb && editedGroups && editedGroups.has(childKey);
+
+  let halbBtn = '';
+  if (isHalb && !isDeleted) {
+    if (hasChildGroup) {
+      halbBtn = `<button class="row-btn goto-child" title="Go to child group: ${esc(childKey)}" onclick="goToChildGroup('${childKey}')">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        ${esc(childKey)}
+      </button>`;
+    } else {
+      halbBtn = `<button class="row-btn goto-child missing" title="No child group found for ${esc(childKey)}" onclick="createChildGroup('${childKey}','${esc(r.compDesc)}')">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add children
+      </button>`;
+    }
+  }
+
   const actionBtns = isDeleted
     ? `<div class="row-actions"><button class="row-btn restore" title="Restore" onclick="restoreRow('${groupKey}','${r.id}')">↩</button></div>`
-    : `<div class="row-actions"><button class="row-btn del" title="Delete row" onclick="deleteRow('${groupKey}','${r.id}')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-      </button></div>`;
+    : `<div class="row-actions">
+        ${halbBtn}
+        <button class="row-btn del" title="Delete row" onclick="deleteRow('${groupKey}','${r.id}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        </button>
+      </div>`;
 
   function inp(field, val, w='90px') {
     const origVal = origRow ? origRow[field] : val;
@@ -1316,6 +1355,34 @@ function addNewGroup() {
   activeGroupKey = k;
   renderEditor();
   toast('New group added: '+k,'ok');
+}
+
+function goToChildGroup(childKey) {
+  if (!editedGroups.has(childKey)) { toast('Child group not found: '+childKey, 'err'); return; }
+  activeGroupKey = childKey;
+  renderEditor();
+  // Scroll the pill into view
+  setTimeout(() => {
+    const pills = document.querySelectorAll('.group-pill');
+    const keys = [...editedGroups.keys()];
+    const idx = keys.indexOf(childKey);
+    if (pills[idx]) pills[idx].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  }, 50);
+}
+
+function createChildGroup(childKey, childDesc) {
+  if (editedGroups.has(childKey)) { goToChildGroup(childKey); return; }
+  const g = editedGroups.values().next().value; // borrow plant/alt from first group
+  editedGroups.set(childKey, {
+    matDesc: childDesc || '',
+    plant: g ? g.plant : '5500/5600',
+    alt: g ? g.alt : '1',
+    rows: [],
+    _isNew: true
+  });
+  activeGroupKey = childKey;
+  renderEditor();
+  toast('Child group created: '+childKey, 'ok');
 }
 
 function reRenderGroup(groupKey) {
