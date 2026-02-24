@@ -4,1836 +4,1144 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BOM Studio</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --bg: #f5f4f0;
-  --surface: #ffffff;
-  --surface2: #f0efe9;
-  --surface3: #e8e7e0;
-  --border: #dddbd2;
-  --border2: #c8c6bc;
-  --text: #1a1916;
-  --text2: #5a5850;
-  --text3: #9a9890;
-  --accent: #2563a8;
-  --accent-bg: #eff4fc;
-  --accent-border: #bdd0ef;
-  --green: #16803c;
-  --green-bg: #f0faf4;
-  --green-border: #a7d9b8;
-  --red: #c0392b;
-  --red-bg: #fdf2f1;
-  --red-border: #f0b8b2;
-  --amber: #b45309;
-  --amber-bg: #fffbeb;
-  --amber-border: #f0d58a;
-  --halb: #7c3aed;
-  --halb-bg: #f5f0ff;
-  --roh: #0e7490;
-  --roh-bg: #f0f9ff;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
-  --radius: 8px;
-  --radius-sm: 5px;
+  --bg:#f2f1ec;--surface:#faf9f6;--surface2:#edecea;--surface3:#e3e2de;
+  --border:#d8d6cf;--border2:#c4c2ba;--text:#1c1b18;--text2:#5c5a54;--text3:#9c9a94;
+  --accent:#1d4ed8;--accent-light:#eff4ff;--accent-border:#bfcffd;
+  --green:#15803d;--green-light:#f0faf3;--green-border:#86efac;
+  --red:#b91c1c;--red-light:#fff1f1;--red-border:#fca5a5;
+  --amber:#92400e;--amber-light:#fffbeb;--amber-border:#fcd34d;
+  --purple:#6d28d9;--purple-light:#f5f3ff;
+  --cyan:#0e7490;--cyan-light:#f0f9ff;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.05);
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  --r:6px;--r-sm:4px;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13.5px;min-height:100vh;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:5px;height:5px;} ::-webkit-scrollbar-track{background:var(--surface2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;} ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+.app{display:flex;flex-direction:column;min-height:100vh;}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* Topbar */
+.topbar{background:var(--text);color:#fff;padding:0 24px;display:flex;align-items:center;height:52px;position:sticky;top:0;z-index:200;}
+.logo{font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:-.02em;color:#fff;padding-right:18px;border-right:1px solid rgba(255,255,255,.12);margin-right:6px;flex-shrink:0;}
+.logo em{color:#60a5fa;font-style:normal;}
+.tabs{display:flex;height:52px;}
+.tab{padding:0 18px;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:7px;font-family:var(--sans);border-bottom:2px solid transparent;}
+.tab:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.05);}
+.tab.active{color:#fff;border-bottom-color:#60a5fa;background:rgba(255,255,255,.06);}
+.tab-num{width:18px;height:18px;background:rgba(255,255,255,.12);border-radius:3px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:var(--mono);}
+.tab.active .tab-num{background:#60a5fa;color:var(--text);}
+.badge{background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:9px;font-family:var(--mono);}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.vdiv{width:1px;height:26px;background:rgba(255,255,255,.12);flex-shrink:0;margin:0 4px;}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  min-height: 100vh;
-}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:12.5px;font-weight:500;padding:7px 13px;border-radius:var(--r-sm);border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:all .12s;line-height:1;}
+.btn svg{flex-shrink:0;}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);} .btn-primary:hover{background:#1a45c0;}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border2);} .btn-secondary:hover{background:var(--surface2);}
+.btn-ghost{background:transparent;color:var(--text2);} .btn-ghost:hover{background:var(--surface2);color:var(--text);}
+.btn-green{background:var(--green);color:#fff;} .btn-green:hover{background:#126633;}
+.btn-sm{padding:4px 10px;font-size:11.5px;}
+.btn:disabled{opacity:.38;cursor:not-allowed;pointer-events:none;}
 
-/* ── Layout ── */
-.app { display: flex; flex-direction: column; min-height: 100vh; }
+/* Pages */
+.page{display:none;padding:20px 24px;animation:fadeIn .15s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.hidden{display:none!important;}
 
-.topbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  height: 56px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow-sm);
-}
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:14px;}
+.card-header{padding:11px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;background:var(--surface2);}
+.card-header h3{font-size:12.5px;font-weight:600;}
+.card-header .hint{margin-left:auto;font-size:11px;color:var(--text3);font-family:var(--mono);}
+.step-badge{min-width:20px;height:20px;background:var(--accent);color:#fff;border-radius:3px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono);}
+.card-footer{padding:11px 18px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;background:var(--surface2);}
 
-.logo {
-  font-family: 'DM Mono', monospace;
-  font-weight: 500;
-  font-size: 15px;
-  color: var(--text);
-  letter-spacing: -0.03em;
-  white-space: nowrap;
-}
-.logo span { color: var(--accent); }
+/* Import grid */
+.import-grid{display:grid;grid-template-columns:1fr 310px;gap:14px;margin-bottom:14px;}
+@media(max-width:860px){.import-grid{grid-template-columns:1fr;}}
+textarea.paste-area{width:100%;height:230px;border:none;outline:none;padding:13px 17px;font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--text);background:var(--surface);resize:vertical;caret-color:var(--accent);}
+textarea.paste-area:focus{background:#fdfcf9;} textarea.paste-area::placeholder{color:var(--text3);}
+.col-map{padding:13px 17px;display:flex;flex-direction:column;gap:3px;}
+.col-row{display:grid;grid-template-columns:80px 16px 1fr;align-items:center;gap:5px;padding:3px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.col-row:last-child{border-bottom:none;}
+.col-from{font-family:var(--mono);color:var(--accent);font-size:10.5px;}
+.col-arr{color:var(--text3);text-align:center;font-size:9px;}
+.col-to{color:var(--text2);}
 
-.topbar-sep { width: 1px; height: 28px; background: var(--border); }
+/* Stats */
+.stats-bar{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-xs);}
+.stats-bar.show{display:flex;flex-wrap:wrap;animation:fadeIn .2s ease;}
+.stat-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 20px;border-right:1px solid var(--border);gap:5px;flex:1;min-width:85px;}
+.stat-cell:last-child{border-right:none;}
+.stat-val{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent);line-height:1;}
+.stat-val.green{color:var(--green);} .stat-val.purple{color:var(--purple);} .stat-val.red{color:var(--red);} .stat-val.muted{color:var(--text3);}
+.stat-key{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);}
 
-.tabs { display: flex; gap: 2px; }
-.tab {
-  padding: 6px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text2);
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-.tab:hover { background: var(--surface2); color: var(--text); }
-.tab.active { background: var(--accent-bg); color: var(--accent); }
-.tab .badge {
-  display: inline-block;
-  margin-left: 6px;
-  background: var(--red);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 1px 5px;
-  border-radius: 10px;
-  vertical-align: middle;
-}
+/* Preview */
+.preview-wrap{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-sm);}
+.preview-wrap.show{display:block;animation:fadeIn .2s ease;}
+.preview-header{display:flex;align-items:center;gap:9px;padding:10px 17px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.preview-header h3{font-size:12.5px;font-weight:600;}
+.preview-count{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.preview-actions{margin-left:auto;display:flex;gap:6px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 0 2px var(--green-border);}
+.tbl-wrap{overflow-x:auto;max-height:460px;overflow-y:auto;}
 
-.topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap;}
+table thead th{padding:7px 11px;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);background:var(--surface2);border-bottom:1px solid var(--border);text-align:left;position:sticky;top:0;z-index:5;}
+table tbody td{padding:6px 11px;border-bottom:1px solid var(--border);font-family:var(--mono);color:var(--text2);}
+table tbody tr:last-child td{border-bottom:none;}
+table tbody tr:hover td{background:var(--surface2);}
+table tbody tr.sep-row td{background:var(--bg);color:var(--text3);font-size:9px;text-align:center;font-style:italic;padding:4px 11px;border-top:1px solid var(--border);}
+.c-num{color:var(--text3);} .c-mat{color:var(--accent);font-weight:500;} .c-comp{color:var(--text);font-weight:500;}
+.c-halb{color:var(--purple);font-weight:600;} .c-roh{color:var(--cyan);font-weight:600;}
 
-/* ── Buttons ── */
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px; font-weight: 500;
-  padding: 7px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.12s;
-}
-.btn svg { flex-shrink: 0; }
-.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
-.btn-primary:hover { background: #1e52a0; }
-.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border2); }
-.btn-secondary:hover { background: var(--surface2); border-color: var(--border2); }
-.btn-ghost { background: transparent; color: var(--text2); border-color: transparent; }
-.btn-ghost:hover { background: var(--surface2); color: var(--text); }
-.btn-green { background: var(--green); color: white; border-color: var(--green); }
-.btn-green:hover { background: #126833; }
-.btn-red { background: var(--red); color: white; border-color: var(--red); }
-.btn-red:hover { background: #a03122; }
-.btn-sm { padding: 4px 10px; font-size: 12px; }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* Editor */
+.editor-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.editor-title{font-size:13px;font-weight:600;color:var(--text2);}
+.editor-meta{font-size:11.5px;color:var(--text3);font-family:var(--mono);}
+.group-search{display:flex;align-items:center;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface);overflow:hidden;padding:0 9px;height:30px;width:190px;}
+.group-search svg{color:var(--text3);flex-shrink:0;margin-right:5px;}
+.group-search input{border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--text);width:100%;}
+.group-search input::placeholder{color:var(--text3);}
+.group-nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-xs);min-height:44px;align-items:flex-start;align-content:flex-start;}
+.group-pill{padding:3px 10px;border-radius:3px;font-size:11px;font-weight:500;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .12s;font-family:var(--mono);letter-spacing:-.02em;}
+.group-pill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+.group-pill.active{background:var(--text);color:#fff;border-color:var(--text);}
+.group-pill.changed{border-color:var(--amber-border);background:var(--amber-light);color:var(--amber);}
+.group-pill.active.changed{background:var(--amber);color:#fff;border-color:var(--amber);}
+.group-pill.newgrp{border-color:var(--green-border);background:var(--green-light);color:var(--green);}
+.group-pill.active.newgrp{background:var(--green);color:#fff;border-color:var(--green);}
+.group-pill.gpill-hidden{display:none;}
+.bom-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
 
-/* ── Pages ── */
-.page { display: none; padding: 24px; }
-.page.active { display: block; }
+/* Group header */
+.grp-header{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--surface2);border-bottom:2px solid var(--border);flex-wrap:wrap;}
+.grp-title-col{flex:1;min-width:200px;}
+.grp-mat{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text);margin-bottom:6px;}
+.grp-fields{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+.grp-field{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:4px 9px;}
+.grp-field label{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:600;user-select:none;}
+.grp-field input{border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--text);}
+.grp-field input:focus{color:var(--accent);}
+.grp-meta{margin-left:auto;text-align:right;}
+.grp-stat{font-size:22px;font-weight:600;color:var(--text);font-family:var(--mono);line-height:1;}
+.grp-stat-label{font-size:10px;color:var(--text3);}
 
-/* ── Import page ── */
-.import-layout {
-  max-width: 100%;
-}
+/* BOM table */
+table.bom-tbl thead th{top:0;position:sticky;z-index:5;background:var(--surface2);}
+table.bom-tbl tbody tr:hover td{background:#f7f6f2;}
+table.bom-tbl tbody tr.row-added td{background:var(--green-light)!important;}
+table.bom-tbl tbody tr.row-deleted td{background:var(--red-light)!important;opacity:.55;pointer-events:none;}
+table.bom-tbl tbody tr.row-deleted *{text-decoration:line-through;}
+table.bom-tbl tbody tr.row-modified td{background:var(--amber-light)!important;}
+.cell-input{width:100%;padding:6px 10px;border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--text);min-width:60px;display:block;}
+.cell-input:focus{background:var(--accent-light);color:var(--accent);}
+.cell-input.changed{color:var(--amber);}
+select.cell-select{width:100%;padding:6px 10px;border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;}
+select.cell-select:focus{background:var(--accent-light);color:var(--accent);}
+.row-actions{display:flex;gap:3px;padding:3px 7px;align-items:center;}
+.row-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:3px;border:none;cursor:pointer;background:transparent;color:var(--text3);transition:all .12s;}
+.row-btn:hover{background:var(--surface3);color:var(--text);}
+.row-btn.del:hover{background:var(--red-light);color:var(--red);}
+.row-btn.restore{color:var(--green);border:1px solid var(--green-border);background:var(--green-light);width:auto;padding:0 8px;font-size:11px;height:24px;font-family:var(--sans);}
+.row-btn.restore:hover{background:var(--green);color:#fff;}
+.row-btn.goto-child{width:auto;padding:0 8px;font-size:10px;font-weight:600;color:var(--purple);border:1px solid rgba(109,40,217,.2);background:var(--purple-light);gap:3px;height:24px;border-radius:3px;font-family:var(--mono);}
+.row-btn.goto-child:hover{background:var(--purple);color:#fff;}
+.row-btn.goto-child.missing{color:var(--text3);background:var(--surface3);border-color:var(--border);font-style:italic;}
+.row-btn.goto-child.missing:hover{background:var(--surface3);color:var(--text);}
+.add-row-btn{width:100%;padding:9px;border:none;background:transparent;color:var(--text3);font-size:11.5px;font-weight:500;cursor:pointer;border-top:1px dashed var(--border2);transition:all .12s;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--sans);}
+.add-row-btn:hover{background:var(--green-light);color:var(--green);}
 
-.import-top {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 16px;
-  margin-bottom: 20px;
-}
+/* Diff */
+.diff-top{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.diff-legend{display:flex;gap:12px;font-size:11.5px;}
+.diff-legend-item{display:flex;align-items:center;gap:5px;}
+.diff-dot{width:9px;height:9px;border-radius:2px;}
+.diff-stats{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.diff-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 18px;display:flex;align-items:center;gap:10px;}
+.diff-stat-num{font-size:26px;font-weight:700;font-family:var(--mono);line-height:1;}
+.diff-stat-num.green{color:var(--green);} .diff-stat-num.red{color:var(--red);} .diff-stat-num.amber{color:var(--amber);} .diff-stat-num.muted{color:var(--text3);}
+.diff-stat-label{font-size:11px;color:var(--text2);}
+.diff-group{margin-bottom:16px;}
+.diff-group-title{font-size:11.5px;font-weight:600;font-family:var(--mono);color:var(--text2);padding:8px 13px;background:var(--surface2);border:1px solid var(--border);border-bottom:none;border-radius:var(--r) var(--r) 0 0;display:flex;align-items:center;gap:8px;}
+.diff-tbl-wrap{border:1px solid var(--border);border-radius:0 0 var(--r) var(--r);overflow:hidden;overflow-x:auto;}
+table.diff-tbl td{font-family:var(--mono);}
+tr.diff-added td{background:var(--green-light);} tr.diff-added td:first-child{border-left:3px solid var(--green);}
+tr.diff-removed td{background:var(--red-light);} tr.diff-removed td:first-child{border-left:3px solid var(--red);}
+tr.diff-modified td{background:var(--amber-light);} tr.diff-modified td:first-child{border-left:3px solid var(--amber);}
+tr.diff-unchanged td{color:var(--text3);}
+.diff-tag{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;font-size:11px;font-weight:700;font-family:var(--mono);}
+.dt-a{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);}
+.dt-r{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);}
+.dt-m{background:var(--amber-light);color:var(--amber);border:1px solid var(--amber-border);}
+.dt-u{background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.cell-old{color:var(--red);text-decoration:line-through;margin-right:4px;}
+.cell-new{color:var(--green);}
+.nb-tag{display:inline-flex;padding:1px 6px;border-radius:3px;font-size:9.5px;font-weight:700;font-family:var(--mono);background:var(--green-light);color:var(--green);border:1px solid var(--green-border);}
 
-@media (max-width: 900px) {
-  .import-top { grid-template-columns: 1fr; }
-}
+/* Empty */
+.empty{text-align:center;padding:70px 24px;color:var(--text3);}
+.empty-icon{font-size:36px;margin-bottom:12px;}
+.empty h3{font-size:14.5px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.empty p{font-size:12.5px;}
 
-.import-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.card-header {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--surface2);
-}
-
-.card-header h3 { font-size: 13px; font-weight: 600; }
-.card-header .hint { margin-left: auto; font-size: 11px; color: var(--text3); }
-
-.step-num {
-  width: 22px; height: 22px;
-  background: var(--accent);
-  color: white;
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-textarea.paste-area {
-  width: 100%;
-  height: 260px;
-  border: none;
-  outline: none;
-  padding: 16px 20px;
-  font-family: 'DM Mono', monospace;
-  font-size: 11.5px;
-  line-height: 1.7;
-  color: var(--text);
-  background: var(--surface);
-  resize: vertical;
-}
-textarea.paste-area::placeholder { color: var(--text3); }
-
-.import-actions {
-  padding: 14px 20px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  background: var(--surface2);
-}
-
-.col-map {
-  padding: 16px 20px;
-  display: grid;
-  grid-template-columns: 1fr 24px 1fr;
-  gap: 6px 8px;
-  align-items: center;
-  font-size: 12px;
-}
-.col-from { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 11px; }
-.col-arr { color: var(--text3); text-align: center; }
-.col-to { color: var(--text2); }
-.col-note { grid-column: 3; color: var(--green); font-size: 10px; }
-
-/* ── BOM Editor ── */
-.editor-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-
-.group-nav {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.group-pill {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1px solid var(--border2);
-  background: var(--surface);
-  cursor: pointer;
-  transition: all 0.12s;
-  font-family: 'DM Mono', monospace;
-}
-.group-pill:hover { border-color: var(--accent); color: var(--accent); }
-.group-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
-.group-pill.has-changes { border-color: var(--amber); }
-.group-pill.active.has-changes { background: var(--amber); border-color: var(--amber); }
-
-.bom-table-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-
-.bom-group {
-  display: none;
-}
-.bom-group.active { display: block; }
-
-.group-header-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: var(--surface2);
-  border-bottom: 2px solid var(--border);
-}
-
-.group-title { font-weight: 600; font-size: 13px; font-family: 'DM Mono', monospace; }
-.group-desc { font-size: 12px; color: var(--text2); }
-.group-meta { margin-left: auto; font-size: 11px; color: var(--text3); display: flex; gap: 12px; }
-
-table.bom-tbl { width: 100%; border-collapse: collapse; }
-
-table.bom-tbl thead th {
-  padding: 8px 10px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text3);
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  white-space: nowrap;
-  position: sticky;
-  top: 56px;
-  z-index: 5;
-}
-
-table.bom-tbl tbody td {
-  padding: 0;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
-
-table.bom-tbl tbody tr:last-child td { border-bottom: none; }
-table.bom-tbl tbody tr:hover td { background: #fafaf8; }
-
-table.bom-tbl tbody tr.row-added td { background: var(--green-bg) !important; }
-table.bom-tbl tbody tr.row-deleted td { background: var(--red-bg) !important; opacity: 0.6; text-decoration: line-through; pointer-events: none; }
-table.bom-tbl tbody tr.row-modified td { background: var(--amber-bg) !important; }
-
-.cell-input {
-  width: 100%;
-  padding: 7px 10px;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-family: 'DM Mono', monospace;
-  font-size: 11.5px;
-  color: var(--text);
-  min-width: 60px;
-}
-.cell-input:focus { background: var(--accent-bg); }
-.cell-input.changed { color: var(--amber); font-weight: 500; }
-
-select.cell-select {
-  width: 100%;
-  padding: 7px 10px;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-family: 'DM Mono', monospace;
-  font-size: 11.5px;
-  color: var(--text);
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-}
-select.cell-select:focus { background: var(--accent-bg); }
-
-.type-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  font-family: 'DM Mono', monospace;
-  letter-spacing: 0.05em;
-}
-.type-halb { background: var(--halb-bg); color: var(--halb); }
-.type-roh  { background: var(--roh-bg); color: var(--roh); }
-
-.row-actions { display: flex; gap: 4px; padding: 4px 8px; }
-.row-btn {
-  width: 26px; height: 26px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  background: transparent;
-  color: var(--text3);
-  transition: all 0.12s;
-}
-.row-btn:hover { background: var(--surface3); color: var(--text); }
-.row-btn.del:hover { background: var(--red-bg); color: var(--red); }
-.row-btn.restore:hover { background: var(--green-bg); color: var(--green); }
-.row-btn.goto-child {
-  width: auto;
-  padding: 0 8px;
-  font-size: 10px;
-  font-weight: 600;
-  font-family: 'DM Mono', monospace;
-  color: var(--halb);
-  border: 1px solid var(--halb-bg);
-  background: var(--halb-bg);
-  border-radius: 4px;
-  gap: 3px;
-  white-space: nowrap;
-}
-.row-btn.goto-child:hover { background: var(--halb); color: white; border-color: var(--halb); }
-.row-btn.goto-child.missing { color: var(--text3); background: var(--surface2); border-color: var(--border); font-style: italic; }
-.row-btn.goto-child.missing:hover { background: var(--surface3); color: var(--text); }
-
-.add-row-btn {
-  width: 100%;
-  padding: 9px;
-  border: none;
-  background: transparent;
-  color: var(--text3);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  border-top: 1px dashed var(--border2);
-  transition: all 0.12s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-.add-row-btn:hover { background: var(--green-bg); color: var(--green); }
-
-/* ── Diff page ── */
-.diff-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-
-.diff-legend { display: flex; gap: 14px; font-size: 12px; }
-.diff-legend-item { display: flex; align-items: center; gap: 6px; }
-.diff-dot { width: 10px; height: 10px; border-radius: 3px; }
-.diff-dot-added { background: var(--green); }
-.diff-dot-removed { background: var(--red); }
-.diff-dot-modified { background: var(--amber); }
-.diff-dot-unchanged { background: var(--border2); }
-
-.diff-summary {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-.diff-stat {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-.diff-stat-num { font-size: 22px; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; }
-.diff-stat-num.green { color: var(--green); }
-.diff-stat-num.red { color: var(--red); }
-.diff-stat-num.amber { color: var(--amber); }
-.diff-stat-num.muted { color: var(--text3); }
-.diff-stat-label { color: var(--text2); font-size: 11px; }
-
-.diff-group { margin-bottom: 20px; }
-.diff-group-title {
-  font-size: 12px;
-  font-weight: 600;
-  font-family: 'DM Mono', monospace;
-  color: var(--text2);
-  padding: 8px 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-bottom: none;
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.diff-table-wrap {
-  border: 1px solid var(--border);
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-  overflow: hidden;
-  overflow-x: auto;
-}
-
-table.diff-tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; white-space: nowrap; }
-table.diff-tbl th {
-  padding: 7px 12px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text3);
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-}
-table.diff-tbl td {
-  padding: 7px 12px;
-  border-bottom: 1px solid var(--border);
-  font-family: 'DM Mono', monospace;
-}
-table.diff-tbl tr:last-child td { border-bottom: none; }
-
-tr.diff-added td { background: var(--green-bg); }
-tr.diff-added td:first-child { border-left: 3px solid var(--green); }
-tr.diff-removed td { background: var(--red-bg); }
-tr.diff-removed td:first-child { border-left: 3px solid var(--red); }
-tr.diff-modified td { background: var(--amber-bg); }
-tr.diff-modified td:first-child { border-left: 3px solid var(--amber); }
-tr.diff-unchanged td { color: var(--text3); }
-
-.diff-tag {
-  display: inline-block;
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 700;
-  font-family: 'DM Mono', monospace;
-}
-.diff-tag-added { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
-.diff-tag-removed { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
-.diff-tag-modified { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
-.diff-tag-unchanged { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
-
-.cell-old { color: var(--red); text-decoration: line-through; margin-right: 4px; }
-.cell-new { color: var(--green); }
-
-/* ── Import stats bar ── */
-.import-stats {
-  display: none;
-  gap: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  margin-bottom: 16px;
-}
-.import-stats.visible { display: flex; flex-wrap: wrap; }
-.istat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px 20px;
-  border-right: 1px solid var(--border);
-  min-width: 100px;
-}
-.istat:last-child { border-right: none; }
-.istat-val {
-  font-family: 'DM Mono', monospace;
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--accent);
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.istat-val.green { color: var(--green); }
-.istat-val.purple { color: var(--halb); }
-.istat-val.red { color: var(--red); }
-.istat-key {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text3);
-}
-
-/* ── Import output table ── */
-.import-output {
-  display: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 20px;
-}
-.import-output.visible { display: block; }
-.import-output-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface2);
-}
-.import-output-header h3 { font-size: 13px; font-weight: 600; }
-.import-output-actions { margin-left: auto; display: flex; gap: 8px; }
-.output-table-wrap {
-  overflow-x: auto;
-  max-height: 520px;
-  overflow-y: auto;
-}
-table.output-tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; white-space: nowrap; }
-table.output-tbl thead th {
-  padding: 8px 12px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text3);
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 3;
-}
-table.output-tbl tbody td {
-  padding: 7px 12px;
-  border-bottom: 1px solid var(--border);
-  font-family: 'DM Mono', monospace;
-  color: var(--text2);
-}
-table.output-tbl tbody tr:last-child td { border-bottom: none; }
-table.output-tbl tbody tr:hover td { background: var(--surface2); }
-table.output-tbl tbody tr.sep-row td {
-  background: var(--surface2);
-  color: var(--text3);
-  font-style: italic;
-  font-size: 10px;
-  text-align: center;
-  padding: 5px 12px;
-  border-top: 1px solid var(--border);
-}
-.tbl-num { color: var(--text3); }
-.tbl-mat { color: var(--accent); font-weight: 500; }
-.tbl-comp { color: var(--text); font-weight: 500; }
-.tbl-halb { color: var(--halb); font-weight: 600; }
-.tbl-roh  { color: var(--roh); font-weight: 600; }
-
-/* ── Toast ── */
-#toast {
-  position: fixed;
-  bottom: 24px; right: 24px;
-  background: var(--text);
-  color: white;
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 500;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all 0.2s ease;
-  pointer-events: none;
-  z-index: 999;
-  box-shadow: var(--shadow);
-}
-#toast.show { opacity: 1; transform: translateY(0); }
-#toast.ok { background: var(--green); }
-#toast.err { background: var(--red); }
-
-/* ── Empty states ── */
-.empty {
-  text-align: center;
-  padding: 60px 24px;
-  color: var(--text3);
-}
-.empty-icon { font-size: 40px; margin-bottom: 12px; }
-.empty h3 { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
-.empty p { font-size: 13px; }
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--surface2); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+/* Toast */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:9px 16px;border-radius:var(--r-sm);font-size:12.5px;font-weight:500;opacity:0;transform:translateY(6px);transition:all .18s ease;pointer-events:none;z-index:9999;box-shadow:var(--shadow);max-width:360px;}
+#toast.show{opacity:1;transform:translateY(0);}
+#toast.ok{background:var(--green);} #toast.err{background:var(--red);} #toast.warn{background:var(--amber);}
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- Top Bar -->
+<!-- Topbar -->
 <div class="topbar">
-  <div class="logo">BOM<span>Studio</span></div>
-  <div class="topbar-sep"></div>
+  <div class="logo">BOM<em>Studio</em></div>
+  <div class="vdiv"></div>
   <div class="tabs">
-    <button class="tab active" data-page="import" onclick="switchPage('import')">① Import</button>
-    <button class="tab" data-page="editor" onclick="switchPage('editor')">② Edit BOM</button>
-    <button class="tab" data-page="diff" onclick="switchPage('diff')">③ Compare Changes <span class="badge" id="diffBadge" style="display:none">!</span></button>
+    <button class="tab active" data-page="import" onclick="switchPage('import')">
+      <span class="tab-num">1</span>Import
+    </button>
+    <button class="tab" data-page="editor" onclick="switchPage('editor')">
+      <span class="tab-num">2</span>Edit BOM
+    </button>
+    <button class="tab" data-page="diff" onclick="switchPage('diff')">
+      <span class="tab-num">3</span>Compare
+      <span class="badge hidden" id="diffBadge">0</span>
+    </button>
   </div>
   <div class="topbar-right">
-    <button class="btn btn-secondary" id="btnExportTSV" onclick="exportTSV()" style="display:none">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Export for Excel
+    <button class="btn btn-secondary hidden" id="btnExportTSV" onclick="exportTSV()" style="color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);font-size:12px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export TSV
     </button>
   </div>
 </div>
 
-<!-- ① Import Page -->
+<!-- Page 1: Import -->
 <div class="page active" id="page-import">
-<div class="import-layout">
-
-  <!-- Top: paste area + column reference side by side -->
-  <div class="import-top">
-    <div class="import-card">
+  <div class="import-grid">
+    <div class="card">
       <div class="card-header">
-        <div class="step-num">1</div>
+        <div class="step-badge">1</div>
         <h3>Paste Sheet 1 Data</h3>
-        <span class="hint">Include the header row · Tab-separated from SAP/Excel</span>
+        <span class="hint">Tab-separated from SAP / Excel · include header row</span>
       </div>
-      <textarea class="paste-area" id="pasteArea" placeholder="Paste your Sheet 1 BOM data here (with header row)...
-
-Expected columns:
-Plant | Level | Material | Material Description | Component | Component Description | Comp.Qty(CUn) | Comp.Qty(BUn) | UOM | Material Type | Alternative BOM | Base Unit of Measure | BasQty(Next Level) | ..."></textarea>
-      <div class="import-actions">
+      <textarea class="paste-area" id="pasteArea"
+        placeholder="Paste your Sheet 1 BOM export here (with header row)&#10;&#10;Expected columns (0-indexed):&#10;Col 0: Plant | Col 1: Level | Col 2: Material | Col 3: Material Description&#10;Col 4: Component | Col 5: Component Description | Col 6: Comp.Qty(CUn)&#10;Col 8: UOM | Col 9: Material Type | Col 10: Alternative BOM | Col 12: BasQty"></textarea>
+      <div class="card-footer">
         <button class="btn btn-primary" onclick="importBOM()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-          Import & Build BOM
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+          Import &amp; Build BOM
         </button>
         <button class="btn btn-ghost" onclick="clearImport()">Clear</button>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3)" id="importStatus"></span>
       </div>
     </div>
-
-    <div class="import-card">
+    <div class="card">
       <div class="card-header">
-        <div class="step-num" style="background:var(--text3)">?</div>
-        <h3>Column Mapping Reference</h3>
+        <div class="step-badge" style="background:var(--text3)">?</div>
+        <h3>Column Reference</h3>
       </div>
       <div class="col-map">
-        <span class="col-from">Col 0 — Plant</span><span class="col-arr">→</span><span class="col-to">Plant (5600 or 5500 → "5500/5600")</span>
-        <span class="col-from">Col 1 — Level</span><span class="col-arr">→</span><span class="col-to">Drives parent hierarchy (1→2→3…)</span>
-        <span class="col-from">Col 2 — Material</span><span class="col-arr">→</span><span class="col-to">Material number</span>
-        <span class="col-from">Col 3 — Material Description</span><span class="col-arr">→</span><span class="col-to">Material Description</span>
-        <span class="col-from">Col 4 — Component</span><span class="col-arr">→</span><span class="col-to">Component number</span>
-        <span class="col-from">Col 5 — Component Description</span><span class="col-arr">→</span><span class="col-to">Component Description</span>
-        <span class="col-from">Col 6 — Comp. Qty(CUn)</span><span class="col-arr">→</span><span class="col-to">Quantity <em>(Sheet 2)</em></span>
-        <span class="col-from">Col 8 — UOM</span><span class="col-arr">→</span><span class="col-to">Component unit</span>
-        <span class="col-from">Col 9 — Material Type</span><span class="col-arr">→</span><span class="col-to">Material Type (ROH / HALB)</span>
-        <span class="col-from">Col 10 — Alternative BOM</span><span class="col-arr">→</span><span class="col-to">Alternative</span>
-        <span class="col-from">Col 12 — BasQty (Next Level)</span><span class="col-arr">→</span><span class="col-to">Base quantity</span>
-        <span class="col-note">Usage = 1 · Alt Text = blank · Prod.Stor.Loc = blank · Duplicates auto-removed</span>
+        <div class="col-row"><span class="col-from">Col 0</span><span class="col-arr">→</span><span class="col-to">Plant (5600 → 5500/5600)</span></div>
+        <div class="col-row"><span class="col-from">Col 1</span><span class="col-arr">→</span><span class="col-to">Level (hierarchy driver)</span></div>
+        <div class="col-row"><span class="col-from">Col 2</span><span class="col-arr">→</span><span class="col-to">Material number</span></div>
+        <div class="col-row"><span class="col-from">Col 3</span><span class="col-arr">→</span><span class="col-to">Material Description</span></div>
+        <div class="col-row"><span class="col-from">Col 4</span><span class="col-arr">→</span><span class="col-to">Component number</span></div>
+        <div class="col-row"><span class="col-from">Col 5</span><span class="col-arr">→</span><span class="col-to">Component Description</span></div>
+        <div class="col-row"><span class="col-from">Col 6</span><span class="col-arr">→</span><span class="col-to">Comp.Qty(CUn) → Quantity</span></div>
+        <div class="col-row"><span class="col-from">Col 8</span><span class="col-arr">→</span><span class="col-to">UOM (component unit)</span></div>
+        <div class="col-row"><span class="col-from">Col 9</span><span class="col-arr">→</span><span class="col-to">Material Type (ROH/HALB)</span></div>
+        <div class="col-row"><span class="col-from">Col 10</span><span class="col-arr">→</span><span class="col-to">Alternative BOM</span></div>
+        <div class="col-row"><span class="col-from">Col 12</span><span class="col-arr">→</span><span class="col-to">BasQty (Next Level)</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Stats bar — shown after import -->
-  <div class="import-stats" id="importStats">
-    <div class="istat"><div class="istat-val" id="iIn">0</div><div class="istat-key">Input Rows</div></div>
-    <div class="istat"><div class="istat-val" id="iOut">0</div><div class="istat-key">Output Rows</div></div>
-    <div class="istat"><div class="istat-val" id="iPar">0</div><div class="istat-key">Parent Groups</div></div>
-    <div class="istat"><div class="istat-val red" id="iDup">0</div><div class="istat-key">Duplicates Removed</div></div>
-    <div class="istat"><div class="istat-val green" id="iRoh">0</div><div class="istat-key">ROH</div></div>
-    <div class="istat"><div class="istat-val purple" id="iHalb">0</div><div class="istat-key">HALB</div></div>
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-cell"><div class="stat-val" id="sIn">0</div><div class="stat-key">Input Rows</div></div>
+    <div class="stat-cell"><div class="stat-val" id="sOut">0</div><div class="stat-key">Output Rows</div></div>
+    <div class="stat-cell"><div class="stat-val" id="sPar">0</div><div class="stat-key">Parent Groups</div></div>
+    <div class="stat-cell"><div class="stat-val red" id="sDup">0</div><div class="stat-key">Dupes Removed</div></div>
+    <div class="stat-cell"><div class="stat-val green" id="sRoh">0</div><div class="stat-key">ROH</div></div>
+    <div class="stat-cell"><div class="stat-val purple" id="sHalb">0</div><div class="stat-key">HALB</div></div>
   </div>
 
-  <!-- Sheet 2 output table — shown after import -->
-  <div class="import-output" id="importOutput">
-    <div class="import-output-header">
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0"></div>
-      <h3>Sheet 2 Output</h3>
-      <span style="font-size:11px;color:var(--text3)" id="importRowCount"></span>
-      <div class="import-output-actions">
-        <button class="btn btn-secondary btn-sm" onclick="importCopyTSV()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  <div class="preview-wrap" id="previewWrap">
+    <div class="preview-header">
+      <div class="live-dot"></div>
+      <h3>Sheet 2 Preview</h3>
+      <span class="preview-count" id="previewCount"></span>
+      <div class="preview-actions">
+        <button class="btn btn-secondary btn-sm" onclick="copyForExcel()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copy for Excel
         </button>
-        <button class="btn btn-secondary btn-sm" onclick="importDownloadCSV()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <button class="btn btn-secondary btn-sm" onclick="downloadCSV()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download CSV
         </button>
       </div>
     </div>
-    <div class="output-table-wrap">
-      <table class="output-tbl">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Material</th>
-            <th>Material Description</th>
-            <th>Plant</th>
-            <th>Usage</th>
-            <th>Alternative</th>
-            <th>Base Qty</th>
-            <th>Component</th>
-            <th>Component Description</th>
-            <th>Material Type</th>
-            <th>Alt Text</th>
-            <th>Quantity</th>
-            <th>Component Unit</th>
-            <th>Prod.Stor.Loc.</th>
-          </tr>
-        </thead>
-        <tbody id="importTableBody"></tbody>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Material</th><th>Desc</th><th>Plant</th>
+          <th>Usage</th><th>Alt</th><th>Base Qty</th><th>Component</th>
+          <th>Comp Desc</th><th>Mat Type</th><th>Alt Text</th>
+          <th>Qty</th><th>Unit</th><th>Stor.Loc.</th>
+        </tr></thead>
+        <tbody id="previewBody"></tbody>
       </table>
     </div>
   </div>
-
-</div>
 </div>
 
-<!-- ② Editor Page -->
+<!-- Page 2: Editor -->
 <div class="page" id="page-editor">
-
   <div id="editorEmpty" class="empty">
     <div class="empty-icon">📋</div>
     <h3>No BOM loaded</h3>
-    <p>Go to Import and paste your Sheet 1 data to get started.</p>
+    <p>Go to Import, paste Sheet 1 data, and click "Import &amp; Build BOM".</p>
   </div>
-
-  <div id="editorContent" style="display:none">
-    <div class="editor-toolbar">
-      <span style="font-size:13px; font-weight:600; color:var(--text2)">Parent Groups</span>
-      <span style="font-size:12px; color:var(--text3)" id="groupCount"></span>
-      <div style="margin-left:auto; display:flex; gap:8px;">
+  <div id="editorContent" class="hidden">
+    <div class="editor-top">
+      <span class="editor-title">Parent Groups</span>
+      <span class="editor-meta" id="groupCount"></span>
+      <div class="group-search">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search groups…" id="groupSearch" oninput="filterGroups(this.value)">
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
         <button class="btn btn-secondary btn-sm" onclick="addNewGroup()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add Group
         </button>
-        <button class="btn btn-green btn-sm" onclick="runDiff(); switchPage('diff')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+        <button class="btn btn-green btn-sm" onclick="switchPage('diff')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
           View Changes
         </button>
       </div>
     </div>
-
     <div class="group-nav" id="groupNav"></div>
-
-    <div class="bom-table-wrap">
-      <div id="groupsContainer"></div>
-    </div>
+    <div class="bom-wrap"><div id="groupsContainer"></div></div>
   </div>
-
 </div>
 
-<!-- ③ Diff Page -->
+<!-- Page 3: Diff -->
 <div class="page" id="page-diff">
-
   <div id="diffEmpty" class="empty">
     <div class="empty-icon">🔍</div>
     <h3>No comparison yet</h3>
-    <p>Import a BOM and make edits, then come back here to see changes.</p>
+    <p>Import a BOM, make edits, then return here to review changes.</p>
   </div>
-
-  <div id="diffContent" style="display:none">
-    <div class="diff-toolbar">
-      <span style="font-size:13px; font-weight:600">Changes vs. Original BOM</span>
-      <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
-        <div class="diff-legend">
-          <div class="diff-legend-item"><div class="diff-dot diff-dot-added"></div><span>Added</span></div>
-          <div class="diff-legend-item"><div class="diff-dot diff-dot-removed"></div><span>Removed</span></div>
-          <div class="diff-legend-item"><div class="diff-dot diff-dot-modified"></div><span>Modified</span></div>
-          <div class="diff-legend-item"><div class="diff-dot diff-dot-unchanged"></div><span>Unchanged</span></div>
-        </div>
+  <div id="diffContent" class="hidden">
+    <div class="diff-top">
+      <span style="font-size:13px;font-weight:600;">Changes vs. Original BOM</span>
+      <div class="diff-legend">
+        <div class="diff-legend-item"><div class="diff-dot" style="background:var(--green)"></div><span>Added</span></div>
+        <div class="diff-legend-item"><div class="diff-dot" style="background:var(--red)"></div><span>Removed</span></div>
+        <div class="diff-legend-item"><div class="diff-dot" style="background:var(--amber)"></div><span>Modified</span></div>
+        <div class="diff-legend-item"><div class="diff-dot" style="background:var(--border2)"></div><span>Unchanged</span></div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.7);cursor:pointer;white-space:nowrap;">
+          <input type="checkbox" id="chkShowUnchanged" onchange="runDiff()"> Show unchanged
+        </label>
         <button class="btn btn-secondary btn-sm" onclick="exportDiffCSV()">Export Diff CSV</button>
         <button class="btn btn-green btn-sm" onclick="exportExcel()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download Excel (.xlsx)
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Excel
         </button>
       </div>
     </div>
-
-    <div class="diff-summary" id="diffSummary"></div>
+    <div class="diff-stats" id="diffStats"></div>
     <div id="diffOutput"></div>
   </div>
-
 </div>
 
-</div><!-- end .app -->
-
+</div><!-- .app -->
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════════════════════
-let originalGroups = null;  // frozen after import — never mutated
-let editedGroups   = null;  // live editable copy
+// ═══════════════════════════════════════════════════════════════════════════
+let originalGroups = null;
+let editedGroups   = null;
+let importFlatRows = [];
+let activeGroupKey = null;
 
-// ═══════════════════════════════════════════════════════════════
-// PARSING — exact logic from BOM Converter v2
-// Column indices (0-based):
-// Plant(0) | Level(1) | Material(2) | MatDesc(3) | Component(4) | CompDesc(5)
-// Comp.Qty(CUn)(6) | Comp.Qty(BUn)(7) | UOM(8) | MatType(9) | AltBOM(10)
-// BaseUoM(11) | BasQty(12) | ...
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════════════════
 const C = {
-  PLANT:0, LEVEL:1, MATERIAL:2, MAT_DESC:3,
-  COMPONENT:4, COMP_DESC:5,
-  QTY_CUN:6,   // Comp. Qty(CUn) — used as "Quantity" in Sheet 2
-  QTY_BUN:7,
-  UOM:8,
-  MAT_TYPE:9,
-  ALT_BOM:10,
-  BASE_QTY:12
+  PLANT:0,LEVEL:1,MATERIAL:2,MAT_DESC:3,
+  COMPONENT:4,COMP_DESC:5,QTY_CUN:6,QTY_BUN:7,
+  UOM:8,MAT_TYPE:9,ALT_BOM:10,BASE_QTY:12
 };
+const ROW_FIELDS = ['component','compDesc','matType','qty','uom','baseQty'];
+const GRP_FIELDS = ['matDesc','plant','alt'];
+const SHEET2_COLS = [
+  'Material','Material Description','Plant','Usage','Alternative',
+  'Base quantity','Component','Component Description','Material Type',
+  'Alt Text','Quantity','Component unit','Prod. Stor.Loc.'
+];
 
-function g(cells, idx) { return (cells[idx] || '').trim(); }
-function parsePlant(raw) {
-  const p = raw.trim();
-  if (p === '5600') return '5500/5600';
-  if (p === '5500') return '5500/5600';
-  return p;
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════════════════
+function gc(cells,idx){return(cells[idx]||'').trim();}
+function parsePlant(raw){const p=(raw||'').trim();return(p==='5600'||p==='5500')?'5500/5600':p;}
+// HTML escape
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// JS string escape for use in onclick="..." attributes
+function escJs(s){if(!s)return'';return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n');}
+function setEl(id,v){document.getElementById(id).textContent=v;}
+let _uid=10000;
+function newId(){return'r'+(++_uid);}
 
-function parseSheet1(raw) {
-  const lines = raw.split('\n').map(l => l.trimEnd()).filter(l => l.trim());
-  if (lines.length < 2) throw new Error('Need at least a header row + 1 data row.');
+// ═══════════════════════════════════════════════════════════════════════════
+// PARSE
+// ═══════════════════════════════════════════════════════════════════════════
+function parseSheet1(raw){
+  const lines=raw.split('\n').map(l=>l.trimEnd()).filter(l=>l.trim());
+  if(lines.length<2) throw new Error('Need at least a header row + 1 data row.');
+  const sep=lines[0].includes('\t')?'\t':'|';
+  const dataLines=lines.slice(1);
 
-  const sep = lines[0].includes('\t') ? '\t' : '|';
-  const dataLines = lines.slice(1);
-
-  // ── First pass: find top-level material ──────────────────────
-  let topMaterial = '', topMatDesc = '', topPlant = '', topAlt = '1';
-  for (const line of dataLines) {
-    const cells = line.split(sep);
-    if (cells.length < 10) continue;
-    if (g(cells, C.LEVEL) === '1') {
-      topMaterial = g(cells, C.MATERIAL);
-      topMatDesc  = g(cells, C.MAT_DESC);
-      topPlant    = parsePlant(g(cells, C.PLANT));
-      topAlt      = g(cells, C.ALT_BOM) || '1';
-      break;
+  let topMaterial='',topMatDesc='',topPlant='',topAlt='1';
+  for(const line of dataLines){
+    const cells=line.split(sep);
+    if(cells.length<10)continue;
+    if(gc(cells,C.LEVEL)==='1'){
+      topMaterial=gc(cells,C.MATERIAL);topMatDesc=gc(cells,C.MAT_DESC);
+      topPlant=parsePlant(gc(cells,C.PLANT));topAlt=gc(cells,C.ALT_BOM)||'1';break;
     }
   }
-  if (!topMaterial) throw new Error('Could not find any Level 1 rows. Check your data.');
+  if(!topMaterial) throw new Error('No Level 1 rows found. Check your data format.');
 
-  // parentStack[level] = { material, matDesc, plant, alt }
-  // parentStack[0] = the main finished-good material (parent for level-1 rows)
-  const parentStack = {};
-  parentStack[0] = { material: topMaterial, matDesc: topMatDesc, plant: topPlant, alt: topAlt };
+  const parentStack={0:{material:topMaterial,matDesc:topMatDesc,plant:topPlant,alt:topAlt}};
+  const groups={};
+  const seenKey=new Set();
+  let dupes=0,inputCount=0,uid=0;
 
-  // groups: plain object keyed by parent material (preserves insertion order)
-  // Each group: { matDesc, plant, alt, children: [{id, component, compDesc, matType, qty, uom, baseQty}] }
-  const groups = {};
-  const seenKey = new Set();   // deduplication: "parentMat||component"
-  let dupes = 0;
-  let inputCount = 0;
-  let uid = 0;
+  for(const line of dataLines){
+    const cells=line.split(sep);
+    if(cells.length<10)continue;
+    const level=parseInt(gc(cells,C.LEVEL))||0;
+    const material=gc(cells,C.MATERIAL);
+    const matDesc=gc(cells,C.MAT_DESC);
+    const component=gc(cells,C.COMPONENT);
+    const compDesc=gc(cells,C.COMP_DESC);
+    const matType=gc(cells,C.MAT_TYPE);
+    const qtyCun=gc(cells,C.QTY_CUN);
+    const uom=gc(cells,C.UOM);
+    // FIX #1: use actual baseQty from column 12 — do not hardcode
+    const baseQty=gc(cells,C.BASE_QTY)||'1,000';
+    const plant=parsePlant(gc(cells,C.PLANT));
+    const altBom=gc(cells,C.ALT_BOM)||'1';
 
-  // ── Second pass: assign each row to correct parent via parentStack ──
-  for (const line of dataLines) {
-    const cells = line.split(sep);
-    if (cells.length < 10) continue;
-
-    const level     = parseInt(g(cells, C.LEVEL)) || 0;
-    const material  = g(cells, C.MATERIAL);
-    const matDesc   = g(cells, C.MAT_DESC);
-    const component = g(cells, C.COMPONENT);
-    const compDesc  = g(cells, C.COMP_DESC);
-    const matType   = g(cells, C.MAT_TYPE);
-    const qtyCun    = g(cells, C.QTY_CUN);
-    const uom       = g(cells, C.UOM);
-    const baseQty   = g(cells, C.BASE_QTY) || '1,000';
-    const plant     = parsePlant(g(cells, C.PLANT));
-    const altBom    = g(cells, C.ALT_BOM) || '1';
-
-    if (!component) continue;
+    if(!component)continue;
     inputCount++;
 
-    // Parent lives one level up in the stack
-    const parentLevel = level - 1;
-    const parent = parentStack[parentLevel];
-    if (!parent) continue; // orphan row — skip
+    const parentLevel=level-1;
+    const parent=parentStack[parentLevel];
+    if(!parent)continue;
 
-    const parentMat = parent.material;
-
-    // Deduplicate: same parent + same component = skip
-    const dedupKey = `${parentMat}||${component}`;
-    if (seenKey.has(dedupKey)) {
-      dupes++;
-    } else {
+    const parentMat=parent.material;
+    const dedupKey=parentMat+'\x00'+component;
+    if(seenKey.has(dedupKey)){dupes++;} else {
       seenKey.add(dedupKey);
-      if (!groups[parentMat]) {
-        groups[parentMat] = { matDesc: parent.matDesc, plant: parent.plant, alt: parent.alt, children: [] };
+      if(!groups[parentMat]){
+        groups[parentMat]={matDesc:parent.matDesc,plant:parent.plant,alt:parent.alt,children:[]};
       }
-      groups[parentMat].children.push({
-        id: 'r' + (++uid),
-        component, compDesc, matType,
-        qty: qtyCun, uom, baseQty
-      });
+      groups[parentMat].children.push({id:'r'+(++uid),component,compDesc,matType,qty:qtyCun,uom,baseQty});
     }
+    // Advance stack — always done, even for dupes, so child hierarchy stays consistent
+    parentStack[level]={material:component,matDesc:compDesc,plant,alt:altBom};
 
-    // Always update the stack so children of this row know their parent
-    parentStack[level] = { material: component, matDesc: compDesc, plant, alt: altBom };
-
-    // Handle multiple top-level materials in one paste
-    if (level === 1 && material !== topMaterial) {
-      topMaterial = material;
-      topMatDesc  = matDesc;
-      parentStack[0] = { material: topMaterial, matDesc: topMatDesc, plant, alt: altBom };
+    // Multiple top-level materials
+    if(level===1&&material!==topMaterial){
+      topMaterial=material;topMatDesc=matDesc;
+      parentStack[0]={material:topMaterial,matDesc:topMatDesc,plant,alt:altBom};
     }
   }
 
-  // Convert plain object groups → Map (for Studio compatibility) and attach stats
-  const groupsMap = new Map();
-  for (const [key, grp] of Object.entries(groups)) {
-    groupsMap.set(key, {
-      matDesc: grp.matDesc,
-      plant:   grp.plant,
-      alt:     grp.alt,
-      rows:    grp.children   // renamed to 'rows' for Studio
-    });
+  const map=new Map();
+  for(const[key,grp]of Object.entries(groups)){
+    map.set(key,{matDesc:grp.matDesc,plant:grp.plant,alt:grp.alt,rows:grp.children});
   }
-
-  // Attach parse stats onto the Map so importBOM can surface them
-  groupsMap._stats = { inputCount, dupes };
-  return groupsMap;
+  map._stats={inputCount,dupes};
+  return map;
 }
 
-// Deep clone groups map
-function cloneGroups(groups) {
-  const out = new Map();
-  groups.forEach((g,k) => {
-    out.set(k, {
-      matDesc: g.matDesc,
-      plant: g.plant,
-      alt: g.alt,
-      rows: g.rows.map(r => ({...r}))
-    });
+function cloneGroups(src){
+  const out=new Map();
+  src.forEach((grp,key)=>{
+    out.set(key,{matDesc:grp.matDesc,plant:grp.plant,alt:grp.alt,rows:grp.rows.map(r=>({...r})),_isNew:grp._isNew||false});
   });
   return out;
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // IMPORT
-// ═══════════════════════════════════════════════════════════════
-let _uidCounter = 10000;
-function newId() { return 'r'+(++_uidCounter); }
+// ═══════════════════════════════════════════════════════════════════════════
+function rowToSheet2(r){
+  // FIX #2: use actual r.baseQty — never hardcode '1000'
+  return[r.parentMat,r.matDesc,r.plant,'1',r.alt,r.baseQty,r.component,r.compDesc,r.matType,'',r.qty,r.uom,''];
+}
 
-// Flat ordered list of all output rows for the import table
-let importFlatRows = [];
-
-const SHEET2_HEADERS = ['Material','Material Description','Plant','Usage','Alternative','Base quantity','Component','Component Description','Material Type','Alt Text','Quantity','Component unit','Prod. Stor.Loc.'];
-
-function importBOM() {
-  const raw = document.getElementById('pasteArea').value.trim();
-  if (!raw) { toast('Paste Sheet 1 data first.','err'); return; }
-  try {
-    const groups = parseSheet1(raw);
-    const stats = groups._stats || {};
+function importBOM(){
+  const raw=document.getElementById('pasteArea').value.trim();
+  if(!raw){toast('Paste Sheet 1 data first.','err');return;}
+  try{
+    const groups=parseSheet1(raw);
+    const stats=groups._stats||{};
     delete groups._stats;
 
-    originalGroups = groups;
-    editedGroups   = cloneGroups(groups);
+    originalGroups=groups;
+    editedGroups=cloneGroups(groups);
 
-    // ── Build flat rows for the import table ──────────────────
-    importFlatRows = [];
-    groups.forEach((g, parentMat) => {
-      g.rows.forEach(r => {
-        importFlatRows.push({ parentMat, matDesc: g.matDesc, plant: g.plant, alt: g.alt, ...r });
+    importFlatRows=[];
+    groups.forEach((grp,parentMat)=>{
+      grp.rows.forEach(r=>{
+        importFlatRows.push({parentMat,matDesc:grp.matDesc,plant:grp.plant,alt:grp.alt,...r});
       });
     });
 
-    // ── Stats ─────────────────────────────────────────────────
-    const roh  = importFlatRows.filter(r => r.matType === 'ROH').length;
-    const halb = importFlatRows.filter(r => r.matType === 'HALB').length;
-    document.getElementById('iIn').textContent   = stats.inputCount || importFlatRows.length;
-    document.getElementById('iOut').textContent  = importFlatRows.length;
-    document.getElementById('iPar').textContent  = groups.size;
-    document.getElementById('iDup').textContent  = stats.dupes || 0;
-    document.getElementById('iRoh').textContent  = roh;
-    document.getElementById('iHalb').textContent = halb;
-    document.getElementById('importStats').classList.add('visible');
+    const roh=importFlatRows.filter(r=>r.matType==='ROH').length;
+    const halb=importFlatRows.filter(r=>r.matType==='HALB').length;
+    setEl('sIn',stats.inputCount||importFlatRows.length);
+    setEl('sOut',importFlatRows.length);
+    setEl('sPar',groups.size);
+    setEl('sDup',stats.dupes||0);
+    setEl('sRoh',roh);
+    setEl('sHalb',halb);
+    document.getElementById('statsBar').classList.add('show');
 
-    // ── Render table ──────────────────────────────────────────
-    renderImportTable(importFlatRows);
-    document.getElementById('importRowCount').textContent = importFlatRows.length + ' rows · ' + groups.size + ' groups';
-    document.getElementById('importOutput').classList.add('visible');
-    document.getElementById('importOutput').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    renderPreviewTable(importFlatRows);
+    document.getElementById('previewCount').textContent=importFlatRows.length+' rows · '+groups.size+' groups';
+    document.getElementById('previewWrap').classList.add('show');
 
-    // ── Ready editor & export ─────────────────────────────────
     renderEditor();
-    document.getElementById('btnExportTSV').style.display = '';
+    document.getElementById('btnExportTSV').classList.remove('hidden');
     updateDiffBadge();
 
-    const dupeNote = stats.dupes > 0 ? ` · ${stats.dupes} duplicates removed` : '';
-    toast(`Imported ${stats.inputCount} rows → ${groups.size} parent groups${dupeNote}`, 'ok');
-  } catch(e) {
-    toast('Error: '+e.message, 'err');
-    console.error(e);
+    const dupeNote=stats.dupes>0?' · '+stats.dupes+' dupes removed':'';
+    document.getElementById('importStatus').textContent='✓ '+stats.inputCount+' rows processed';
+    toast('Imported '+groups.size+' parent groups'+dupeNote,'ok');
+    setTimeout(()=>document.getElementById('statsBar').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+  }catch(e){
+    toast('Error: '+e.message,'err');console.error(e);
   }
 }
 
-function renderImportTable(rows) {
-  const tbody = document.getElementById('importTableBody');
-  tbody.innerHTML = '';
-  let lastParent = null;
-  let n = 0;
-  rows.forEach(r => {
-    if (r.parentMat !== lastParent && lastParent !== null) {
-      const sep = document.createElement('tr');
-      sep.className = 'sep-row';
-      sep.innerHTML = `<td colspan="14">── next parent group ──</td>`;
-      tbody.appendChild(sep);
+function renderPreviewTable(rows){
+  const tbody=document.getElementById('previewBody');
+  tbody.innerHTML='';
+  let lastParent=null,n=0;
+  rows.forEach(r=>{
+    if(r.parentMat!==lastParent&&lastParent!==null){
+      const sep=document.createElement('tr');sep.className='sep-row';
+      sep.innerHTML='<td colspan="14">── next parent group ──</td>';tbody.appendChild(sep);
     }
-    lastParent = r.parentMat;
-    n++;
-    const tc = r.matType === 'HALB' ? 'tbl-halb' : r.matType === 'ROH' ? 'tbl-roh' : '';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="tbl-num">${n}</td>
-      <td class="tbl-mat">${esc(r.parentMat)}</td>
-      <td>${esc(r.matDesc)}</td>
-      <td>${esc(r.plant)}</td>
-      <td style="text-align:center">1</td>
-      <td style="text-align:center">${esc(r.alt)}</td>
-      <td style="text-align:right">1000</td>
-      <td class="tbl-comp">${esc(r.component)}</td>
-      <td>${esc(r.compDesc)}</td>
-      <td class="${tc}">${esc(r.matType)}</td>
-      <td></td>
-      <td style="text-align:right">${esc(r.qty)}</td>
-      <td>${esc(r.uom)}</td>
-      <td></td>
-    `;
+    lastParent=r.parentMat;n++;
+    const tc=r.matType==='HALB'?'c-halb':r.matType==='ROH'?'c-roh':'';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="c-num">${n}</td><td class="c-mat">${esc(r.parentMat)}</td>
+      <td>${esc(r.matDesc)}</td><td>${esc(r.plant)}</td>
+      <td style="text-align:center">1</td><td style="text-align:center">${esc(r.alt)}</td>
+      <td style="text-align:right">${esc(r.baseQty)}</td>
+      <td class="c-comp">${esc(r.component)}</td><td>${esc(r.compDesc)}</td>
+      <td class="${tc}">${esc(r.matType)}</td><td></td>
+      <td style="text-align:right">${esc(r.qty)}</td><td>${esc(r.uom)}</td><td></td>`;
     tbody.appendChild(tr);
   });
 }
 
-function importCopyTSV() {
-  if (!importFlatRows.length) return;
-  const lines = [SHEET2_HEADERS.join('\t')];
-  let last = null;
-  importFlatRows.forEach(r => {
-    if (r.parentMat !== last && last !== null) lines.push('\t'.repeat(SHEET2_HEADERS.length - 1));
-    last = r.parentMat;
-    lines.push([r.parentMat, r.matDesc, r.plant, '1', r.alt, '1000', r.component, r.compDesc, r.matType, '', r.qty, r.uom, ''].join('\t'));
+function copyForExcel(){
+  if(!importFlatRows.length)return;
+  const lines=[SHEET2_COLS.join('\t')];
+  let last=null;
+  importFlatRows.forEach(r=>{if(r.parentMat!==last&&last!==null)lines.push('');last=r.parentMat;lines.push(rowToSheet2(r).join('\t'));});
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>toast('Copied! Paste into Excel','ok')).catch(()=>downloadCSV());
+}
+
+function downloadCSV(){
+  if(!importFlatRows.length)return;
+  const lines=[SHEET2_COLS.map(h=>`"${h}"`).join(',')];
+  let last=null;
+  importFlatRows.forEach(r=>{
+    if(r.parentMat!==last&&last!==null)lines.push(','.repeat(SHEET2_COLS.length-1));
+    last=r.parentMat;
+    lines.push(rowToSheet2(r).map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
   });
-  navigator.clipboard.writeText(lines.join('\n'))
-    .then(() => toast('Copied! Paste directly into Excel', 'ok'))
-    .catch(() => { importDownloadCSV(); });
+  triggerDownload(lines.join('\n'),'sheet2_bom.csv','text/csv');
 }
 
-function importDownloadCSV() {
-  if (!importFlatRows.length) return;
-  const lines = [SHEET2_HEADERS.map(h=>`"${h}"`).join(',')];
-  let last = null;
-  importFlatRows.forEach(r => {
-    if (r.parentMat !== last && last !== null) lines.push(','.repeat(SHEET2_HEADERS.length - 1));
-    last = r.parentMat;
-    lines.push([r.parentMat, r.matDesc, r.plant, '1', r.alt, '1000', r.component, r.compDesc, r.matType, '', r.qty, r.uom, '']
-      .map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
-  });
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'sheet2_bom_output.csv';
-  a.click();
-  toast('Downloaded sheet2_bom_output.csv', 'ok');
+function clearImport(){
+  document.getElementById('pasteArea').value='';
+  document.getElementById('statsBar').classList.remove('show');
+  document.getElementById('previewWrap').classList.remove('show');
+  document.getElementById('previewBody').innerHTML='';
+  document.getElementById('importStatus').textContent='';
+  importFlatRows=[];
 }
 
-function clearImport() {
-  document.getElementById('pasteArea').value = '';
-  document.getElementById('importStats').classList.remove('visible');
-  document.getElementById('importOutput').classList.remove('visible');
-  document.getElementById('importTableBody').innerHTML = '';
-  importFlatRows = [];
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// EDITOR — RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+function renderEditor(){
+  document.getElementById('editorEmpty').style.display='none';
+  document.getElementById('editorContent').classList.remove('hidden');
+  const nav=document.getElementById('groupNav');
+  const container=document.getElementById('groupsContainer');
+  nav.innerHTML='';container.innerHTML='';
+  const keys=[...editedGroups.keys()];
+  document.getElementById('groupCount').textContent=keys.length+' groups';
+  if(!activeGroupKey||!editedGroups.has(activeGroupKey))activeGroupKey=keys[0];
 
-// ═══════════════════════════════════════════════════════════════
-// RENDER EDITOR
-// ═══════════════════════════════════════════════════════════════
-let activeGroupKey = null;
+  keys.forEach((key,i)=>{
+    const grp=editedGroups.get(key);
+    const isNew=grp._isNew===true;
+    const changed=groupHasChanges(key);
+    const isActive=key===activeGroupKey;
 
-function renderEditor() {
-  document.getElementById('editorEmpty').style.display = 'none';
-  document.getElementById('editorContent').style.display = '';
-
-  const nav = document.getElementById('groupNav');
-  const container = document.getElementById('groupsContainer');
-  nav.innerHTML = ''; container.innerHTML = '';
-
-  const keys = [...editedGroups.keys()];
-  document.getElementById('groupCount').textContent = keys.length+' groups';
-
-  if (!activeGroupKey || !editedGroups.has(activeGroupKey)) {
-    activeGroupKey = keys[0];
-  }
-
-  keys.forEach((key, i) => {
-    const g = editedGroups.get(key);
-    const hasChanges = groupHasChanges(key);
-
-    // Nav pill
-    const pill = document.createElement('button');
-    pill.className = 'group-pill'+(key===activeGroupKey?' active':'')+(hasChanges?' has-changes':'');
-    pill.title = g.matDesc;
-    pill.textContent = key;
-    pill.onclick = () => { activeGroupKey=key; renderEditor(); };
+    const pill=document.createElement('button');
+    pill.className='group-pill'+(isActive?' active':'')+(isNew?' newgrp':changed?' changed':'');
+    pill.title=grp.matDesc||key;
+    pill.textContent=key;
+    pill.dataset.key=key;
+    pill.onclick=()=>{activeGroupKey=key;renderEditor();};
     nav.appendChild(pill);
 
-    // Group section
-    const div = document.createElement('div');
-    div.className = 'bom-group'+(key===activeGroupKey?' active':'');
-    div.id = 'grp-'+i;
-    div.innerHTML = buildGroupHTML(key, g);
-    container.appendChild(div);
+    const panel=document.createElement('div');
+    panel.style.display=isActive?'block':'none';
+    panel.id='grp-panel-'+i;
+    panel.dataset.groupKey=key;
+    panel.innerHTML=buildGroupHTML(key,grp);
+    container.appendChild(panel);
   });
 }
 
-function buildGroupHTML(key, g) {
-  const colHeaders = ['Component','Description','Mat Type','Qty','UOM','Base Qty','Plant','Alt','Actions'];
-  const thHTML = colHeaders.map(h=>`<th>${h}</th>`).join('');
-
-  let rowsHTML = g.rows.map((r,ri) => buildRowHTML(key, r, ri)).join('');
-
-  return `
-    <div class="group-header-row">
-      <div>
-        <div class="group-title">${esc(key)}</div>
-        <div class="group-desc">${esc(g.matDesc)}</div>
-      </div>
-      <div class="group-meta">
-        <span>${g.rows.filter(r=>!r._deleted).length} components</span>
-        <span>${g.plant}</span>
+function buildGroupHTML(key,grp){
+  const activeRows=grp.rows.filter(r=>!r._deleted);
+  const sk=escJs(key);
+  return `<div class="grp-header">
+    <div class="grp-title-col">
+      <div class="grp-mat">${esc(key)}</div>
+      <div class="grp-fields">
+        <div class="grp-field" style="flex:1;min-width:180px;">
+          <label>Description</label>
+          <input type="text" value="${esc(grp.matDesc)}" style="flex:1;min-width:140px;"
+            oninput="updateGroupMeta('${sk}','matDesc',this.value)"
+            placeholder="Material description…">
+        </div>
+        <div class="grp-field">
+          <label>Plant</label>
+          <input type="text" value="${esc(grp.plant)}" style="width:80px;"
+            oninput="updateGroupMeta('${sk}','plant',this.value)">
+        </div>
+        <div class="grp-field">
+          <label>Alt</label>
+          <input type="text" value="${esc(grp.alt)}" style="width:36px;"
+            oninput="updateGroupMeta('${sk}','alt',this.value)">
+        </div>
       </div>
     </div>
-    <table class="bom-tbl">
-      <thead><tr>${thHTML}</tr></thead>
-      <tbody id="tbody-${key}">${rowsHTML}</tbody>
-    </table>
-    <button class="add-row-btn" onclick="addRow('${key}')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Add component row
-    </button>
-  `;
+    <div class="grp-meta">
+      <div class="grp-stat">${activeRows.length}</div>
+      <div class="grp-stat-label">components</div>
+    </div>
+  </div>
+  <table class="bom-tbl">
+    <thead><tr>
+      <th>Component</th><th>Description</th><th>Mat Type</th>
+      <th>Quantity</th><th>UOM</th><th>Base Qty</th><th>Actions</th>
+    </tr></thead>
+    <tbody id="tbody-${esc(key)}">${grp.rows.map((r,ri)=>buildRowHTML(key,r,ri)).join('')}</tbody>
+  </table>
+  <button class="add-row-btn" onclick="addRow('${sk}')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Add component row
+  </button>`;
 }
 
-function buildRowHTML(groupKey, r, ri) {
-  const isDeleted = r._deleted===true;
-  const isAdded   = r._isNew===true;
-  const origRow   = getOrigRow(groupKey, r.id);
-  const isModified = !isAdded && !isDeleted && origRow && rowModified(r, origRow);
+function buildRowHTML(groupKey,r,ri){
+  const isDeleted=r._deleted===true;
+  const isAdded=r._isNew===true;
+  const origRow=getOrigRow(groupKey,r.id);
+  const isModified=!isAdded&&!isDeleted&&origRow&&rowModified(r,origRow);
+  let rowClass='';
+  if(isDeleted)rowClass='row-deleted';
+  else if(isAdded)rowClass='row-added';
+  else if(isModified)rowClass='row-modified';
 
-  let cls = '';
-  if (isDeleted) cls = 'row-deleted';
-  else if (isAdded) cls = 'row-added';
-  else if (isModified) cls = 'row-modified';
+  const sk=escJs(groupKey);const sid=r.id;
 
-  const typeSelect = `<select class="cell-select" onchange="cellChanged('${groupKey}','${r.id}','matType',this.value)" ${isDeleted?'disabled':''}>
-    ${['ROH','HALB','FERT','ROH-SFG'].map(t=>`<option value="${t}" ${r.matType===t?'selected':''}>${t}</option>`).join('')}
-  </select>`;
-
-  // HALB rows: show child group navigation button
-  // ROH rows: no children possible — no button
-  const isHalb = r.matType === 'HALB';
-  const childKey = r.component; // the component number IS the parent key of its children
-  const hasChildGroup = isHalb && editedGroups && editedGroups.has(childKey);
-
-  let halbBtn = '';
-  if (isHalb && !isDeleted) {
-    if (hasChildGroup) {
-      halbBtn = `<button class="row-btn goto-child" title="Go to child group: ${esc(childKey)}" onclick="goToChildGroup('${childKey}')">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        ${esc(childKey)}
-      </button>`;
-    } else {
-      halbBtn = `<button class="row-btn goto-child missing" title="No child group found for ${esc(childKey)}" onclick="createChildGroup('${childKey}','${esc(r.compDesc)}')">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add children
-      </button>`;
+  const isHalb=r.matType==='HALB';
+  const childExists=isHalb&&editedGroups&&editedGroups.has(r.component);
+  let halbBtn='';
+  if(isHalb&&!isDeleted){
+    if(childExists){
+      halbBtn=`<button class="row-btn goto-child" title="Go to child: ${esc(r.component)}" onclick="goToChildGroup('${escJs(r.component)}')">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>${esc(r.component)}</button>`;
+    }else{
+      // FIX #3: use escJs for both component and desc in onclick to prevent broken strings
+      halbBtn=`<button class="row-btn goto-child missing" title="Create child group" onclick="createChildGroup('${escJs(r.component)}','${escJs(r.compDesc)}')">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add children</button>`;
     }
   }
 
-  const actionBtns = isDeleted
-    ? `<div class="row-actions"><button class="row-btn restore" title="Restore" onclick="restoreRow('${groupKey}','${r.id}')">↩</button></div>`
-    : `<div class="row-actions">
-        ${halbBtn}
-        <button class="row-btn del" title="Delete row" onclick="deleteRow('${groupKey}','${r.id}')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        </button>
-      </div>`;
+  const actionCell=isDeleted
+    ?`<div class="row-actions"><button class="row-btn restore" onclick="restoreRow('${sk}','${sid}')">↩ Restore</button></div>`
+    :`<div class="row-actions">${halbBtn}<button class="row-btn del" title="Delete" onclick="deleteRow('${sk}','${sid}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      </button></div>`;
 
-  function inp(field, val, w='90px') {
-    const origVal = origRow ? origRow[field] : val;
-    const changed = !isAdded && val !== origVal;
-    return `<input class="cell-input${changed?' changed':''}" style="min-width:${w}" value="${esc(val)}" 
-      oninput="cellChanged('${groupKey}','${r.id}','${field}',this.value)" 
+  function inp(field,val,width){
+    const origVal=origRow?(origRow[field]||''):val;
+    const changed=!isAdded&&String(val)!==String(origVal);
+    return`<input class="cell-input${changed?' changed':''}" style="min-width:${width||'80px'}" value="${esc(val)}"
+      oninput="cellChanged('${sk}','${sid}','${field}',this.value)"
       title="${changed?'Original: '+esc(origVal):''}"
       ${isDeleted?'disabled':''}>`;
   }
 
-  return `<tr class="${cls}" id="row-${r.id}">
-    <td>${inp('component', r.component, '130px')}</td>
-    <td>${inp('compDesc', r.compDesc, '220px')}</td>
-    <td>${typeSelect}</td>
-    <td>${inp('qty', r.qty, '70px')}</td>
-    <td>${inp('uom', r.uom, '55px')}</td>
-    <td>${inp('baseQty', r.baseQty, '70px')}</td>
-    <td>${inp('plant', g_plant(groupKey), '90px')}</td>
-    <td>${inp('alt', g_alt(groupKey), '50px')}</td>
-    <td>${actionBtns}</td>
+  const types=['ROH','HALB','FERT','HALB-SFG','ROH-SFG'];
+  const typeOpts=types.map(t=>`<option value="${t}"${r.matType===t?' selected':''}>${t}</option>`).join('');
+
+  return`<tr class="${rowClass}" id="row-${sid}">
+    <td>${inp('component',r.component,'120px')}</td>
+    <td>${inp('compDesc',r.compDesc,'190px')}</td>
+    <td><select class="cell-select" onchange="cellChanged('${sk}','${sid}','matType',this.value)" ${isDeleted?'disabled':''}>${typeOpts}</select></td>
+    <td>${inp('qty',r.qty,'75px')}</td>
+    <td>${inp('uom',r.uom,'50px')}</td>
+    <td>${inp('baseQty',r.baseQty,'75px')}</td>
+    <td>${actionCell}</td>
   </tr>`;
 }
 
-function g_plant(key) { return editedGroups.get(key)?.plant||''; }
-function g_alt(key)   { return editedGroups.get(key)?.alt||''; }
+// ═══════════════════════════════════════════════════════════════════════════
+// EDITOR — MUTATIONS
+// ═══════════════════════════════════════════════════════════════════════════
 
-function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// CELL EDITING
-// ═══════════════════════════════════════════════════════════════
-function cellChanged(groupKey, rowId, field, value) {
-  const g = editedGroups.get(groupKey);
-  if (!g) return;
-  const row = g.rows.find(r=>r.id===rowId);
-  if (!row) return;
-  row[field] = value;
-  // Re-render just the row styling (lightweight)
-  refreshRowStyle(groupKey, rowId);
+// FIX #4: group-level metadata (plant, alt, matDesc) stored on group, NOT on rows
+function updateGroupMeta(groupKey,field,value){
+  const grp=editedGroups.get(groupKey);
+  if(!grp)return;
+  grp[field]=value;
+  updateGroupPill(groupKey);
   updateDiffBadge();
 }
 
-function refreshRowStyle(groupKey, rowId) {
-  const g = editedGroups.get(groupKey);
-  const r = g?.rows.find(r=>r.id===rowId);
-  if (!r) return;
-  const tr = document.getElementById('row-'+rowId);
-  if (!tr) return;
+function cellChanged(groupKey,rowId,field,value){
+  const grp=editedGroups.get(groupKey);if(!grp)return;
+  const row=grp.rows.find(r=>r.id===rowId);if(!row)return;
+  row[field]=value;
+  refreshRowStyle(groupKey,rowId);
+  updateGroupPill(groupKey);
+  updateDiffBadge();
+}
 
-  const isDeleted  = r._deleted===true;
-  const isAdded    = r._isNew===true;
-  const origRow    = getOrigRow(groupKey, r.id);
-  const isModified = !isAdded && !isDeleted && origRow && rowModified(r, origRow);
-
-  tr.className = isDeleted?'row-deleted':isAdded?'row-added':isModified?'row-modified':'';
-
-  // Update changed highlights on inputs
-  tr.querySelectorAll('.cell-input').forEach(inp => {
-    const field = inp.getAttribute('oninput')?.match(/'(\w+)',this/)?.[1];
-    if (field && origRow) {
-      inp.classList.toggle('changed', !isAdded && inp.value !== (origRow[field]||''));
+function refreshRowStyle(groupKey,rowId){
+  const grp=editedGroups.get(groupKey);
+  const row=grp?.rows.find(r=>r.id===rowId);
+  if(!row)return;
+  const tr=document.getElementById('row-'+rowId);if(!tr)return;
+  const isDeleted=row._deleted===true;
+  const isAdded=row._isNew===true;
+  const origRow=getOrigRow(groupKey,rowId);
+  const isModified=!isAdded&&!isDeleted&&origRow&&rowModified(row,origRow);
+  tr.className=isDeleted?'row-deleted':isAdded?'row-added':isModified?'row-modified':'';
+  tr.querySelectorAll('.cell-input').forEach(inp=>{
+    const m=inp.getAttribute('oninput')?.match(/'(\w+)',this/);
+    const f=m?.[1];
+    if(f&&origRow&&!isAdded){
+      const ov=origRow[f]||'';
+      inp.classList.toggle('changed',inp.value!==ov);
+      inp.title=inp.value!==ov?'Original: '+ov:'';
     }
   });
 }
 
-function deleteRow(groupKey, rowId) {
-  const g = editedGroups.get(groupKey);
-  const r = g?.rows.find(r=>r.id===rowId);
-  if (!r) return;
-  if (r._isNew) {
-    g.rows = g.rows.filter(r=>r.id!==rowId);
-    reRenderGroup(groupKey);
-  } else {
-    r._deleted = true;
-    refreshRowStyle(groupKey, rowId);
-    // Update action button
-    const tr = document.getElementById('row-'+rowId);
-    if (tr) {
-      tr.querySelector('.row-actions').innerHTML = `<button class="row-btn restore" title="Restore" onclick="restoreRow('${groupKey}','${rowId}')">↩</button>`;
+function deleteRow(groupKey,rowId){
+  const grp=editedGroups.get(groupKey);
+  const row=grp?.rows.find(r=>r.id===rowId);if(!row)return;
+  if(row._isNew){grp.rows=grp.rows.filter(r=>r.id!==rowId);reRenderPanel(groupKey);}
+  else{
+    row._deleted=true;
+    const tr=document.getElementById('row-'+rowId);
+    if(tr){
+      tr.className='row-deleted';
       tr.querySelectorAll('input,select').forEach(el=>el.disabled=true);
+      const ac=tr.querySelector('.row-actions');
+      if(ac)ac.innerHTML=`<button class="row-btn restore" onclick="restoreRow('${escJs(groupKey)}','${rowId}')">↩ Restore</button>`;
     }
   }
-  updateGroupPill(groupKey);
-  updateDiffBadge();
+  updateGroupPill(groupKey);updateDiffBadge();
 }
 
-function restoreRow(groupKey, rowId) {
-  const g = editedGroups.get(groupKey);
-  const r = g?.rows.find(r=>r.id===rowId);
-  if (!r) return;
-  delete r._deleted;
-  reRenderGroup(groupKey);
-  updateGroupPill(groupKey);
-  updateDiffBadge();
+function restoreRow(groupKey,rowId){
+  const grp=editedGroups.get(groupKey);
+  const row=grp?.rows.find(r=>r.id===rowId);if(!row)return;
+  delete row._deleted;
+  reRenderPanel(groupKey);updateGroupPill(groupKey);updateDiffBadge();
 }
 
-function addRow(groupKey) {
-  const g = editedGroups.get(groupKey);
-  if (!g) return;
-  g.rows.push({ id:newId(), component:'', compDesc:'', matType:'ROH', qty:'1,000', uom:'NO', baseQty:'1,000', _isNew:true });
-  reRenderGroup(groupKey);
-  updateGroupPill(groupKey);
-  updateDiffBadge();
+function addRow(groupKey){
+  const grp=editedGroups.get(groupKey);if(!grp)return;
+  grp.rows.push({id:newId(),component:'',compDesc:'',matType:'ROH',qty:'1,000',uom:'EA',baseQty:'1,000',_isNew:true});
+  reRenderPanel(groupKey);updateGroupPill(groupKey);updateDiffBadge();
+  setTimeout(()=>{
+    const tbody=document.getElementById('tbody-'+groupKey);
+    if(tbody){const li=tbody.querySelector('tr:last-child input.cell-input');if(li)li.focus();}
+  },50);
 }
 
-function addNewGroup() {
-  const key = prompt('Enter new parent Material number:');
-  if (!key || !key.trim()) return;
-  const k = key.trim().toUpperCase();
-  if (editedGroups.has(k)) { toast('Group already exists','err'); return; }
-  const desc = prompt('Material Description (optional):') || '';
-  editedGroups.set(k, { matDesc:desc, plant:'5500/5600', alt:'1', rows:[], _isNew:true });
-  activeGroupKey = k;
-  renderEditor();
-  toast('New group added: '+k,'ok');
+function addNewGroup(){
+  const key=prompt('Enter new parent Material number:');
+  if(!key?.trim())return;
+  const k=key.trim().toUpperCase();
+  if(editedGroups.has(k)){toast('Group already exists: '+k,'err');return;}
+  const desc=prompt('Material Description (optional):')||'';
+  const first=editedGroups.values().next().value;
+  editedGroups.set(k,{matDesc:desc,plant:first?.plant||'5500/5600',alt:first?.alt||'1',rows:[],_isNew:true});
+  activeGroupKey=k;renderEditor();toast('Group added: '+k,'ok');
 }
 
-function goToChildGroup(childKey) {
-  if (!editedGroups.has(childKey)) { toast('Child group not found: '+childKey, 'err'); return; }
-  activeGroupKey = childKey;
-  renderEditor();
-  // Scroll the pill into view
-  setTimeout(() => {
-    const pills = document.querySelectorAll('.group-pill');
-    const keys = [...editedGroups.keys()];
-    const idx = keys.indexOf(childKey);
-    if (pills[idx]) pills[idx].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
-  }, 50);
+function goToChildGroup(childKey){
+  if(!editedGroups.has(childKey)){toast('Child group not found: '+childKey,'err');return;}
+  activeGroupKey=childKey;renderEditor();
+  setTimeout(()=>{
+    const pills=document.querySelectorAll('.group-pill');
+    const keys=[...editedGroups.keys()];const idx=keys.indexOf(childKey);
+    pills[idx]?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },60);
 }
 
-function createChildGroup(childKey, childDesc) {
-  if (editedGroups.has(childKey)) { goToChildGroup(childKey); return; }
-  const g = editedGroups.values().next().value; // borrow plant/alt from first group
-  editedGroups.set(childKey, {
-    matDesc: childDesc || '',
-    plant: g ? g.plant : '5500/5600',
-    alt: g ? g.alt : '1',
-    rows: [],
-    _isNew: true
+function createChildGroup(childKey,childDesc){
+  if(editedGroups.has(childKey)){goToChildGroup(childKey);return;}
+  const first=editedGroups.values().next().value;
+  editedGroups.set(childKey,{matDesc:childDesc||'',plant:first?.plant||'5500/5600',alt:first?.alt||'1',rows:[],_isNew:true});
+  activeGroupKey=childKey;renderEditor();toast('Child group created: '+childKey,'ok');
+}
+
+function reRenderPanel(groupKey){
+  const keys=[...editedGroups.keys()];const i=keys.indexOf(groupKey);
+  const grp=editedGroups.get(groupKey);
+  const panel=document.getElementById('grp-panel-'+i);
+  if(panel)panel.innerHTML=buildGroupHTML(groupKey,grp);
+}
+
+function updateGroupPill(groupKey){
+  const keys=[...editedGroups.keys()];
+  const pills=document.querySelectorAll('.group-pill');
+  const idx=keys.indexOf(groupKey);const pill=pills[idx];if(!pill)return;
+  const grp=editedGroups.get(groupKey);
+  const isNew=grp?._isNew===true;const changed=groupHasChanges(groupKey);
+  const isActive=groupKey===activeGroupKey;
+  pill.className='group-pill'+(isActive?' active':'')+(isNew?' newgrp':changed?' changed':'');
+}
+
+function filterGroups(q){
+  const pills=document.querySelectorAll('.group-pill');
+  const norm=q.toLowerCase().trim();
+  pills.forEach(pill=>{
+    const key=pill.dataset.key;
+    const grp=editedGroups?.get(key);
+    const match=!norm||key.toLowerCase().includes(norm)||(grp?.matDesc||'').toLowerCase().includes(norm);
+    pill.classList.toggle('gpill-hidden',!match);
   });
-  activeGroupKey = childKey;
-  renderEditor();
-  toast('Child group created: '+childKey, 'ok');
 }
 
-function reRenderGroup(groupKey) {
-  const g = editedGroups.get(groupKey);
-  if (!g) return;
-  const keys = [...editedGroups.keys()];
-  const i = keys.indexOf(groupKey);
-  const div = document.getElementById('grp-'+i);
-  if (div) div.innerHTML = buildGroupHTML(groupKey, g);
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// CHANGE DETECTION
+// ═══════════════════════════════════════════════════════════════════════════
+function getOrigRow(groupKey,rowId){return originalGroups?.get(groupKey)?.rows.find(r=>r.id===rowId)||null;}
+function rowModified(e,o){return ROW_FIELDS.some(f=>(e[f]||'')!==(o[f]||''));}
 
-function updateGroupPill(groupKey) {
-  const hasChanges = groupHasChanges(groupKey);
-  const keys = [...editedGroups.keys()];
-  const pills = document.querySelectorAll('.group-pill');
-  const idx = keys.indexOf(groupKey);
-  if (pills[idx]) {
-    pills[idx].classList.toggle('has-changes', hasChanges);
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// CHANGE DETECTION HELPERS
-// ═══════════════════════════════════════════════════════════════
-const ROW_FIELDS = ['component','compDesc','matType','qty','uom','baseQty'];
-
-function getOrigRow(groupKey, rowId) {
-  return originalGroups?.get(groupKey)?.rows.find(r=>r.id===rowId) || null;
-}
-
-function rowModified(edited, orig) {
-  return ROW_FIELDS.some(f => (edited[f]||'') !== (orig[f]||''));
-}
-
-function groupHasChanges(key) {
-  if (!originalGroups) return false;
-  const eg = editedGroups.get(key);
-  const og = originalGroups.get(key);
-  if (!og) return true; // new group
-  if (!eg) return false;
-  for (const r of eg.rows) {
-    if (r._isNew || r._deleted) return true;
-    const o = og.rows.find(x=>x.id===r.id);
-    if (!o || rowModified(r,o)) return true;
+function groupHasChanges(key){
+  if(!originalGroups)return false;
+  const eg=editedGroups.get(key);const og=originalGroups.get(key);
+  if(!og)return true;if(!eg)return false;
+  // FIX #5: check group-level field changes too
+  for(const f of GRP_FIELDS){if((eg[f]||'')!==(og[f]||''))return true;}
+  for(const r of eg.rows){
+    if(r._isNew||r._deleted)return true;
+    const o=og.rows.find(x=>x.id===r.id);
+    if(!o||rowModified(r,o))return true;
   }
   return false;
 }
 
-function countAllChanges() {
-  if (!editedGroups || !originalGroups) return 0;
-  let total = 0;
-  editedGroups.forEach((eg,key) => {
-    const og = originalGroups.get(key);
-    if (!og) { total += eg.rows.length; return; }
-    eg.rows.forEach(r => {
-      if (r._isNew || r._deleted) { total++; return; }
-      const o = og.rows.find(x=>x.id===r.id);
-      if (!o || rowModified(r,o)) total++;
+function countAllChanges(){
+  if(!editedGroups||!originalGroups)return 0;
+  let total=0;
+  editedGroups.forEach((eg,key)=>{
+    const og=originalGroups.get(key);
+    if(!og){total+=eg.rows.length;return;}
+    for(const f of GRP_FIELDS){if((eg[f]||'')!==(og[f]||''))total++;}
+    eg.rows.forEach(r=>{
+      if(r._isNew||r._deleted){total++;return;}
+      const o=og.rows.find(x=>x.id===r.id);
+      if(!o||rowModified(r,o))total++;
     });
-    og.rows.forEach(r => { if (!eg.rows.find(x=>x.id===r.id)) total++; });
+    og.rows.forEach(o=>{if(!eg.rows.find(r=>r.id===o.id))total++;});
   });
   return total;
 }
 
-function updateDiffBadge() {
-  const n = countAllChanges();
-  const badge = document.getElementById('diffBadge');
-  badge.style.display = n>0 ? '' : 'none';
-  badge.textContent = n>99 ? '99+' : n;
+function updateDiffBadge(){
+  const n=countAllChanges();
+  const badge=document.getElementById('diffBadge');
+  badge.classList.toggle('hidden',n===0);
+  badge.textContent=n>99?'99+':n;
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // DIFF ENGINE
-// ═══════════════════════════════════════════════════════════════
-function runDiff() {
-  document.getElementById('diffEmpty').style.display = 'none';
-  document.getElementById('diffContent').style.display = '';
+// ═══════════════════════════════════════════════════════════════════════════
+function runDiff(){
+  if(!originalGroups||!editedGroups)return;
+  document.getElementById('diffEmpty').style.display='none';
+  document.getElementById('diffContent').classList.remove('hidden');
+  const showUnchanged=document.getElementById('chkShowUnchanged').checked;
+  const allKeys=new Set([...originalGroups.keys(),...editedGroups.keys()]);
+  let totA=0,totR=0,totM=0,totU=0;
+  const groupDiffs=[];
 
-  const allGroupKeys = new Set([...originalGroups.keys(), ...editedGroups.keys()]);
-  let totalAdded=0, totalRemoved=0, totalModified=0, totalUnchanged=0;
-  const groupDiffs = [];
+  allKeys.forEach(key=>{
+    const og=originalGroups.get(key);const eg=editedGroups.get(key);
+    const diffRows=[];
 
-  allGroupKeys.forEach(key => {
-    const og = originalGroups.get(key);
-    const eg = editedGroups.get(key);
-    const diffRows = [];
-
-    if (!og) {
-      // Entirely new group
-      (eg?.rows||[]).forEach(r => {
-        diffRows.push({ type:'added', edited:r });
-        totalAdded++;
-      });
-    } else if (!eg) {
-      // Group deleted (shouldn't normally happen in this UI)
-      og.rows.forEach(r => { diffRows.push({ type:'removed', orig:r }); totalRemoved++; });
+    if(!og){
+      (eg?.rows||[]).forEach(r=>{diffRows.push({type:'added',edited:r});totA++;});
+    } else if(!eg){
+      og.rows.forEach(r=>{diffRows.push({type:'removed',orig:r});totR++;});
     } else {
-      // Compare rows
-      eg.rows.forEach(r => {
-        if (r._isNew) { diffRows.push({ type:'added', edited:r }); totalAdded++; return; }
-        if (r._deleted) { diffRows.push({ type:'removed', orig: og.rows.find(x=>x.id===r.id)||r, edited:r }); totalRemoved++; return; }
-        const o = og.rows.find(x=>x.id===r.id);
-        if (!o) { diffRows.push({ type:'added', edited:r }); totalAdded++; return; }
-        if (rowModified(r,o)) { diffRows.push({ type:'modified', orig:o, edited:r }); totalModified++; }
-        else { diffRows.push({ type:'unchanged', orig:o, edited:r }); totalUnchanged++; }
+      eg.rows.forEach(r=>{
+        if(r._isNew){diffRows.push({type:'added',edited:r});totA++;return;}
+        if(r._deleted){diffRows.push({type:'removed',orig:og.rows.find(x=>x.id===r.id)||r,edited:r});totR++;return;}
+        const o=og.rows.find(x=>x.id===r.id);
+        if(!o){diffRows.push({type:'added',edited:r});totA++;return;}
+        if(rowModified(r,o)){diffRows.push({type:'modified',orig:o,edited:r});totM++;}
+        else{diffRows.push({type:'unchanged',orig:o,edited:r});totU++;}
       });
-      // Check for rows in orig that aren't in edited (shouldn't happen if delete marks _deleted)
-      og.rows.forEach(o => {
-        if (!eg.rows.find(r=>r.id===o.id)) { diffRows.push({ type:'removed', orig:o }); totalRemoved++; }
-      });
+      og.rows.forEach(o=>{if(!eg.rows.find(r=>r.id===o.id)){diffRows.push({type:'removed',orig:o});totR++;}});
     }
 
-    if (diffRows.length) {
-      const g = eg||og;
-      groupDiffs.push({ key, matDesc:g.matDesc, plant:g.plant, rows:diffRows, isNew:!og });
+    if(diffRows.length){
+      const g=eg||og;
+      const ogGrp=og;const egGrp=eg;
+      // Detect group-level changes
+      const grpChanges=[];
+      if(og&&eg){
+        for(const f of GRP_FIELDS){
+          if((eg[f]||'')!==(og[f]||''))grpChanges.push(`${f}: "${og[f]}" → "${eg[f]}"`);
+        }
+      }
+      groupDiffs.push({key,matDesc:g.matDesc,plant:g.plant,rows:diffRows,isNew:!og,grpChanges});
     }
   });
 
   // Summary
-  const summary = document.getElementById('diffSummary');
-  summary.innerHTML = `
-    <div class="diff-stat"><div class="diff-stat-num green">${totalAdded}</div><div class="diff-stat-label">Rows Added</div></div>
-    <div class="diff-stat"><div class="diff-stat-num red">${totalRemoved}</div><div class="diff-stat-label">Rows Removed</div></div>
-    <div class="diff-stat"><div class="diff-stat-num amber">${totalModified}</div><div class="diff-stat-label">Rows Modified</div></div>
-    <div class="diff-stat"><div class="diff-stat-num muted">${totalUnchanged}</div><div class="diff-stat-label">Unchanged</div></div>
-  `;
+  document.getElementById('diffStats').innerHTML=`
+    <div class="diff-stat"><div class="diff-stat-num green">${totA}</div><div class="diff-stat-label">Added</div></div>
+    <div class="diff-stat"><div class="diff-stat-num red">${totR}</div><div class="diff-stat-label">Removed</div></div>
+    <div class="diff-stat"><div class="diff-stat-num amber">${totM}</div><div class="diff-stat-label">Modified</div></div>
+    <div class="diff-stat"><div class="diff-stat-num muted">${totU}</div><div class="diff-stat-label">Unchanged</div></div>`;
 
-  // Output
-  const out = document.getElementById('diffOutput');
-  out.innerHTML = '';
+  const out=document.getElementById('diffOutput');out.innerHTML='';
 
-  if (totalAdded+totalRemoved+totalModified === 0) {
-    out.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><h3>No changes detected</h3><p>The edited BOM matches the original exactly.</p></div>`;
+  if(totA+totR+totM===0&&!groupDiffs.some(g=>g.grpChanges.length)){
+    out.innerHTML=`<div class="empty"><div class="empty-icon">✅</div><h3>No changes detected</h3><p>The edited BOM matches the original exactly.</p></div>`;
     return;
   }
 
-  groupDiffs.forEach(gd => {
-    const hasChange = gd.rows.some(r=>r.type!=='unchanged');
-    if (!hasChange) return;
+  groupDiffs.forEach(gd=>{
+    const visibleRows=gd.rows.filter(r=>r.type!=='unchanged'||(showUnchanged));
+    if(!visibleRows.length&&!gd.grpChanges.length)return;
+    const hasChange=gd.rows.some(r=>r.type!=='unchanged')||gd.grpChanges.length>0;
+    if(!hasChange&&!showUnchanged)return;
 
-    const div = document.createElement('div');
-    div.className = 'diff-group';
+    const div=document.createElement('div');div.className='diff-group';
+    const newBadge=gd.isNew?`<span class="nb-tag">NEW GROUP</span>`:'';
+    const grpChgHtml=gd.grpChanges.length
+      ?`<div style="padding:6px 13px;background:#fefce8;border-bottom:1px solid var(--amber-border);font-size:11px;color:var(--amber);font-family:var(--mono);">
+          ⚠ Group header changed: ${gd.grpChanges.map(esc).join(' · ')}
+        </div>`:'';
 
-    const newBadge = gd.isNew ? `<span class="diff-tag diff-tag-added">NEW GROUP</span>` : '';
-    div.innerHTML = `
-      <div class="diff-group-title">
+    div.innerHTML=`<div class="diff-group-title">
         <span>${esc(gd.key)}</span>
-        <span style="font-weight:400; color:var(--text3)">${esc(gd.matDesc)}</span>
+        <span style="font-weight:400;color:var(--text3)">${esc(gd.matDesc)}</span>
         ${newBadge}
       </div>
-      <div class="diff-table-wrap">
+      ${grpChgHtml}
+      <div class="diff-tbl-wrap">
         <table class="diff-tbl">
-          <thead><tr>
-            <th>Status</th>
-            <th>Component</th>
-            <th>Description</th>
-            <th>Mat Type</th>
-            <th>Qty</th>
-            <th>UOM</th>
-            <th>Base Qty</th>
-          </tr></thead>
-          <tbody>${gd.rows.filter(r=>r.type!=='unchanged').map(r=>buildDiffRow(r)).join('')}</tbody>
+          <thead><tr><th>Status</th><th>Component</th><th>Description</th><th>Mat Type</th><th>Qty</th><th>UOM</th><th>Base Qty</th></tr></thead>
+          <tbody>${visibleRows.map(r=>buildDiffRow(r)).join('')}</tbody>
         </table>
-      </div>
-    `;
+      </div>`;
     out.appendChild(div);
   });
 }
 
-function buildDiffRow(r) {
-  const typeMap = { added:'diff-added', removed:'diff-removed', modified:'diff-modified', unchanged:'diff-unchanged' };
-  const tagMap  = { added:'diff-tag-added', removed:'diff-tag-removed', modified:'diff-tag-modified', unchanged:'diff-tag-unchanged' };
-  const labelMap = { added:'+', removed:'−', modified:'~', unchanged:'=' };
-
-  const cls = typeMap[r.type];
-  const tag = `<span class="diff-tag ${tagMap[r.type]}">${labelMap[r.type]}</span>`;
-
-  function diffCell(field) {
-    if (r.type==='added')   return esc(r.edited[field]);
-    if (r.type==='removed') return `<span style="text-decoration:line-through;color:var(--red)">${esc(r.orig[field])}</span>`;
-    if (r.type==='modified') {
-      const ov = r.orig[field]||'', nv = r.edited[field]||'';
-      if (ov!==nv) return `<span class="cell-old">${esc(ov)}</span><span class="cell-new">${esc(nv)}</span>`;
+function buildDiffRow(r){
+  const clsMap={added:'diff-added',removed:'diff-removed',modified:'diff-modified',unchanged:'diff-unchanged'};
+  const tagMap={added:'dt-a',removed:'dt-r',modified:'dt-m',unchanged:'dt-u'};
+  const labelMap={added:'+',removed:'−',modified:'~',unchanged:'='};
+  const cls=clsMap[r.type];
+  const tag=`<span class="diff-tag ${tagMap[r.type]}">${labelMap[r.type]}</span>`;
+  function dc(field){
+    if(r.type==='added')return esc(r.edited[field]);
+    if(r.type==='removed')return`<span style="text-decoration:line-through;color:var(--red)">${esc(r.orig[field])}</span>`;
+    if(r.type==='modified'){
+      const ov=r.orig[field]||'',nv=r.edited[field]||'';
+      if(ov!==nv)return`<span class="cell-old">${esc(ov)}</span><span class="cell-new">${esc(nv)}</span>`;
       return esc(nv);
     }
     return esc((r.edited||r.orig)[field]);
   }
-
-  const row = r.edited||r.orig;
-  return `<tr class="${cls}">
-    <td>${tag}</td>
-    <td>${diffCell('component')}</td>
-    <td>${diffCell('compDesc')}</td>
-    <td>${diffCell('matType')}</td>
-    <td>${diffCell('qty')}</td>
-    <td>${diffCell('uom')}</td>
-    <td>${diffCell('baseQty')}</td>
-  </tr>`;
+  return`<tr class="${cls}"><td>${tag}</td><td>${dc('component')}</td><td>${dc('compDesc')}</td><td>${dc('matType')}</td><td>${dc('qty')}</td><td>${dc('uom')}</td><td>${dc('baseQty')}</td></tr>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// EXPORT (from Editor tab — exports edited BOM)
-// ═══════════════════════════════════════════════════════════════
-function buildExportRows() {
-  const rows = [];
-  editedGroups.forEach((g, key) => {
-    const activeRows = g.rows.filter(r => !r._deleted);
-    if (activeRows.length === 0) return;
-    activeRows.forEach(r => {
-      rows.push([key, g.matDesc, g.plant, '1', g.alt, '1000', r.component, r.compDesc, r.matType, '', r.qty, r.uom, '']);
+// ═══════════════════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════════════════
+function exportTSV(){
+  if(!editedGroups)return;
+  const lines=[SHEET2_COLS.join('\t')];
+  editedGroups.forEach((grp,key)=>{
+    const active=grp.rows.filter(r=>!r._deleted);if(!active.length)return;
+    active.forEach(r=>{
+      lines.push([key,grp.matDesc,grp.plant,'1',grp.alt,r.baseQty,r.component,r.compDesc,r.matType,'',r.qty,r.uom,''].join('\t'));
     });
-    rows.push(null); // blank separator
+    lines.push('');
   });
-  return rows;
-}
-
-function exportTSV() {
-  const rows = buildExportRows();
-  const lines = [SHEET2_HEADERS.join('\t')];
-  rows.forEach(r => lines.push(r ? r.join('\t') : ''));
   navigator.clipboard.writeText(lines.join('\n')).then(()=>toast('Copied! Paste into Excel','ok')).catch(()=>{
-    downloadText(lines.join('\n'), 'bom_sheet2.tsv', 'text/tab-separated-values');
+    triggerDownload(lines.join('\n'),'bom_sheet2.tsv','text/tab-separated-values');
   });
 }
 
-function exportDiffCSV() {
-  if (!editedGroups || !originalGroups) { toast('No data','err'); return; }
-  const lines = ['Status,Group,Material Description,Component,Component Description,Mat Type,Qty,UOM,Base Qty'];
-  const allKeys = new Set([...originalGroups.keys(), ...editedGroups.keys()]);
+function exportDiffCSV(){
+  if(!editedGroups||!originalGroups){toast('No data','err');return;}
+  const lines=['Status,Group,Material Description,Component,Component Description,Mat Type,Qty Orig,Qty New,UOM Orig,UOM New,BaseQty Orig,BaseQty New'];
+  const allKeys=new Set([...originalGroups.keys(),...editedGroups.keys()]);
+  const cv=v=>`"${String(v||'').replace(/"/g,'""')}"`;
 
-  allKeys.forEach(key => {
-    const og = originalGroups.get(key);
-    const eg = editedGroups.get(key);
-    const g = eg||og;
-
-    const processRow = (r, type) => {
-      const row = r.edited||r.orig||r;
-      lines.push([type, key, g.matDesc, row.component, row.compDesc, row.matType, row.qty, row.uom, row.baseQty].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
-    };
-
-    (eg?.rows||[]).forEach(r => {
-      if (r._isNew) processRow({edited:r},'ADDED');
-      else if (r._deleted) processRow({orig: og?.rows.find(x=>x.id===r.id)||r},'REMOVED');
-      else {
-        const o = og?.rows.find(x=>x.id===r.id);
-        if (!o) processRow({edited:r},'ADDED');
-        else if (rowModified(r,o)) {
-          // one row each for before/after
-          lines.push(['MODIFIED_OLD', key, g.matDesc, o.component, o.compDesc, o.matType, o.qty, o.uom, o.baseQty].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
-          lines.push(['MODIFIED_NEW', key, g.matDesc, r.component, r.compDesc, r.matType, r.qty, r.uom, r.baseQty].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
-        }
-      }
+  allKeys.forEach(key=>{
+    const og=originalGroups.get(key);const eg=editedGroups.get(key);
+    const g=eg||og;
+    (eg?.rows||[]).forEach(r=>{
+      if(r._isNew){lines.push(['ADDED',key,g.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty].map(cv).join(','));return;}
+      if(r._deleted){const o=og?.rows.find(x=>x.id===r.id)||r;lines.push(['REMOVED',key,g.matDesc,o.component,o.compDesc,o.matType,o.qty,'',o.uom,'',o.baseQty,''].map(cv).join(','));return;}
+      const o=og?.rows.find(x=>x.id===r.id);
+      if(!o){lines.push(['ADDED',key,g.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty].map(cv).join(','));}
+      else if(rowModified(r,o)){lines.push(['MODIFIED',key,g.matDesc,r.component,r.compDesc,o.matType===r.matType?r.matType:o.matType+'→'+r.matType,o.qty,r.qty,o.uom,r.uom,o.baseQty,r.baseQty].map(cv).join(','));}
     });
   });
-
-  downloadText(lines.join('\n'), 'bom_diff.csv', 'text/csv');
+  triggerDownload(lines.join('\n'),'bom_diff.csv','text/csv');
 }
 
-function exportExcel() {
-  if (!editedGroups || !originalGroups) { toast('No data to export','err'); return; }
+function exportExcel(){
+  if(!editedGroups||!originalGroups){toast('No data to export','err');return;}
+  const wb=XLSX.utils.book_new();
 
-  const wb = XLSX.utils.book_new();
+  // Sheet 1: New BOM
+  const bomH=['Material','Material Description','Plant','Usage','Alternative','Base quantity','Component','Component Description','Material Type','Alt Text','Quantity','Component unit','Prod. Stor.Loc.'];
+  const bomRows=[bomH];let lastPar=null;
+  editedGroups.forEach((grp,key)=>{
+    const active=grp.rows.filter(r=>!r._deleted);if(!active.length)return;
+    if(lastPar!==null)bomRows.push(new Array(bomH.length).fill(''));
+    lastPar=key;
+    active.forEach(r=>{bomRows.push([key,grp.matDesc,grp.plant,1,grp.alt,r.baseQty,r.component,r.compDesc,r.matType,'',r.qty,r.uom,'']);});
+  });
+  const wsNew=XLSX.utils.aoa_to_sheet(bomRows);
+  wsNew['!cols']=[{wch:18},{wch:42},{wch:12},{wch:7},{wch:11},{wch:12},{wch:18},{wch:42},{wch:12},{wch:9},{wch:10},{wch:14},{wch:14}];
+  styleHeaderRow(wsNew,'2563A8');
+  XLSX.utils.book_append_sheet(wb,wsNew,'New BOM');
 
-  // ── SHEET 1: Edited BOM (Sheet 2 format) ─────────────────────────────────
-  const bomHeaders = ['Material','Material Description','Plant','Usage','Alternative',
-    'Base quantity','Component','Component Description','Material Type',
-    'Alt Text','Quantity','Component unit','Prod. Stor.Loc.'];
-
-  const bomRows = [bomHeaders];
-  let lastBomParent = null;
-
-  editedGroups.forEach((g, key) => {
-    const activeRows = g.rows.filter(r => !r._deleted);
-    if (!activeRows.length) return;
-    // blank separator row between groups (except first)
-    if (lastBomParent !== null) bomRows.push(new Array(bomHeaders.length).fill(''));
-    lastBomParent = key;
-    activeRows.forEach(r => {
-      bomRows.push([key, g.matDesc, g.plant, 1, g.alt, 1000,
-        r.component, r.compDesc, r.matType, '', r.qty, r.uom, '']);
+  // Sheet 2: Diff
+  const dH=['Status','Group','Material Description','Component','Component Description','Mat Type','Qty (Orig)','Qty (New)','UOM (Orig)','UOM (New)','BaseQty (Orig)','BaseQty (New)'];
+  const dRows=[dH];
+  const allKeys=new Set([...originalGroups.keys(),...editedGroups.keys()]);
+  allKeys.forEach(key=>{
+    const og=originalGroups.get(key);const eg=editedGroups.get(key);const grp=eg||og;
+    if(!og){(eg?.rows||[]).forEach(r=>dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty]));return;}
+    (eg?.rows||[]).forEach(r=>{
+      if(r._isNew){dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty]);return;}
+      if(r._deleted){const o=og.rows.find(x=>x.id===r.id)||r;dRows.push(['REMOVED',key,grp.matDesc,o.component,o.compDesc,o.matType,o.qty,'',o.uom,'',o.baseQty,'']);return;}
+      const o=og.rows.find(x=>x.id===r.id);
+      if(!o){dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty]);}
+      else if(rowModified(r,o)){dRows.push(['MODIFIED',key,grp.matDesc,r.component,r.compDesc,o.matType===r.matType?r.matType:o.matType+'→'+r.matType,o.qty,r.qty,o.uom,r.uom,o.baseQty,r.baseQty]);}
+      else{dRows.push(['UNCHANGED',key,grp.matDesc,r.component,r.compDesc,r.matType,r.qty,r.qty,r.uom,r.uom,r.baseQty,r.baseQty]);}
     });
   });
-
-  const wsNew = XLSX.utils.aoa_to_sheet(bomRows);
-
-  // Column widths for BOM sheet
-  wsNew['!cols'] = [
-    {wch:18},{wch:42},{wch:12},{wch:7},{wch:11},{wch:10},
-    {wch:18},{wch:42},{wch:12},{wch:9},{wch:10},{wch:14},{wch:14}
-  ];
-
-  // Style header row bold + background
-  const bomRange = XLSX.utils.decode_range(wsNew['!ref']);
-  for (let C = bomRange.s.c; C <= bomRange.e.c; C++) {
-    const cell = wsNew[XLSX.utils.encode_cell({r:0, c:C})];
-    if (cell) {
-      cell.s = {
-        font: { bold: true, color: { rgb: 'FFFFFF' } },
-        fill: { fgColor: { rgb: '2563A8' } },
-        alignment: { horizontal: 'center' }
-      };
-    }
+  const wsDiff=XLSX.utils.aoa_to_sheet(dRows);
+  wsDiff['!cols']=[{wch:11},{wch:18},{wch:38},{wch:18},{wch:38},{wch:10},{wch:12},{wch:12},{wch:10},{wch:10},{wch:13},{wch:13}];
+  styleHeaderRow(wsDiff,'374151');
+  const colorsMap={ADDED:{bg:'DCFCE7',fg:'166534'},REMOVED:{bg:'FEE2E2',fg:'991B1B'},MODIFIED:{bg:'FEF9C3',fg:'92400E'},UNCHANGED:{bg:'F9FAFB',fg:'6B7280'}};
+  const dRange=XLSX.utils.decode_range(wsDiff['!ref']);
+  for(let R=1;R<=dRange.e.r;R++){
+    const sc=wsDiff[XLSX.utils.encode_cell({r:R,c:0})];if(!sc)continue;
+    const col=colorsMap[sc.v];if(!col)continue;
+    sc.s={font:{bold:true,color:{rgb:col.fg}},fill:{fgColor:{rgb:col.bg}},alignment:{horizontal:'center'}};
+    for(let CC=1;CC<=dRange.e.c;CC++){const c=wsDiff[XLSX.utils.encode_cell({r:R,c:CC})];if(c)c.s={fill:{fgColor:{rgb:col.bg}}};}
   }
+  XLSX.utils.book_append_sheet(wb,wsDiff,'Changes (Diff)');
 
-  XLSX.utils.book_append_sheet(wb, wsNew, 'New BOM');
-
-  // ── SHEET 2: Diff ────────────────────────────────────────────────────────
-  const diffHeaders = ['Status','Group (Parent)','Material Description',
-    'Component','Component Description','Mat Type',
-    'Qty (Original)','Qty (New)','UOM (Original)','UOM (New)',
-    'Base Qty (Original)','Base Qty (New)'];
-
-  const diffRows = [diffHeaders];
-
-  const allKeys = new Set([...originalGroups.keys(), ...editedGroups.keys()]);
-
-  allKeys.forEach(key => {
-    const og = originalGroups.get(key);
-    const eg = editedGroups.get(key);
-    const grp = eg || og;
-
-    if (!og) {
-      // New group — all rows added
-      (eg?.rows || []).forEach(r => {
-        diffRows.push(['ADDED', key, grp.matDesc,
-          r.component, r.compDesc, r.matType,
-          '', r.qty, '', r.uom, '', r.baseQty]);
-      });
-      return;
-    }
-
-    (eg?.rows || []).forEach(r => {
-      if (r._isNew) {
-        diffRows.push(['ADDED', key, grp.matDesc,
-          r.component, r.compDesc, r.matType,
-          '', r.qty, '', r.uom, '', r.baseQty]);
-        return;
-      }
-      if (r._deleted) {
-        const o = og.rows.find(x => x.id === r.id) || r;
-        diffRows.push(['REMOVED', key, grp.matDesc,
-          o.component, o.compDesc, o.matType,
-          o.qty, '', o.uom, '', o.baseQty, '']);
-        return;
-      }
-      const o = og.rows.find(x => x.id === r.id);
-      if (!o) {
-        diffRows.push(['ADDED', key, grp.matDesc,
-          r.component, r.compDesc, r.matType,
-          '', r.qty, '', r.uom, '', r.baseQty]);
-        return;
-      }
-      if (rowModified(r, o)) {
-        diffRows.push(['MODIFIED', key, grp.matDesc,
-          r.component, r.compDesc,
-          o.matType === r.matType ? r.matType : `${o.matType} → ${r.matType}`,
-          o.qty, r.qty, o.uom, r.uom, o.baseQty, r.baseQty]);
-      } else {
-        diffRows.push(['UNCHANGED', key, grp.matDesc,
-          r.component, r.compDesc, r.matType,
-          r.qty, r.qty, r.uom, r.uom, r.baseQty, r.baseQty]);
-      }
-    });
-  });
-
-  const wsDiff = XLSX.utils.aoa_to_sheet(diffRows);
-
-  // Column widths for diff sheet
-  wsDiff['!cols'] = [
-    {wch:11},{wch:18},{wch:38},{wch:18},{wch:38},
-    {wch:10},{wch:14},{wch:14},{wch:12},{wch:12},{wch:14},{wch:14}
-  ];
-
-  // Style header row
-  const diffRange = XLSX.utils.decode_range(wsDiff['!ref']);
-  for (let C = diffRange.s.c; C <= diffRange.e.c; C++) {
-    const cell = wsDiff[XLSX.utils.encode_cell({r:0, c:C})];
-    if (cell) {
-      cell.s = {
-        font: { bold: true, color: { rgb: 'FFFFFF' } },
-        fill: { fgColor: { rgb: '374151' } },
-        alignment: { horizontal: 'center' }
-      };
-    }
-  }
-
-  // Color-code status column rows in diff sheet
-  const statusColors = {
-    'ADDED':     { bg: 'DCFCE7', fg: '166534' },
-    'REMOVED':   { bg: 'FEE2E2', fg: '991B1B' },
-    'MODIFIED':  { bg: 'FEF9C3', fg: '92400E' },
-    'UNCHANGED': { bg: 'F9FAFB', fg: '6B7280' },
-  };
-
-  for (let R = 1; R <= diffRange.e.r; R++) {
-    const statusCell = wsDiff[XLSX.utils.encode_cell({r:R, c:0})];
-    if (!statusCell) continue;
-    const status = statusCell.v;
-    const colors = statusColors[status];
-    if (!colors) continue;
-    statusCell.s = {
-      font: { bold: true, color: { rgb: colors.fg } },
-      fill: { fgColor: { rgb: colors.bg } },
-      alignment: { horizontal: 'center' }
-    };
-    // Light background on the rest of the row
-    for (let C = 1; C <= diffRange.e.c; C++) {
-      const c = wsDiff[XLSX.utils.encode_cell({r:R, c:C})];
-      if (c) c.s = { fill: { fgColor: { rgb: colors.bg } } };
-    }
-  }
-
-  XLSX.utils.book_append_sheet(wb, wsDiff, 'Changes (Diff)');
-
-  // ── Write and download ────────────────────────────────────────────────────
-  // Generate filename with timestamp
-  const now = new Date();
-  const ts = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
-  const filename = `BOM_Export_${ts}.xlsx`;
-
-  XLSX.writeFile(wb, filename, { bookType: 'xlsx', type: 'binary', cellStyles: true });
-  toast(`Downloaded ${filename}`, 'ok');
+  const ts=new Date();const tsStr=ts.getFullYear()+pad(ts.getMonth()+1)+pad(ts.getDate());
+  const fn='BOM_Export_'+tsStr+'.xlsx';
+  XLSX.writeFile(wb,fn,{bookType:'xlsx',type:'binary',cellStyles:true});
+  toast('Downloaded '+fn,'ok');
 }
 
-function downloadText(text, filename, mime) {
-  const blob = new Blob([text], { type: mime });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
+function styleHeaderRow(ws,color){
+  const range=XLSX.utils.decode_range(ws['!ref']);
+  for(let C2=range.s.c;C2<=range.e.c;C2++){
+    const cell=ws[XLSX.utils.encode_cell({r:0,c:C2})];
+    if(cell)cell.s={font:{bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:color}},alignment:{horizontal:'center'}};
+  }
+}
+
+function pad(n){return String(n).padStart(2,'0');}
+function triggerDownload(text,filename,mime){
+  const blob=new Blob([text],{type:mime});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
   toast('Downloaded: '+filename,'ok');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // UI UTILS
-// ═══════════════════════════════════════════════════════════════
-function switchPage(page) {
+// ═══════════════════════════════════════════════════════════════════════════
+function switchPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-
-  if (page==='diff' && editedGroups && originalGroups) runDiff();
+  if(page==='diff'&&editedGroups&&originalGroups)runDiff();
 }
 
-function toast(msg, type='ok') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'show '+(type==='ok'?'ok':'err');
-  clearTimeout(el._t);
-  el._t = setTimeout(()=>{ el.className=''; }, 2800);
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='show '+type;
+  clearTimeout(el._t);el._t=setTimeout(()=>{el.className='';},2800);
 }
 </script>
 </body>
