@@ -14,26 +14,29 @@
   --green:#15803d;--green-light:#f0faf3;--green-border:#86efac;
   --red:#b91c1c;--red-light:#fff1f1;--red-border:#fca5a5;
   --amber:#92400e;--amber-light:#fffbeb;--amber-border:#fcd34d;
-  --purple:#6d28d9;--purple-light:#f5f3ff;
-  --cyan:#0e7490;--cyan-light:#f0f9ff;
+  --purple:#6d28d9;--purple-light:#f5f3ff;--purple-border:#c4b5fd;
+  --cyan:#0e7490;--cyan-light:#f0f9ff;--cyan-border:#a5f3fc;
   --shadow-xs:0 1px 2px rgba(0,0,0,.05);
   --shadow-sm:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --shadow:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
   --r:6px;--r-sm:4px;
   --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --tree-w:300px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13.5px;min-height:100vh;-webkit-font-smoothing:antialiased;}
-::-webkit-scrollbar{width:5px;height:5px;} ::-webkit-scrollbar-track{background:var(--surface2);}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;} ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
-.app{display:flex;flex-direction:column;min-height:100vh;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13.5px;min-height:100vh;-webkit-font-smoothing:antialiased;overflow:hidden;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--surface2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+.app{display:flex;flex-direction:column;height:100vh;}
 
-/* Topbar */
-.topbar{background:var(--text);color:#fff;padding:0 24px;display:flex;align-items:center;height:52px;position:sticky;top:0;z-index:200;}
-.logo{font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:-.02em;color:#fff;padding-right:18px;border-right:1px solid rgba(255,255,255,.12);margin-right:6px;flex-shrink:0;}
+/* ── Topbar ─────────────────────────────────────────────── */
+.topbar{background:var(--text);color:#fff;padding:0 20px;display:flex;align-items:center;height:50px;flex-shrink:0;z-index:200;}
+.logo{font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:-.02em;color:#fff;padding-right:16px;border-right:1px solid rgba(255,255,255,.12);margin-right:4px;flex-shrink:0;}
 .logo em{color:#60a5fa;font-style:normal;}
-.tabs{display:flex;height:52px;}
-.tab{padding:0 18px;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:7px;font-family:var(--sans);border-bottom:2px solid transparent;}
+.tabs{display:flex;height:50px;}
+.tab{padding:0 16px;font-size:12px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;border:none;background:transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px;font-family:var(--sans);border-bottom:2px solid transparent;}
 .tab:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.05);}
 .tab.active{color:#fff;border-bottom-color:#60a5fa;background:rgba(255,255,255,.06);}
 .tab-num{width:18px;height:18px;background:rgba(255,255,255,.12);border-radius:3px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:var(--mono);}
@@ -42,171 +45,264 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
 .vdiv{width:1px;height:26px;background:rgba(255,255,255,.12);flex-shrink:0;margin:0 4px;}
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:12.5px;font-weight:500;padding:7px 13px;border-radius:var(--r-sm);border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:all .12s;line-height:1;}
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--r-sm);border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:all .12s;line-height:1;}
 .btn svg{flex-shrink:0;}
-.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);} .btn-primary:hover{background:#1a45c0;}
-.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border2);} .btn-secondary:hover{background:var(--surface2);}
-.btn-ghost{background:transparent;color:var(--text2);} .btn-ghost:hover{background:var(--surface2);color:var(--text);}
-.btn-green{background:var(--green);color:#fff;} .btn-green:hover{background:#126633;}
-.btn-sm{padding:4px 10px;font-size:11.5px;}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-primary:hover{background:#1a45c0;}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border2);}
+.btn-secondary:hover{background:var(--surface2);}
+.btn-ghost{background:transparent;color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{background:#126633;}
+.btn-sm{padding:4px 9px;font-size:11px;}
 .btn:disabled{opacity:.38;cursor:not-allowed;pointer-events:none;}
+.btn-icon{width:28px;height:28px;padding:0;justify-content:center;border-radius:var(--r-sm);background:transparent;color:var(--text3);border:none;}
+.btn-icon:hover{background:var(--surface3);color:var(--text);}
 
-/* Pages */
-.page{display:none;padding:20px 24px;animation:fadeIn .15s ease;}
-.page.active{display:block;}
+/* ── Pages ────────────────────────────────────────────────── */
+.page{display:none;flex:1;overflow:hidden;animation:fadeIn .15s ease;}
+.page.active{display:flex;flex-direction:column;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 .hidden{display:none!important;}
+.page-scroll{flex:1;overflow-y:auto;padding:18px 22px;}
 
-/* Card */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:14px;}
-.card-header{padding:11px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;background:var(--surface2);}
-.card-header h3{font-size:12.5px;font-weight:600;}
-.card-header .hint{margin-left:auto;font-size:11px;color:var(--text3);font-family:var(--mono);}
+/* ── Card ─────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:12px;}
+.card-header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--surface2);}
+.card-header h3{font-size:12px;font-weight:600;}
+.card-header .hint{margin-left:auto;font-size:10.5px;color:var(--text3);font-family:var(--mono);}
 .step-badge{min-width:20px;height:20px;background:var(--accent);color:#fff;border-radius:3px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono);}
-.card-footer{padding:11px 18px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;background:var(--surface2);}
+.card-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;background:var(--surface2);}
 
-/* Import grid */
-.import-grid{display:grid;grid-template-columns:1fr 310px;gap:14px;margin-bottom:14px;}
-@media(max-width:860px){.import-grid{grid-template-columns:1fr;}}
-textarea.paste-area{width:100%;height:230px;border:none;outline:none;padding:13px 17px;font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--text);background:var(--surface);resize:vertical;caret-color:var(--accent);}
-textarea.paste-area:focus{background:#fdfcf9;} textarea.paste-area::placeholder{color:var(--text3);}
-.col-map{padding:13px 17px;display:flex;flex-direction:column;gap:3px;}
-.col-row{display:grid;grid-template-columns:80px 16px 1fr;align-items:center;gap:5px;padding:3px 0;border-bottom:1px solid var(--border);font-size:11px;}
+/* ── Import page ──────────────────────────────────────────── */
+.import-grid{display:grid;grid-template-columns:1fr 290px;gap:12px;margin-bottom:12px;}
+@media(max-width:820px){.import-grid{grid-template-columns:1fr;}}
+textarea.paste-area{width:100%;height:210px;border:none;outline:none;padding:12px 16px;font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--text);background:var(--surface);resize:vertical;caret-color:var(--accent);}
+textarea.paste-area:focus{background:#fdfcf9;}
+textarea.paste-area::placeholder{color:var(--text3);}
+.col-map{padding:12px 16px;display:flex;flex-direction:column;gap:2px;}
+.col-row{display:grid;grid-template-columns:76px 14px 1fr;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid var(--border);font-size:10.5px;}
 .col-row:last-child{border-bottom:none;}
-.col-from{font-family:var(--mono);color:var(--accent);font-size:10.5px;}
+.col-from{font-family:var(--mono);color:var(--accent);font-size:10px;}
 .col-arr{color:var(--text3);text-align:center;font-size:9px;}
 .col-to{color:var(--text2);}
 
-/* Stats */
-.stats-bar{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-xs);}
+/* ── Stats bar ────────────────────────────────────────────── */
+.stats-bar{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow-xs);}
 .stats-bar.show{display:flex;flex-wrap:wrap;animation:fadeIn .2s ease;}
-.stat-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 20px;border-right:1px solid var(--border);gap:5px;flex:1;min-width:85px;}
+.stat-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 18px;border-right:1px solid var(--border);gap:4px;flex:1;min-width:80px;}
 .stat-cell:last-child{border-right:none;}
-.stat-val{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent);line-height:1;}
-.stat-val.green{color:var(--green);} .stat-val.purple{color:var(--purple);} .stat-val.red{color:var(--red);} .stat-val.muted{color:var(--text3);}
-.stat-key{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent);line-height:1;}
+.stat-val.green{color:var(--green);}
+.stat-val.purple{color:var(--purple);}
+.stat-val.red{color:var(--red);}
+.stat-val.muted{color:var(--text3);}
+.stat-key{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);}
 
-/* Preview */
-.preview-wrap{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-sm);}
+/* ── Preview table ────────────────────────────────────────── */
+.preview-wrap{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow-sm);}
 .preview-wrap.show{display:block;animation:fadeIn .2s ease;}
-.preview-header{display:flex;align-items:center;gap:9px;padding:10px 17px;border-bottom:1px solid var(--border);background:var(--surface2);}
-.preview-header h3{font-size:12.5px;font-weight:600;}
-.preview-count{font-size:11px;color:var(--text3);font-family:var(--mono);}
-.preview-actions{margin-left:auto;display:flex;gap:6px;}
+.preview-header{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.preview-header h3{font-size:12px;font-weight:600;}
+.preview-count{font-size:10.5px;color:var(--text3);font-family:var(--mono);}
+.preview-actions{margin-left:auto;display:flex;gap:5px;}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 0 2px var(--green-border);}
-.tbl-wrap{overflow-x:auto;max-height:460px;overflow-y:auto;}
+.tbl-wrap{overflow-x:auto;max-height:380px;overflow-y:auto;}
 
-/* Tables */
-table{width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap;}
-table thead th{padding:7px 11px;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);background:var(--surface2);border-bottom:1px solid var(--border);text-align:left;position:sticky;top:0;z-index:5;}
-table tbody td{padding:6px 11px;border-bottom:1px solid var(--border);font-family:var(--mono);color:var(--text2);}
+/* ── Tables (generic) ─────────────────────────────────────── */
+table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap;}
+table thead th{padding:6px 10px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);background:var(--surface2);border-bottom:1px solid var(--border);text-align:left;position:sticky;top:0;z-index:5;}
+table tbody td{padding:5px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);color:var(--text2);}
 table tbody tr:last-child td{border-bottom:none;}
 table tbody tr:hover td{background:var(--surface2);}
-table tbody tr.sep-row td{background:var(--bg);color:var(--text3);font-size:9px;text-align:center;font-style:italic;padding:4px 11px;border-top:1px solid var(--border);}
-.c-num{color:var(--text3);} .c-mat{color:var(--accent);font-weight:500;} .c-comp{color:var(--text);font-weight:500;}
-.c-halb{color:var(--purple);font-weight:600;} .c-roh{color:var(--cyan);font-weight:600;}
+table tbody tr.sep-row td{background:var(--bg);color:var(--text3);font-size:9px;text-align:center;font-style:italic;padding:3px 10px;border-top:1px solid var(--border);}
+.c-num{color:var(--text3);}
+.c-mat{color:var(--accent);font-weight:500;}
+.c-comp{color:var(--text);font-weight:500;}
+.c-halb{color:var(--purple);font-weight:600;}
+.c-roh{color:var(--cyan);font-weight:600;}
 
-/* Editor */
-.editor-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
-.editor-title{font-size:13px;font-weight:600;color:var(--text2);}
-.editor-meta{font-size:11.5px;color:var(--text3);font-family:var(--mono);}
-.group-search{display:flex;align-items:center;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface);overflow:hidden;padding:0 9px;height:30px;width:190px;}
-.group-search svg{color:var(--text3);flex-shrink:0;margin-right:5px;}
-.group-search input{border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--text);width:100%;}
-.group-search input::placeholder{color:var(--text3);}
-.group-nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-xs);min-height:44px;align-items:flex-start;align-content:flex-start;}
-.group-pill{padding:3px 10px;border-radius:3px;font-size:11px;font-weight:500;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .12s;font-family:var(--mono);letter-spacing:-.02em;}
-.group-pill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
-.group-pill.active{background:var(--text);color:#fff;border-color:var(--text);}
-.group-pill.changed{border-color:var(--amber-border);background:var(--amber-light);color:var(--amber);}
-.group-pill.active.changed{background:var(--amber);color:#fff;border-color:var(--amber);}
-.group-pill.newgrp{border-color:var(--green-border);background:var(--green-light);color:var(--green);}
-.group-pill.active.newgrp{background:var(--green);color:#fff;border-color:var(--green);}
-.group-pill.gpill-hidden{display:none;}
-.bom-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
+/* ═══════════════════════════════════════════════════════════
+   TREE EDITOR LAYOUT
+═══════════════════════════════════════════════════════════ */
+.editor-layout{display:flex;flex:1;overflow:hidden;background:var(--bg);}
 
-/* Group header */
-.grp-header{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--surface2);border-bottom:2px solid var(--border);flex-wrap:wrap;}
-.grp-title-col{flex:1;min-width:200px;}
-.grp-mat{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text);margin-bottom:6px;}
-.grp-fields{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
-.grp-field{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:4px 9px;}
-.grp-field label{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:600;user-select:none;}
-.grp-field input{border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--text);}
-.grp-field input:focus{color:var(--accent);}
-.grp-meta{margin-left:auto;text-align:right;}
-.grp-stat{font-size:22px;font-weight:600;color:var(--text);font-family:var(--mono);line-height:1;}
-.grp-stat-label{font-size:10px;color:var(--text3);}
+/* ── Tree sidebar ─────────────────────────────────────────── */
+.tree-sidebar{width:var(--tree-w);min-width:220px;max-width:420px;flex-shrink:0;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--border);overflow:hidden;position:relative;}
+.tree-resize-handle{position:absolute;right:-3px;top:0;bottom:0;width:6px;cursor:col-resize;z-index:10;background:transparent;}
+.tree-resize-handle:hover{background:rgba(29,78,216,.15);}
+.tree-top{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;background:var(--surface2);flex-shrink:0;}
+.tree-search-wrap{display:flex;align-items:center;flex:1;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface);overflow:hidden;padding:0 8px;height:27px;}
+.tree-search-wrap svg{color:var(--text3);flex-shrink:0;margin-right:4px;}
+.tree-search-wrap input{border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11px;color:var(--text);width:100%;}
+.tree-search-wrap input::placeholder{color:var(--text3);}
+.tree-controls{display:flex;gap:2px;flex-shrink:0;}
+.tree-ctrl-btn{width:24px;height:24px;border:1px solid var(--border2);border-radius:3px;background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;font-weight:700;transition:all .1s;}
+.tree-ctrl-btn:hover{background:var(--surface3);color:var(--text);}
+.tree-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 0;}
 
-/* BOM table */
-table.bom-tbl thead th{top:0;position:sticky;z-index:5;background:var(--surface2);}
+/* ── Tree nodes ───────────────────────────────────────────── */
+.tree-node{position:relative;}
+.tree-node-row{display:flex;align-items:center;padding:0 8px 0 0;height:30px;cursor:pointer;user-select:none;border-left:2px solid transparent;transition:background .1s, border-color .1s;position:relative;}
+.tree-node-row:hover{background:var(--surface2);}
+.tree-node-row.active{background:var(--accent-light);border-left-color:var(--accent);}
+.tree-node-row.active .tn-mat{color:var(--accent);}
+.tree-node-row.active .tn-desc{color:var(--accent);opacity:.7;}
+
+/* indent guides */
+.tn-indent{display:flex;align-items:center;flex-shrink:0;}
+.tn-guide{width:18px;height:30px;flex-shrink:0;position:relative;}
+.tn-guide.has-line::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:1px;background:var(--border2);}
+.tn-guide.is-branch::before{content:'';position:absolute;left:9px;top:0;bottom:50%;width:1px;background:var(--border2);}
+.tn-guide.is-branch::after{content:'';position:absolute;left:9px;top:50%;width:9px;height:1px;background:var(--border2);}
+.tn-guide.is-last::before{content:'';position:absolute;left:9px;top:0;bottom:50%;width:1px;background:var(--border2);}
+.tn-guide.is-last::after{content:'';position:absolute;left:9px;top:50%;width:9px;height:1px;background:var(--border2);}
+
+/* toggle */
+.tn-toggle{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:2px;color:var(--text3);margin-right:2px;}
+.tn-toggle svg{transition:transform .15s;}
+.tn-toggle.open svg{transform:rotate(90deg);}
+.tn-toggle.leaf{cursor:default;}
+.tn-toggle:not(.leaf):hover{background:var(--surface3);color:var(--text);}
+
+/* icon */
+.tn-icon{width:18px;height:18px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-right:5px;font-size:9px;font-weight:700;font-family:var(--mono);}
+.tn-icon.root{background:var(--text);color:#fff;}
+.tn-icon.halb{background:var(--purple-light);color:var(--purple);border:1px solid var(--purple-border);}
+.tn-icon.roh{background:var(--cyan-light);color:var(--cyan);border:1px solid var(--cyan-border);}
+.tn-icon.unknown{background:var(--surface3);color:var(--text3);border:1px solid var(--border);}
+
+/* content */
+.tn-content{flex:1;min-width:0;display:flex;align-items:center;gap:5px;overflow:hidden;}
+.tn-mat{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;max-width:110px;}
+.tn-desc{font-size:10.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.tn-badges{display:flex;gap:2px;flex-shrink:0;align-items:center;}
+.tn-count{background:var(--surface3);color:var(--text2);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;font-family:var(--mono);}
+.tn-change-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.tn-change-dot.modified{background:var(--amber);}
+.tn-change-dot.added{background:var(--green);}
+.tn-change-dot.deleted{background:var(--red);}
+
+/* children container */
+.tree-children{overflow:hidden;transition:max-height .2s ease;}
+.tree-children.collapsed{max-height:0 !important;}
+
+/* no-match */
+.tree-nomatch{padding:20px 16px;text-align:center;font-size:11px;color:var(--text3);font-style:italic;}
+
+/* ── Right panel ──────────────────────────────────────────── */
+.detail-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* breadcrumb bar */
+.breadcrumb-bar{padding:8px 16px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:4px;flex-shrink:0;overflow-x:auto;white-space:nowrap;}
+.breadcrumb-bar::-webkit-scrollbar{height:3px;}
+.bc-item{font-family:var(--mono);font-size:11px;color:var(--text3);cursor:pointer;padding:2px 5px;border-radius:3px;transition:all .1s;}
+.bc-item:hover{background:var(--surface2);color:var(--accent);}
+.bc-item.active{color:var(--text);font-weight:600;cursor:default;}
+.bc-item.active:hover{background:transparent;color:var(--text);}
+.bc-sep{color:var(--border2);font-size:10px;font-family:var(--mono);}
+.bc-root-icon{color:var(--text3);margin-right:2px;}
+
+/* detail toolbar */
+.detail-toolbar{padding:8px 16px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.detail-toolbar .grp-field{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:3px 8px;}
+.detail-toolbar .grp-field label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:600;user-select:none;white-space:nowrap;}
+.detail-toolbar .grp-field input{border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11px;color:var(--text);}
+.detail-toolbar .grp-field input:focus{color:var(--accent);}
+.detail-meta{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.detail-stat{text-align:right;}
+.detail-stat-val{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text);line-height:1;}
+.detail-stat-label{font-size:9px;color:var(--text3);}
+
+/* detail table wrap */
+.detail-table-wrap{flex:1;overflow-y:auto;overflow-x:auto;}
+
+/* BOM editor table */
+table.bom-tbl{white-space:nowrap;}
+table.bom-tbl thead th{position:sticky;top:0;z-index:5;}
 table.bom-tbl tbody tr:hover td{background:#f7f6f2;}
 table.bom-tbl tbody tr.row-added td{background:var(--green-light)!important;}
 table.bom-tbl tbody tr.row-deleted td{background:var(--red-light)!important;opacity:.55;pointer-events:none;}
 table.bom-tbl tbody tr.row-deleted *{text-decoration:line-through;}
 table.bom-tbl tbody tr.row-modified td{background:var(--amber-light)!important;}
-.cell-input{width:100%;padding:6px 10px;border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--text);min-width:60px;display:block;}
+table.bom-tbl tbody tr.row-highlight td{outline:2px solid var(--accent);outline-offset:-1px;background:var(--accent-light)!important;}
+.cell-input{width:100%;padding:5px 9px;border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11px;color:var(--text);min-width:60px;display:block;}
 .cell-input:focus{background:var(--accent-light);color:var(--accent);}
 .cell-input.changed{color:var(--amber);}
-select.cell-select{width:100%;padding:6px 10px;border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;}
+select.cell-select{width:100%;padding:5px 9px;border:none;outline:none;background:transparent;font-family:var(--mono);font-size:11px;color:var(--text);cursor:pointer;appearance:none;}
 select.cell-select:focus{background:var(--accent-light);color:var(--accent);}
-.row-actions{display:flex;gap:3px;padding:3px 7px;align-items:center;}
-.row-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:3px;border:none;cursor:pointer;background:transparent;color:var(--text3);transition:all .12s;}
+.row-actions{display:flex;gap:3px;padding:2px 6px;align-items:center;}
+.row-btn{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:3px;border:none;cursor:pointer;background:transparent;color:var(--text3);transition:all .12s;}
 .row-btn:hover{background:var(--surface3);color:var(--text);}
 .row-btn.del:hover{background:var(--red-light);color:var(--red);}
-.row-btn.restore{color:var(--green);border:1px solid var(--green-border);background:var(--green-light);width:auto;padding:0 8px;font-size:11px;height:24px;font-family:var(--sans);}
+.row-btn.restore{color:var(--green);border:1px solid var(--green-border);background:var(--green-light);width:auto;padding:0 7px;font-size:10.5px;height:22px;font-family:var(--sans);}
 .row-btn.restore:hover{background:var(--green);color:#fff;}
-.row-btn.goto-child{width:auto;padding:0 8px;font-size:10px;font-weight:600;color:var(--purple);border:1px solid rgba(109,40,217,.2);background:var(--purple-light);gap:3px;height:24px;border-radius:3px;font-family:var(--mono);}
+.row-btn.goto-child{width:auto;padding:0 7px;font-size:10px;font-weight:600;color:var(--purple);border:1px solid rgba(109,40,217,.2);background:var(--purple-light);gap:2px;height:22px;border-radius:3px;font-family:var(--mono);}
 .row-btn.goto-child:hover{background:var(--purple);color:#fff;}
-.row-btn.goto-child.missing{color:var(--text3);background:var(--surface3);border-color:var(--border);font-style:italic;}
-.row-btn.goto-child.missing:hover{background:var(--surface3);color:var(--text);}
-.add-row-btn{width:100%;padding:9px;border:none;background:transparent;color:var(--text3);font-size:11.5px;font-weight:500;cursor:pointer;border-top:1px dashed var(--border2);transition:all .12s;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--sans);}
+.row-btn.goto-child.missing{color:var(--text3);background:var(--surface3);border-color:var(--border);}
+.row-btn.goto-child.missing:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent-border);}
+.add-row-btn{width:100%;padding:8px;border:none;background:transparent;color:var(--text3);font-size:11px;font-weight:500;cursor:pointer;border-top:1px dashed var(--border2);transition:all .12s;display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--sans);}
 .add-row-btn:hover{background:var(--green-light);color:var(--green);}
 
-/* Diff */
-.diff-top{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
-.diff-legend{display:flex;gap:12px;font-size:11.5px;}
-.diff-legend-item{display:flex;align-items:center;gap:5px;}
-.diff-dot{width:9px;height:9px;border-radius:2px;}
-.diff-stats{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
-.diff-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 18px;display:flex;align-items:center;gap:10px;}
-.diff-stat-num{font-size:26px;font-weight:700;font-family:var(--mono);line-height:1;}
-.diff-stat-num.green{color:var(--green);} .diff-stat-num.red{color:var(--red);} .diff-stat-num.amber{color:var(--amber);} .diff-stat-num.muted{color:var(--text3);}
-.diff-stat-label{font-size:11px;color:var(--text2);}
-.diff-group{margin-bottom:16px;}
-.diff-group-title{font-size:11.5px;font-weight:600;font-family:var(--mono);color:var(--text2);padding:8px 13px;background:var(--surface2);border:1px solid var(--border);border-bottom:none;border-radius:var(--r) var(--r) 0 0;display:flex;align-items:center;gap:8px;}
+/* empty states */
+.editor-empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text3);}
+.editor-empty-state .ei{font-size:40px;margin-bottom:4px;}
+.editor-empty-state h3{font-size:14px;font-weight:600;color:var(--text2);}
+.editor-empty-state p{font-size:12px;}
+.detail-empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text3);padding:40px;}
+.detail-empty-state .dei{font-size:32px;margin-bottom:4px;}
+.detail-empty-state p{font-size:12px;text-align:center;}
+
+/* ── Diff page ────────────────────────────────────────────── */
+.diff-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.diff-legend{display:flex;gap:10px;font-size:11px;}
+.diff-legend-item{display:flex;align-items:center;gap:4px;}
+.diff-dot{width:8px;height:8px;border-radius:2px;}
+.diff-stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.diff-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 16px;display:flex;align-items:center;gap:9px;}
+.diff-stat-num{font-size:24px;font-weight:700;font-family:var(--mono);line-height:1;}
+.diff-stat-num.green{color:var(--green);}
+.diff-stat-num.red{color:var(--red);}
+.diff-stat-num.amber{color:var(--amber);}
+.diff-stat-num.muted{color:var(--text3);}
+.diff-stat-label{font-size:10.5px;color:var(--text2);}
+.diff-group{margin-bottom:14px;}
+.diff-group-title{font-size:11px;font-weight:600;font-family:var(--mono);color:var(--text2);padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-bottom:none;border-radius:var(--r) var(--r) 0 0;display:flex;align-items:center;gap:7px;}
 .diff-tbl-wrap{border:1px solid var(--border);border-radius:0 0 var(--r) var(--r);overflow:hidden;overflow-x:auto;}
 table.diff-tbl td{font-family:var(--mono);}
-tr.diff-added td{background:var(--green-light);} tr.diff-added td:first-child{border-left:3px solid var(--green);}
-tr.diff-removed td{background:var(--red-light);} tr.diff-removed td:first-child{border-left:3px solid var(--red);}
-tr.diff-modified td{background:var(--amber-light);} tr.diff-modified td:first-child{border-left:3px solid var(--amber);}
+tr.diff-added td{background:var(--green-light);}
+tr.diff-added td:first-child{border-left:3px solid var(--green);}
+tr.diff-removed td{background:var(--red-light);}
+tr.diff-removed td:first-child{border-left:3px solid var(--red);}
+tr.diff-modified td{background:var(--amber-light);}
+tr.diff-modified td:first-child{border-left:3px solid var(--amber);}
 tr.diff-unchanged td{color:var(--text3);}
-.diff-tag{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;font-size:11px;font-weight:700;font-family:var(--mono);}
+.diff-tag{display:inline-flex;align-items:center;justify-content:center;width:20px;height:17px;border-radius:3px;font-size:11px;font-weight:700;font-family:var(--mono);}
 .dt-a{background:var(--green-light);color:var(--green);border:1px solid var(--green-border);}
 .dt-r{background:var(--red-light);color:var(--red);border:1px solid var(--red-border);}
 .dt-m{background:var(--amber-light);color:var(--amber);border:1px solid var(--amber-border);}
 .dt-u{background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
-.cell-old{color:var(--red);text-decoration:line-through;margin-right:4px;}
+.cell-old{color:var(--red);text-decoration:line-through;margin-right:3px;}
 .cell-new{color:var(--green);}
-.nb-tag{display:inline-flex;padding:1px 6px;border-radius:3px;font-size:9.5px;font-weight:700;font-family:var(--mono);background:var(--green-light);color:var(--green);border:1px solid var(--green-border);}
+.nb-tag{display:inline-flex;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:700;font-family:var(--mono);background:var(--green-light);color:var(--green);border:1px solid var(--green-border);}
 
-/* Empty */
-.empty{text-align:center;padding:70px 24px;color:var(--text3);}
-.empty-icon{font-size:36px;margin-bottom:12px;}
-.empty h3{font-size:14.5px;font-weight:600;color:var(--text2);margin-bottom:6px;}
-.empty p{font-size:12.5px;}
-
-/* Toast */
-#toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:9px 16px;border-radius:var(--r-sm);font-size:12.5px;font-weight:500;opacity:0;transform:translateY(6px);transition:all .18s ease;pointer-events:none;z-index:9999;box-shadow:var(--shadow);max-width:360px;}
+/* ── Toast ────────────────────────────────────────────────── */
+#toast{position:fixed;bottom:18px;right:18px;background:var(--text);color:#fff;padding:8px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:500;opacity:0;transform:translateY(6px);transition:all .18s ease;pointer-events:none;z-index:9999;box-shadow:var(--shadow);max-width:340px;}
 #toast.show{opacity:1;transform:translateY(0);}
-#toast.ok{background:var(--green);} #toast.err{background:var(--red);} #toast.warn{background:var(--amber);}
+#toast.ok{background:var(--green);}
+#toast.err{background:var(--red);}
+#toast.warn{background:var(--amber);}
+
+/* ── Resize cursor on body ────────────────────────────────── */
+body.resizing{cursor:col-resize;user-select:none;}
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- Topbar -->
+<!-- ── Topbar ──────────────────────────────────────────────── -->
 <div class="topbar">
   <div class="logo">BOM<em>Studio</em></div>
   <div class="vdiv"></div>
@@ -223,153 +319,193 @@ tr.diff-unchanged td{color:var(--text3);}
     </button>
   </div>
   <div class="topbar-right">
-    <button class="btn btn-secondary hidden" id="btnExportTSV" onclick="exportTSV()" style="color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);font-size:12px;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <button class="btn btn-secondary hidden" id="btnExportTSV" onclick="exportTSV()" style="color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);font-size:11.5px;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Export TSV
     </button>
   </div>
 </div>
 
-<!-- Page 1: Import -->
+<!-- ════════════════════════════════════════════════════════
+     PAGE 1 — IMPORT
+════════════════════════════════════════════════════════ -->
 <div class="page active" id="page-import">
-  <div class="import-grid">
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge">1</div>
-        <h3>Paste Sheet 1 Data</h3>
-        <span class="hint">Tab-separated from SAP / Excel · include header row</span>
+  <div class="page-scroll">
+    <div class="import-grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="step-badge">1</div>
+          <h3>Paste Sheet 1 Data</h3>
+          <span class="hint">Tab-separated from SAP / Excel · include header row</span>
+        </div>
+        <textarea class="paste-area" id="pasteArea"
+          placeholder="Paste your Sheet 1 BOM export here (with header row)&#10;&#10;Expected columns (0-indexed):&#10;Col 0: Plant | Col 1: Level | Col 2: Material | Col 3: Material Description&#10;Col 4: Component | Col 5: Component Description | Col 6: Comp.Qty(CUn)&#10;Col 8: UOM | Col 9: Material Type | Col 10: Alternative BOM | Col 12: BasQty"></textarea>
+        <div class="card-footer">
+          <button class="btn btn-primary" onclick="importBOM()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            Import &amp; Build BOM
+          </button>
+          <button class="btn btn-ghost" onclick="clearImport()">Clear</button>
+          <span style="margin-left:auto;font-size:11px;color:var(--text3)" id="importStatus"></span>
+        </div>
       </div>
-      <textarea class="paste-area" id="pasteArea"
-        placeholder="Paste your Sheet 1 BOM export here (with header row)&#10;&#10;Expected columns (0-indexed):&#10;Col 0: Plant | Col 1: Level | Col 2: Material | Col 3: Material Description&#10;Col 4: Component | Col 5: Component Description | Col 6: Comp.Qty(CUn)&#10;Col 8: UOM | Col 9: Material Type | Col 10: Alternative BOM | Col 12: BasQty"></textarea>
-      <div class="card-footer">
-        <button class="btn btn-primary" onclick="importBOM()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-          Import &amp; Build BOM
-        </button>
-        <button class="btn btn-ghost" onclick="clearImport()">Clear</button>
-        <span style="margin-left:auto;font-size:11px;color:var(--text3)" id="importStatus"></span>
+      <div class="card">
+        <div class="card-header">
+          <div class="step-badge" style="background:var(--text3)">?</div>
+          <h3>Column Reference</h3>
+        </div>
+        <div class="col-map">
+          <div class="col-row"><span class="col-from">Col 0</span><span class="col-arr">→</span><span class="col-to">Plant (5600→5500/5600)</span></div>
+          <div class="col-row"><span class="col-from">Col 1</span><span class="col-arr">→</span><span class="col-to">Level (hierarchy driver)</span></div>
+          <div class="col-row"><span class="col-from">Col 2</span><span class="col-arr">→</span><span class="col-to">Material number</span></div>
+          <div class="col-row"><span class="col-from">Col 3</span><span class="col-arr">→</span><span class="col-to">Material Description</span></div>
+          <div class="col-row"><span class="col-from">Col 4</span><span class="col-arr">→</span><span class="col-to">Component number</span></div>
+          <div class="col-row"><span class="col-from">Col 5</span><span class="col-arr">→</span><span class="col-to">Component Description</span></div>
+          <div class="col-row"><span class="col-from">Col 6</span><span class="col-arr">→</span><span class="col-to">Comp.Qty(CUn) → Quantity</span></div>
+          <div class="col-row"><span class="col-from">Col 8</span><span class="col-arr">→</span><span class="col-to">UOM (component unit)</span></div>
+          <div class="col-row"><span class="col-from">Col 9</span><span class="col-arr">→</span><span class="col-to">Material Type (ROH/HALB)</span></div>
+          <div class="col-row"><span class="col-from">Col 10</span><span class="col-arr">→</span><span class="col-to">Alternative BOM</span></div>
+          <div class="col-row"><span class="col-from">Col 12</span><span class="col-arr">→</span><span class="col-to">BasQty (Next Level)</span></div>
+        </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge" style="background:var(--text3)">?</div>
-        <h3>Column Reference</h3>
-      </div>
-      <div class="col-map">
-        <div class="col-row"><span class="col-from">Col 0</span><span class="col-arr">→</span><span class="col-to">Plant (5600 → 5500/5600)</span></div>
-        <div class="col-row"><span class="col-from">Col 1</span><span class="col-arr">→</span><span class="col-to">Level (hierarchy driver)</span></div>
-        <div class="col-row"><span class="col-from">Col 2</span><span class="col-arr">→</span><span class="col-to">Material number</span></div>
-        <div class="col-row"><span class="col-from">Col 3</span><span class="col-arr">→</span><span class="col-to">Material Description</span></div>
-        <div class="col-row"><span class="col-from">Col 4</span><span class="col-arr">→</span><span class="col-to">Component number</span></div>
-        <div class="col-row"><span class="col-from">Col 5</span><span class="col-arr">→</span><span class="col-to">Component Description</span></div>
-        <div class="col-row"><span class="col-from">Col 6</span><span class="col-arr">→</span><span class="col-to">Comp.Qty(CUn) → Quantity</span></div>
-        <div class="col-row"><span class="col-from">Col 8</span><span class="col-arr">→</span><span class="col-to">UOM (component unit)</span></div>
-        <div class="col-row"><span class="col-from">Col 9</span><span class="col-arr">→</span><span class="col-to">Material Type (ROH/HALB)</span></div>
-        <div class="col-row"><span class="col-from">Col 10</span><span class="col-arr">→</span><span class="col-to">Alternative BOM</span></div>
-        <div class="col-row"><span class="col-from">Col 12</span><span class="col-arr">→</span><span class="col-to">BasQty (Next Level)</span></div>
-      </div>
-    </div>
-  </div>
 
-  <div class="stats-bar" id="statsBar">
-    <div class="stat-cell"><div class="stat-val" id="sIn">0</div><div class="stat-key">Input Rows</div></div>
-    <div class="stat-cell"><div class="stat-val" id="sOut">0</div><div class="stat-key">Output Rows</div></div>
-    <div class="stat-cell"><div class="stat-val" id="sPar">0</div><div class="stat-key">Parent Groups</div></div>
-    <div class="stat-cell"><div class="stat-val red" id="sDup">0</div><div class="stat-key">Dupes Removed</div></div>
-    <div class="stat-cell"><div class="stat-val green" id="sRoh">0</div><div class="stat-key">ROH</div></div>
-    <div class="stat-cell"><div class="stat-val purple" id="sHalb">0</div><div class="stat-key">HALB</div></div>
-  </div>
-
-  <div class="preview-wrap" id="previewWrap">
-    <div class="preview-header">
-      <div class="live-dot"></div>
-      <h3>Sheet 2 Preview</h3>
-      <span class="preview-count" id="previewCount"></span>
-      <div class="preview-actions">
-        <button class="btn btn-secondary btn-sm" onclick="copyForExcel()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          Copy for Excel
-        </button>
-        <button class="btn btn-secondary btn-sm" onclick="downloadCSV()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download CSV
-        </button>
-      </div>
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-cell"><div class="stat-val" id="sIn">0</div><div class="stat-key">Input Rows</div></div>
+      <div class="stat-cell"><div class="stat-val" id="sOut">0</div><div class="stat-key">Output Rows</div></div>
+      <div class="stat-cell"><div class="stat-val" id="sPar">0</div><div class="stat-key">Parent Groups</div></div>
+      <div class="stat-cell"><div class="stat-val red" id="sDup">0</div><div class="stat-key">Dupes Removed</div></div>
+      <div class="stat-cell"><div class="stat-val green" id="sRoh">0</div><div class="stat-key">ROH</div></div>
+      <div class="stat-cell"><div class="stat-val purple" id="sHalb">0</div><div class="stat-key">HALB</div></div>
     </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>#</th><th>Material</th><th>Desc</th><th>Plant</th>
-          <th>Usage</th><th>Alt</th><th>Base Qty</th><th>Component</th>
-          <th>Comp Desc</th><th>Mat Type</th><th>Alt Text</th>
-          <th>Qty</th><th>Unit</th><th>Stor.Loc.</th>
-        </tr></thead>
-        <tbody id="previewBody"></tbody>
-      </table>
+
+    <div class="preview-wrap" id="previewWrap">
+      <div class="preview-header">
+        <div class="live-dot"></div>
+        <h3>Sheet 2 Preview</h3>
+        <span class="preview-count" id="previewCount"></span>
+        <div class="preview-actions">
+          <button class="btn btn-secondary btn-sm" onclick="copyForExcel()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy for Excel
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="downloadCSV()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download CSV
+          </button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Material</th><th>Desc</th><th>Plant</th>
+            <th>Usage</th><th>Alt</th><th>Base Qty</th><th>Component</th>
+            <th>Comp Desc</th><th>Mat Type</th><th>Alt Text</th>
+            <th>Qty</th><th>Unit</th><th>Stor.Loc.</th>
+          </tr></thead>
+          <tbody id="previewBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Page 2: Editor -->
+<!-- ════════════════════════════════════════════════════════
+     PAGE 2 — EDITOR
+════════════════════════════════════════════════════════ -->
 <div class="page" id="page-editor">
-  <div id="editorEmpty" class="empty">
-    <div class="empty-icon">📋</div>
+  <!-- EMPTY state -->
+  <div id="editorEmptyState" class="editor-empty-state">
+    <div class="ei">🌳</div>
     <h3>No BOM loaded</h3>
     <p>Go to Import, paste Sheet 1 data, and click "Import &amp; Build BOM".</p>
   </div>
-  <div id="editorContent" class="hidden">
-    <div class="editor-top">
-      <span class="editor-title">Parent Groups</span>
-      <span class="editor-meta" id="groupCount"></span>
-      <div class="group-search">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" placeholder="Search groups…" id="groupSearch" oninput="filterGroups(this.value)">
+
+  <!-- LOADED state -->
+  <div id="editorLayout" class="editor-layout hidden">
+
+    <!-- ── Tree sidebar ─────────────────────────────────── -->
+    <div class="tree-sidebar" id="treeSidebar">
+      <div class="tree-top">
+        <div class="tree-search-wrap">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search…" id="treeSearch" oninput="filterTree(this.value)">
+        </div>
+        <div class="tree-controls">
+          <button class="tree-ctrl-btn" title="Expand all" onclick="setAllExpanded(true)">+</button>
+          <button class="tree-ctrl-btn" title="Collapse all" onclick="setAllExpanded(false)">−</button>
+          <button class="tree-ctrl-btn" title="Add group" onclick="addNewGroup()" style="color:var(--green);border-color:var(--green-border);">⊕</button>
+        </div>
       </div>
-      <div style="margin-left:auto;display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="addNewGroup()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Group
-        </button>
-        <button class="btn btn-green btn-sm" onclick="switchPage('diff')">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
-          View Changes
-        </button>
+      <div class="tree-body" id="treeBody"></div>
+      <div class="tree-resize-handle" id="treeResizeHandle"></div>
+    </div>
+
+    <!-- ── Detail panel ──────────────────────────────────── -->
+    <div class="detail-panel" id="detailPanel">
+      <div id="detailEmpty" class="detail-empty-state">
+        <div class="dei">👈</div>
+        <p>Select a group from the tree to edit its components</p>
+      </div>
+      <div id="detailContent" class="hidden" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="breadcrumb-bar" id="breadcrumbBar"></div>
+        <div class="detail-toolbar" id="detailToolbar"></div>
+        <div class="detail-table-wrap">
+          <table class="bom-tbl">
+            <thead><tr>
+              <th style="width:130px">Component</th>
+              <th style="min-width:200px">Description</th>
+              <th style="width:110px">Mat Type</th>
+              <th style="width:90px">Quantity</th>
+              <th style="width:65px">UOM</th>
+              <th style="width:85px">Base Qty</th>
+              <th style="width:130px">Actions</th>
+            </tr></thead>
+            <tbody id="detailTbody"></tbody>
+          </table>
+          <button class="add-row-btn" id="addRowBtn" onclick="addRowToActive()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add component row
+          </button>
+        </div>
       </div>
     </div>
-    <div class="group-nav" id="groupNav"></div>
-    <div class="bom-wrap"><div id="groupsContainer"></div></div>
   </div>
 </div>
 
-<!-- Page 3: Diff -->
+<!-- ════════════════════════════════════════════════════════
+     PAGE 3 — DIFF
+════════════════════════════════════════════════════════ -->
 <div class="page" id="page-diff">
-  <div id="diffEmpty" class="empty">
-    <div class="empty-icon">🔍</div>
-    <h3>No comparison yet</h3>
-    <p>Import a BOM, make edits, then return here to review changes.</p>
-  </div>
-  <div id="diffContent" class="hidden">
-    <div class="diff-top">
-      <span style="font-size:13px;font-weight:600;">Changes vs. Original BOM</span>
-      <div class="diff-legend">
-        <div class="diff-legend-item"><div class="diff-dot" style="background:var(--green)"></div><span>Added</span></div>
-        <div class="diff-legend-item"><div class="diff-dot" style="background:var(--red)"></div><span>Removed</span></div>
-        <div class="diff-legend-item"><div class="diff-dot" style="background:var(--amber)"></div><span>Modified</span></div>
-        <div class="diff-legend-item"><div class="diff-dot" style="background:var(--border2)"></div><span>Unchanged</span></div>
-      </div>
-      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.7);cursor:pointer;white-space:nowrap;">
-          <input type="checkbox" id="chkShowUnchanged" onchange="runDiff()"> Show unchanged
-        </label>
-        <button class="btn btn-secondary btn-sm" onclick="exportDiffCSV()">Export Diff CSV</button>
-        <button class="btn btn-green btn-sm" onclick="exportExcel()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download Excel
-        </button>
-      </div>
+  <div class="page-scroll">
+    <div id="diffEmpty" class="editor-empty-state" style="min-height:300px;">
+      <div class="ei">🔍</div>
+      <h3>No comparison yet</h3>
+      <p>Import a BOM, make edits, then return here to review changes.</p>
     </div>
-    <div class="diff-stats" id="diffStats"></div>
-    <div id="diffOutput"></div>
+    <div id="diffContent" class="hidden">
+      <div class="diff-top" style="margin-bottom:14px;">
+        <span style="font-size:13px;font-weight:600;">Changes vs. Original BOM</span>
+        <div class="diff-legend">
+          <div class="diff-legend-item"><div class="diff-dot" style="background:var(--green)"></div><span>Added</span></div>
+          <div class="diff-legend-item"><div class="diff-dot" style="background:var(--red)"></div><span>Removed</span></div>
+          <div class="diff-legend-item"><div class="diff-dot" style="background:var(--amber)"></div><span>Modified</span></div>
+          <div class="diff-legend-item"><div class="diff-dot" style="background:var(--border2)"></div><span>Unchanged</span></div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" id="chkShowUnchanged" onchange="runDiff()"> Show unchanged
+          </label>
+          <button class="btn btn-secondary btn-sm" onclick="exportDiffCSV()">Export Diff CSV</button>
+          <button class="btn btn-green btn-sm" onclick="exportExcel()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Excel
+          </button>
+        </div>
+      </div>
+      <div class="diff-stats" id="diffStats"></div>
+      <div id="diffOutput"></div>
+    </div>
   </div>
 </div>
 
@@ -383,15 +519,17 @@ tr.diff-unchanged td{color:var(--text3);}
 let originalGroups = null;
 let editedGroups   = null;
 let importFlatRows = [];
-let activeGroupKey = null;
+let activeGroupKey = null;        // currently selected group in editor
+let treeExpanded   = {};          // key → bool (expanded state per node)
+let treeSearchQ    = '';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 const C = {
-  PLANT:0,LEVEL:1,MATERIAL:2,MAT_DESC:3,
-  COMPONENT:4,COMP_DESC:5,QTY_CUN:6,QTY_BUN:7,
-  UOM:8,MAT_TYPE:9,ALT_BOM:10,BASE_QTY:12
+  PLANT:0, LEVEL:1, MATERIAL:2, MAT_DESC:3,
+  COMPONENT:4, COMP_DESC:5, QTY_CUN:6, QTY_BUN:7,
+  UOM:8, MAT_TYPE:9, ALT_BOM:10, BASE_QTY:12
 };
 const ROW_FIELDS = ['component','compDesc','matType','qty','uom','baseQty'];
 const GRP_FIELDS = ['matDesc','plant','alt'];
@@ -404,165 +542,578 @@ const SHEET2_COLS = [
 // ═══════════════════════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════════════════════
-function gc(cells,idx){return(cells[idx]||'').trim();}
-function parsePlant(raw){const p=(raw||'').trim();return(p==='5600'||p==='5500')?'5500/5600':p;}
-// HTML escape
-function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-// JS string escape for use in onclick="..." attributes
-function escJs(s){if(!s)return'';return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n');}
-function setEl(id,v){document.getElementById(id).textContent=v;}
-let _uid=10000;
-function newId(){return'r'+(++_uid);}
+function gc(cells, idx){ return (cells[idx]||'').trim(); }
+function parsePlant(raw){ const p=(raw||'').trim(); return (p==='5600'||p==='5500')?'5500/5600':p; }
+function esc(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escJs(s){ if(!s)return''; return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n'); }
+function setEl(id,v){ document.getElementById(id).textContent=v; }
+let _uid = 10000;
+function newId(){ return 'r'+(++_uid); }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PARSE
 // ═══════════════════════════════════════════════════════════════════════════
 function parseSheet1(raw){
-  const lines=raw.split('\n').map(l=>l.trimEnd()).filter(l=>l.trim());
-  if(lines.length<2) throw new Error('Need at least a header row + 1 data row.');
-  const sep=lines[0].includes('\t')?'\t':'|';
-  const dataLines=lines.slice(1);
+  const lines = raw.split('\n').map(l=>l.trimEnd()).filter(l=>l.trim());
+  if(lines.length < 2) throw new Error('Need at least a header row + 1 data row.');
+  const sep = lines[0].includes('\t') ? '\t' : '|';
+  const dataLines = lines.slice(1);
 
-  let topMaterial='',topMatDesc='',topPlant='',topAlt='1';
+  let topMaterial='', topMatDesc='', topPlant='', topAlt='1';
   for(const line of dataLines){
-    const cells=line.split(sep);
-    if(cells.length<10)continue;
+    const cells = line.split(sep);
+    if(cells.length < 10) continue;
     if(gc(cells,C.LEVEL)==='1'){
-      topMaterial=gc(cells,C.MATERIAL);topMatDesc=gc(cells,C.MAT_DESC);
-      topPlant=parsePlant(gc(cells,C.PLANT));topAlt=gc(cells,C.ALT_BOM)||'1';break;
+      topMaterial=gc(cells,C.MATERIAL); topMatDesc=gc(cells,C.MAT_DESC);
+      topPlant=parsePlant(gc(cells,C.PLANT)); topAlt=gc(cells,C.ALT_BOM)||'1'; break;
     }
   }
   if(!topMaterial) throw new Error('No Level 1 rows found. Check your data format.');
 
-  const parentStack={0:{material:topMaterial,matDesc:topMatDesc,plant:topPlant,alt:topAlt}};
-  const groups={};
-  const seenKey=new Set();
-  let dupes=0,inputCount=0,uid=0;
+  const parentStack = {0:{material:topMaterial,matDesc:topMatDesc,plant:topPlant,alt:topAlt}};
+  const groups = {};
+  const seenKey = new Set();
+  let dupes=0, inputCount=0, uid=0;
 
   for(const line of dataLines){
-    const cells=line.split(sep);
-    if(cells.length<10)continue;
-    const level=parseInt(gc(cells,C.LEVEL))||0;
-    const material=gc(cells,C.MATERIAL);
-    const matDesc=gc(cells,C.MAT_DESC);
-    const component=gc(cells,C.COMPONENT);
-    const compDesc=gc(cells,C.COMP_DESC);
-    const matType=gc(cells,C.MAT_TYPE);
-    const qtyCun=gc(cells,C.QTY_CUN);
-    const uom=gc(cells,C.UOM);
-    // FIX #1: use actual baseQty from column 12 — do not hardcode
-    const baseQty=gc(cells,C.BASE_QTY)||'1,000';
-    const plant=parsePlant(gc(cells,C.PLANT));
-    const altBom=gc(cells,C.ALT_BOM)||'1';
-
-    if(!component)continue;
+    const cells = line.split(sep);
+    if(cells.length < 10) continue;
+    const level     = parseInt(gc(cells,C.LEVEL))||0;
+    const material  = gc(cells,C.MATERIAL);
+    const matDesc   = gc(cells,C.MAT_DESC);
+    const component = gc(cells,C.COMPONENT);
+    const compDesc  = gc(cells,C.COMP_DESC);
+    const matType   = gc(cells,C.MAT_TYPE);
+    const qtyCun    = gc(cells,C.QTY_CUN);
+    const uom       = gc(cells,C.UOM);
+    const baseQty   = gc(cells,C.BASE_QTY)||'1,000';
+    const plant     = parsePlant(gc(cells,C.PLANT));
+    const altBom    = gc(cells,C.ALT_BOM)||'1';
+    if(!component) continue;
     inputCount++;
 
-    const parentLevel=level-1;
-    const parent=parentStack[parentLevel];
-    if(!parent)continue;
+    const parentLevel = level - 1;
+    const parent = parentStack[parentLevel];
+    if(!parent) continue;
 
-    const parentMat=parent.material;
-    const dedupKey=parentMat+'\x00'+component;
-    if(seenKey.has(dedupKey)){dupes++;} else {
+    const parentMat  = parent.material;
+    const dedupKey   = parentMat+'\x00'+component;
+    if(seenKey.has(dedupKey)){ dupes++; }
+    else {
       seenKey.add(dedupKey);
       if(!groups[parentMat]){
-        groups[parentMat]={matDesc:parent.matDesc,plant:parent.plant,alt:parent.alt,children:[]};
+        groups[parentMat] = {matDesc:parent.matDesc, plant:parent.plant, alt:parent.alt, children:[]};
       }
-      groups[parentMat].children.push({id:'r'+(++uid),component,compDesc,matType,qty:qtyCun,uom,baseQty});
+      groups[parentMat].children.push({id:'r'+(++uid), component, compDesc, matType, qty:qtyCun, uom, baseQty});
     }
-    // Advance stack — always done, even for dupes, so child hierarchy stays consistent
-    parentStack[level]={material:component,matDesc:compDesc,plant,alt:altBom};
-
-    // Multiple top-level materials
-    if(level===1&&material!==topMaterial){
-      topMaterial=material;topMatDesc=matDesc;
-      parentStack[0]={material:topMaterial,matDesc:topMatDesc,plant,alt:altBom};
+    parentStack[level] = {material:component, matDesc:compDesc, plant, alt:altBom};
+    if(level===1 && material!==topMaterial){
+      topMaterial=material; topMatDesc=matDesc;
+      parentStack[0] = {material:topMaterial, matDesc:topMatDesc, plant, alt:altBom};
     }
   }
 
-  const map=new Map();
-  for(const[key,grp]of Object.entries(groups)){
-    map.set(key,{matDesc:grp.matDesc,plant:grp.plant,alt:grp.alt,rows:grp.children});
+  const map = new Map();
+  for(const [key,grp] of Object.entries(groups)){
+    map.set(key, {matDesc:grp.matDesc, plant:grp.plant, alt:grp.alt, rows:grp.children});
   }
-  map._stats={inputCount,dupes};
+  map._stats = {inputCount, dupes};
   return map;
 }
 
 function cloneGroups(src){
-  const out=new Map();
+  const out = new Map();
   src.forEach((grp,key)=>{
-    out.set(key,{matDesc:grp.matDesc,plant:grp.plant,alt:grp.alt,rows:grp.rows.map(r=>({...r})),_isNew:grp._isNew||false});
+    out.set(key, {matDesc:grp.matDesc, plant:grp.plant, alt:grp.alt,
+      rows:grp.rows.map(r=>({...r})), _isNew:grp._isNew||false});
   });
   return out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TREE HIERARCHY BUILDER
+// ═══════════════════════════════════════════════════════════════════════════
+// Build a flat representation of the hierarchy for tree rendering.
+// A "root" node is any group key that doesn't appear as a HALB component
+// of another group (or whose parent group doesn't exist in editedGroups).
+
+function buildHierarchy(){
+  if(!editedGroups) return [];
+
+  // Map: component → set of parent group keys that contain it
+  const childOf = new Map(); // key → Set<parentKey>
+  const halbComponents = new Set(); // component keys that are HALB
+
+  editedGroups.forEach((grp, parentKey)=>{
+    grp.rows.forEach(r=>{
+      if(r._deleted) return;
+      if(r.matType==='HALB' && editedGroups.has(r.component)){
+        halbComponents.add(r.component);
+        if(!childOf.has(r.component)) childOf.set(r.component, new Set());
+        childOf.get(r.component).add(parentKey);
+      }
+    });
+  });
+
+  // Roots = groups NOT referenced as a HALB child
+  const roots = [];
+  editedGroups.forEach((_, key)=>{
+    if(!halbComponents.has(key)) roots.push(key);
+  });
+
+  // If everything is a child somehow (circular?), show all as roots
+  if(roots.length === 0) editedGroups.forEach((_,key)=>roots.push(key));
+
+  return {roots, childOf, halbComponents};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TREE RENDERING
+// ═══════════════════════════════════════════════════════════════════════════
+function renderTree(){
+  const body = document.getElementById('treeBody');
+  if(!editedGroups){ body.innerHTML=''; return; }
+
+  const {roots, halbComponents} = buildHierarchy();
+  const q = treeSearchQ.toLowerCase().trim();
+
+  // When searching, show flat filtered list instead
+  if(q){
+    renderFlatSearch(body, q); return;
+  }
+
+  body.innerHTML = '';
+  const visited = new Set(); // prevent infinite loops
+
+  function renderNode(key, depth, isLast, ancestorLines){
+    if(visited.has(key+'@'+depth)){ return null; } // safety
+    visited.add(key+'@'+depth);
+
+    const grp = editedGroups.get(key);
+    if(!grp) return null;
+
+    const isRoot = depth === 0;
+    const hasChildren = !isRoot ? false :
+      grp.rows.some(r=>!r._deleted && r.matType==='HALB' && editedGroups.has(r.component));
+
+    // Also any group can have HALB children
+    const halbKids = grp.rows
+      .filter(r=>!r._deleted && r.matType==='HALB' && editedGroups.has(r.component))
+      .map(r=>r.component);
+    const expandable = halbKids.length > 0;
+
+    if(!(key in treeExpanded)) treeExpanded[key] = depth < 2; // auto-expand up to depth 2
+
+    const expanded = treeExpanded[key] === true;
+    const isActive = key === activeGroupKey;
+    const changeDot = getChangeDot(key);
+    const activeRows = grp.rows.filter(r=>!r._deleted).length;
+    const totalRows  = grp.rows.length;
+
+    // Node row
+    const nodeDiv = document.createElement('div');
+    nodeDiv.className = 'tree-node';
+    nodeDiv.dataset.key = key;
+
+    // Build indent guides HTML
+    let indentHtml = '';
+    for(let i=0; i<depth; i++){
+      const hasLine = ancestorLines[i];
+      indentHtml += `<span class="tn-guide ${hasLine?'has-line':''}"></span>`;
+    }
+    if(depth > 0){
+      indentHtml += `<span class="tn-guide ${isLast?'is-last':'is-branch'}"></span>`;
+    }
+
+    const iconType = isRoot ? 'root' : (grp._isNew ? 'root' : 'halb');
+    const iconLabel = isRoot ? 'P' : 'H';
+
+    const toggleHtml = expandable
+      ? `<span class="tn-toggle${expanded?' open':''}" onclick="event.stopPropagation();toggleNode('${escJs(key)}')">
+           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>
+         </span>`
+      : `<span class="tn-toggle leaf"></span>`;
+
+    const dotHtml = changeDot
+      ? `<span class="tn-change-dot ${changeDot}" title="${changeDot}"></span>` : '';
+
+    const rowHtml = `
+      <div class="tree-node-row${isActive?' active':''}" data-key="${esc(key)}" onclick="selectGroup('${escJs(key)}')">
+        <div class="tn-indent">${indentHtml}</div>
+        ${toggleHtml}
+        <span class="tn-icon ${iconType}">${iconLabel}</span>
+        <div class="tn-content">
+          <span class="tn-mat" title="${esc(key)}">${esc(key)}</span>
+          <span class="tn-desc" title="${esc(grp.matDesc)}">${esc(grp.matDesc)}</span>
+        </div>
+        <div class="tn-badges">
+          ${dotHtml}
+          <span class="tn-count">${activeRows}</span>
+        </div>
+      </div>`;
+
+    nodeDiv.innerHTML = rowHtml;
+
+    // Children container
+    if(expandable){
+      const childrenDiv = document.createElement('div');
+      childrenDiv.className = 'tree-children' + (expanded?'':' collapsed');
+      childrenDiv.dataset.key = key;
+      if(expanded) childrenDiv.style.maxHeight = '9999px';
+
+      const newAncestorLines = [...ancestorLines, !isLast];
+      halbKids.forEach((childKey, idx)=>{
+        const childIsLast = idx === halbKids.length - 1;
+        const childNode = renderNode(childKey, depth+1, childIsLast, newAncestorLines);
+        if(childNode) childrenDiv.appendChild(childNode);
+      });
+      nodeDiv.appendChild(childrenDiv);
+    }
+
+    return nodeDiv;
+  }
+
+  roots.forEach((key, idx)=>{
+    const isLast = idx === roots.length - 1;
+    const node = renderNode(key, 0, isLast, []);
+    if(node) body.appendChild(node);
+  });
+
+  // Groups not reachable from roots (orphans)
+  const allRendered = new Set([...visited].map(s=>s.split('@')[0]));
+  let hasOrphans = false;
+  editedGroups.forEach((_,key)=>{
+    if(!allRendered.has(key)){
+      if(!hasOrphans){
+        const sep = document.createElement('div');
+        sep.style.cssText='padding:5px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);border-top:1px solid var(--border);margin-top:4px;';
+        sep.textContent = 'Other Groups';
+        body.appendChild(sep);
+        hasOrphans = true;
+      }
+      const n = renderNode(key, 0, false, []);
+      if(n) body.appendChild(n);
+    }
+  });
+}
+
+function renderFlatSearch(body, q){
+  body.innerHTML = '';
+  let count = 0;
+  editedGroups.forEach((grp, key)=>{
+    const matchKey  = key.toLowerCase().includes(q);
+    const matchDesc = (grp.matDesc||'').toLowerCase().includes(q);
+    const matchComp = grp.rows.some(r=>(r.component||'').toLowerCase().includes(q)||(r.compDesc||'').toLowerCase().includes(q));
+    if(!matchKey && !matchDesc && !matchComp) return;
+    count++;
+
+    const isActive = key === activeGroupKey;
+    const changeDot = getChangeDot(key);
+    const activeRows = grp.rows.filter(r=>!r._deleted).length;
+
+    const row = document.createElement('div');
+    row.className = 'tree-node-row' + (isActive?' active':'');
+    row.dataset.key = key;
+    row.onclick = ()=>selectGroup(key);
+
+    const dotHtml = changeDot ? `<span class="tn-change-dot ${changeDot}"></span>` : '';
+
+    row.innerHTML = `
+      <span class="tn-toggle leaf"></span>
+      <span class="tn-icon root">P</span>
+      <div class="tn-content">
+        <span class="tn-mat">${esc(key)}</span>
+        <span class="tn-desc">${esc(grp.matDesc)}</span>
+      </div>
+      <div class="tn-badges">${dotHtml}<span class="tn-count">${activeRows}</span></div>`;
+    body.appendChild(row);
+  });
+  if(count === 0){
+    body.innerHTML = `<div class="tree-nomatch">No groups match "<b>${esc(q)}</b>"</div>`;
+  }
+}
+
+function getChangeDot(key){
+  if(!originalGroups) return null;
+  const grp = editedGroups.get(key);
+  if(!grp) return null;
+  if(grp._isNew) return 'added';
+  const og = originalGroups.get(key);
+  if(!og) return 'added';
+  if(grp.rows.some(r=>r._deleted)) return 'deleted';
+  if(groupHasChanges(key)) return 'modified';
+  return null;
+}
+
+function toggleNode(key){
+  treeExpanded[key] = !treeExpanded[key];
+  // Animate
+  const childDiv = document.querySelector(`.tree-children[data-key="${CSS.escape(key)}"]`);
+  const toggleEl = document.querySelector(`.tree-node-row[data-key="${CSS.escape(key)}"] .tn-toggle`);
+  if(childDiv){
+    if(treeExpanded[key]){
+      childDiv.classList.remove('collapsed');
+      childDiv.style.maxHeight = childDiv.scrollHeight + 'px';
+      setTimeout(()=>childDiv.style.maxHeight='9999px', 210);
+    } else {
+      childDiv.style.maxHeight = childDiv.scrollHeight + 'px';
+      requestAnimationFrame(()=>{ childDiv.style.maxHeight='0'; childDiv.classList.add('collapsed'); });
+    }
+    if(toggleEl) toggleEl.classList.toggle('open', treeExpanded[key]);
+  }
+}
+
+function setAllExpanded(val){
+  if(!editedGroups) return;
+  editedGroups.forEach((_,key)=>{ treeExpanded[key] = val; });
+  renderTree();
+}
+
+function filterTree(q){
+  treeSearchQ = q;
+  renderTree();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════════════════════════════════
+function selectGroup(key){
+  activeGroupKey = key;
+  // Highlight in tree
+  document.querySelectorAll('.tree-node-row').forEach(el=>{
+    el.classList.toggle('active', el.dataset.key === key);
+  });
+  renderDetailPanel(key);
+}
+
+function renderDetailPanel(key){
+  const grp = editedGroups?.get(key);
+  if(!grp){
+    document.getElementById('detailEmpty').style.display='flex';
+    document.getElementById('detailContent').classList.add('hidden');
+    return;
+  }
+  document.getElementById('detailEmpty').style.display='none';
+  document.getElementById('detailContent').classList.remove('hidden');
+
+  renderBreadcrumb(key);
+  renderDetailToolbar(key, grp);
+  renderDetailTable(key, grp);
+}
+
+function renderBreadcrumb(key){
+  const bar = document.getElementById('breadcrumbBar');
+  // Build ancestry path
+  const path = buildAncestorPath(key);
+  bar.innerHTML = `<svg class="bc-root-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`;
+  path.forEach((k, i)=>{
+    if(i > 0) bar.innerHTML += `<span class="bc-sep">›</span>`;
+    const isActive = i === path.length - 1;
+    const sk = escJs(k);
+    bar.innerHTML += `<span class="bc-item${isActive?' active':''}" onclick="${isActive?'':("selectGroup('"+sk+"')")}">${esc(k)}</span>`;
+  });
+}
+
+function buildAncestorPath(targetKey){
+  // BFS backwards: find a path from any root to targetKey
+  if(!editedGroups) return [targetKey];
+  const {roots} = buildHierarchy();
+  if(roots.includes(targetKey)) return [targetKey];
+
+  // Build parent map
+  const parentOf = new Map();
+  editedGroups.forEach((grp, pk)=>{
+    grp.rows.forEach(r=>{
+      if(!r._deleted && r.matType==='HALB' && editedGroups.has(r.component)){
+        if(!parentOf.has(r.component)) parentOf.set(r.component, pk);
+      }
+    });
+  });
+
+  const path = [targetKey];
+  let cur = targetKey;
+  const seen = new Set([cur]);
+  while(parentOf.has(cur)){
+    const p = parentOf.get(cur);
+    if(seen.has(p)) break;
+    path.unshift(p);
+    seen.add(p);
+    cur = p;
+  }
+  return path;
+}
+
+function renderDetailToolbar(key, grp){
+  const tb = document.getElementById('detailToolbar');
+  const activeRows = grp.rows.filter(r=>!r._deleted).length;
+  const sk = escJs(key);
+  tb.innerHTML = `
+    <div class="grp-field" style="flex:1;min-width:160px;">
+      <label>Description</label>
+      <input type="text" value="${esc(grp.matDesc)}" style="flex:1;min-width:120px;"
+        oninput="updateGroupMeta('${sk}','matDesc',this.value)" placeholder="Material description…">
+    </div>
+    <div class="grp-field">
+      <label>Plant</label>
+      <input type="text" value="${esc(grp.plant)}" style="width:76px;"
+        oninput="updateGroupMeta('${sk}','plant',this.value)">
+    </div>
+    <div class="grp-field">
+      <label>Alt</label>
+      <input type="text" value="${esc(grp.alt)}" style="width:32px;"
+        oninput="updateGroupMeta('${sk}','alt',this.value)">
+    </div>
+    <div class="detail-meta">
+      <div class="detail-stat">
+        <div class="detail-stat-val">${activeRows}</div>
+        <div class="detail-stat-label">components</div>
+      </div>
+    </div>`;
+}
+
+function renderDetailTable(key, grp){
+  const tbody = document.getElementById('detailTbody');
+  tbody.innerHTML = grp.rows.map((r,ri)=>buildRowHTML(key,r,ri)).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ROW HTML BUILDER
+// ═══════════════════════════════════════════════════════════════════════════
+function buildRowHTML(groupKey, r, ri){
+  const isDeleted  = r._deleted === true;
+  const isAdded    = r._isNew   === true;
+  const origRow    = getOrigRow(groupKey, r.id);
+  const isModified = !isAdded && !isDeleted && origRow && rowModified(r, origRow);
+
+  let rowClass = '';
+  if(isDeleted)       rowClass = 'row-deleted';
+  else if(isAdded)    rowClass = 'row-added';
+  else if(isModified) rowClass = 'row-modified';
+
+  const sk  = escJs(groupKey);
+  const sid = r.id;
+
+  // HALB "go to child" button
+  const isHalb     = r.matType === 'HALB';
+  const childExists = isHalb && editedGroups && editedGroups.has(r.component);
+  let halbBtn = '';
+  if(isHalb && !isDeleted){
+    if(childExists){
+      halbBtn = `<button class="row-btn goto-child" title="Navigate to: ${esc(r.component)}" onclick="selectGroup('${escJs(r.component)}')">
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>${esc(r.component)}</button>`;
+    } else {
+      halbBtn = `<button class="row-btn goto-child missing" title="Create child group for ${esc(r.component)}" onclick="createChildGroup('${escJs(r.component)}','${escJs(r.compDesc)}')">
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>`;
+    }
+  }
+
+  const actionCell = isDeleted
+    ? `<div class="row-actions"><button class="row-btn restore" onclick="restoreRow('${sk}','${sid}')">↩ Restore</button></div>`
+    : `<div class="row-actions">${halbBtn}<button class="row-btn del" title="Delete row" onclick="deleteRow('${sk}','${sid}')">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      </button></div>`;
+
+  function inp(field, val, width){
+    const origVal = origRow ? (origRow[field]||'') : val;
+    const changed = !isAdded && String(val) !== String(origVal);
+    return `<input class="cell-input${changed?' changed':''}" style="min-width:${width||'80px'}" value="${esc(val)}"
+      oninput="cellChanged('${sk}','${sid}','${field}',this.value)"
+      title="${changed?'Original: '+esc(origVal):''}"
+      ${isDeleted?'disabled':''}>`;
+  }
+
+  const types = ['ROH','HALB','FERT','HALB-SFG','ROH-SFG'];
+  const typeOpts = types.map(t=>`<option value="${t}"${r.matType===t?' selected':''}>${t}</option>`).join('');
+
+  return `<tr class="${rowClass}" id="row-${sid}">
+    <td>${inp('component', r.component, '120px')}</td>
+    <td>${inp('compDesc', r.compDesc, '190px')}</td>
+    <td><select class="cell-select" onchange="cellChanged('${sk}','${sid}','matType',this.value)" ${isDeleted?'disabled':''}>${typeOpts}</select></td>
+    <td>${inp('qty', r.qty, '75px')}</td>
+    <td>${inp('uom', r.uom, '50px')}</td>
+    <td>${inp('baseQty', r.baseQty, '75px')}</td>
+    <td>${actionCell}</td>
+  </tr>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // IMPORT
 // ═══════════════════════════════════════════════════════════════════════════
 function rowToSheet2(r){
-  // FIX #2: use actual r.baseQty — never hardcode '1000'
-  return[r.parentMat,r.matDesc,r.plant,'1',r.alt,r.baseQty,r.component,r.compDesc,r.matType,'',r.qty,r.uom,''];
+  return [r.parentMat,r.matDesc,r.plant,'1',r.alt,r.baseQty,r.component,r.compDesc,r.matType,'',r.qty,r.uom,''];
 }
 
 function importBOM(){
-  const raw=document.getElementById('pasteArea').value.trim();
-  if(!raw){toast('Paste Sheet 1 data first.','err');return;}
-  try{
-    const groups=parseSheet1(raw);
-    const stats=groups._stats||{};
+  const raw = document.getElementById('pasteArea').value.trim();
+  if(!raw){ toast('Paste Sheet 1 data first.','err'); return; }
+  try {
+    const groups = parseSheet1(raw);
+    const stats  = groups._stats || {};
     delete groups._stats;
 
-    originalGroups=groups;
-    editedGroups=cloneGroups(groups);
+    originalGroups = groups;
+    editedGroups   = cloneGroups(groups);
+    treeExpanded   = {};
+    activeGroupKey = null;
 
-    importFlatRows=[];
-    groups.forEach((grp,parentMat)=>{
+    importFlatRows = [];
+    groups.forEach((grp, parentMat)=>{
       grp.rows.forEach(r=>{
-        importFlatRows.push({parentMat,matDesc:grp.matDesc,plant:grp.plant,alt:grp.alt,...r});
+        importFlatRows.push({parentMat, matDesc:grp.matDesc, plant:grp.plant, alt:grp.alt, ...r});
       });
     });
 
-    const roh=importFlatRows.filter(r=>r.matType==='ROH').length;
-    const halb=importFlatRows.filter(r=>r.matType==='HALB').length;
-    setEl('sIn',stats.inputCount||importFlatRows.length);
-    setEl('sOut',importFlatRows.length);
-    setEl('sPar',groups.size);
-    setEl('sDup',stats.dupes||0);
-    setEl('sRoh',roh);
-    setEl('sHalb',halb);
+    const roh  = importFlatRows.filter(r=>r.matType==='ROH').length;
+    const halb = importFlatRows.filter(r=>r.matType==='HALB').length;
+    setEl('sIn',  stats.inputCount || importFlatRows.length);
+    setEl('sOut', importFlatRows.length);
+    setEl('sPar', groups.size);
+    setEl('sDup', stats.dupes || 0);
+    setEl('sRoh', roh);
+    setEl('sHalb', halb);
     document.getElementById('statsBar').classList.add('show');
 
     renderPreviewTable(importFlatRows);
-    document.getElementById('previewCount').textContent=importFlatRows.length+' rows · '+groups.size+' groups';
+    document.getElementById('previewCount').textContent = importFlatRows.length+' rows · '+groups.size+' groups';
     document.getElementById('previewWrap').classList.add('show');
 
-    renderEditor();
     document.getElementById('btnExportTSV').classList.remove('hidden');
     updateDiffBadge();
 
-    const dupeNote=stats.dupes>0?' · '+stats.dupes+' dupes removed':'';
-    document.getElementById('importStatus').textContent='✓ '+stats.inputCount+' rows processed';
-    toast('Imported '+groups.size+' parent groups'+dupeNote,'ok');
-    setTimeout(()=>document.getElementById('statsBar').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
-  }catch(e){
-    toast('Error: '+e.message,'err');console.error(e);
+    const dupeNote = stats.dupes > 0 ? ' · '+stats.dupes+' dupes removed' : '';
+    document.getElementById('importStatus').textContent = '✓ '+stats.inputCount+' rows processed';
+    toast('Imported '+groups.size+' parent groups'+dupeNote, 'ok');
+
+    // Prime the editor
+    initEditor();
+  } catch(e){
+    toast('Error: '+e.message, 'err'); console.error(e);
   }
 }
 
+function initEditor(){
+  document.getElementById('editorEmptyState').style.display = 'none';
+  document.getElementById('editorLayout').classList.remove('hidden');
+  // Select first key
+  const firstKey = editedGroups.keys().next().value;
+  activeGroupKey = firstKey;
+  renderTree();
+  renderDetailPanel(firstKey);
+}
+
 function renderPreviewTable(rows){
-  const tbody=document.getElementById('previewBody');
-  tbody.innerHTML='';
-  let lastParent=null,n=0;
+  const tbody = document.getElementById('previewBody');
+  tbody.innerHTML = '';
+  let lastParent = null, n = 0;
   rows.forEach(r=>{
-    if(r.parentMat!==lastParent&&lastParent!==null){
-      const sep=document.createElement('tr');sep.className='sep-row';
-      sep.innerHTML='<td colspan="14">── next parent group ──</td>';tbody.appendChild(sep);
+    if(r.parentMat !== lastParent && lastParent !== null){
+      const sep = document.createElement('tr'); sep.className='sep-row';
+      sep.innerHTML='<td colspan="14">── next parent group ──</td>'; tbody.appendChild(sep);
     }
-    lastParent=r.parentMat;n++;
-    const tc=r.matType==='HALB'?'c-halb':r.matType==='ROH'?'c-roh':'';
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td class="c-num">${n}</td><td class="c-mat">${esc(r.parentMat)}</td>
+    lastParent = r.parentMat; n++;
+    const tc = r.matType==='HALB'?'c-halb':r.matType==='ROH'?'c-roh':'';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="c-num">${n}</td><td class="c-mat">${esc(r.parentMat)}</td>
       <td>${esc(r.matDesc)}</td><td>${esc(r.plant)}</td>
       <td style="text-align:center">1</td><td style="text-align:center">${esc(r.alt)}</td>
       <td style="text-align:right">${esc(r.baseQty)}</td>
@@ -574,419 +1125,296 @@ function renderPreviewTable(rows){
 }
 
 function copyForExcel(){
-  if(!importFlatRows.length)return;
-  const lines=[SHEET2_COLS.join('\t')];
-  let last=null;
-  importFlatRows.forEach(r=>{if(r.parentMat!==last&&last!==null)lines.push('');last=r.parentMat;lines.push(rowToSheet2(r).join('\t'));});
+  if(!importFlatRows.length) return;
+  const lines = [SHEET2_COLS.join('\t')];
+  let last = null;
+  importFlatRows.forEach(r=>{ if(r.parentMat!==last&&last!==null)lines.push(''); last=r.parentMat; lines.push(rowToSheet2(r).join('\t')); });
   navigator.clipboard.writeText(lines.join('\n')).then(()=>toast('Copied! Paste into Excel','ok')).catch(()=>downloadCSV());
 }
 
 function downloadCSV(){
-  if(!importFlatRows.length)return;
-  const lines=[SHEET2_COLS.map(h=>`"${h}"`).join(',')];
-  let last=null;
+  if(!importFlatRows.length) return;
+  const lines = [SHEET2_COLS.map(h=>`"${h}"`).join(',')];
+  let last = null;
   importFlatRows.forEach(r=>{
-    if(r.parentMat!==last&&last!==null)lines.push(','.repeat(SHEET2_COLS.length-1));
-    last=r.parentMat;
+    if(r.parentMat!==last&&last!==null) lines.push(','.repeat(SHEET2_COLS.length-1));
+    last = r.parentMat;
     lines.push(rowToSheet2(r).map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
   });
-  triggerDownload(lines.join('\n'),'sheet2_bom.csv','text/csv');
+  triggerDownload(lines.join('\n'), 'sheet2_bom.csv', 'text/csv');
 }
 
 function clearImport(){
-  document.getElementById('pasteArea').value='';
+  document.getElementById('pasteArea').value = '';
   document.getElementById('statsBar').classList.remove('show');
   document.getElementById('previewWrap').classList.remove('show');
-  document.getElementById('previewBody').innerHTML='';
-  document.getElementById('importStatus').textContent='';
-  importFlatRows=[];
+  document.getElementById('previewBody').innerHTML = '';
+  document.getElementById('importStatus').textContent = '';
+  importFlatRows = [];
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// EDITOR — RENDER
+// EDITOR MUTATIONS
 // ═══════════════════════════════════════════════════════════════════════════
-function renderEditor(){
-  document.getElementById('editorEmpty').style.display='none';
-  document.getElementById('editorContent').classList.remove('hidden');
-  const nav=document.getElementById('groupNav');
-  const container=document.getElementById('groupsContainer');
-  nav.innerHTML='';container.innerHTML='';
-  const keys=[...editedGroups.keys()];
-  document.getElementById('groupCount').textContent=keys.length+' groups';
-  if(!activeGroupKey||!editedGroups.has(activeGroupKey))activeGroupKey=keys[0];
-
-  keys.forEach((key,i)=>{
-    const grp=editedGroups.get(key);
-    const isNew=grp._isNew===true;
-    const changed=groupHasChanges(key);
-    const isActive=key===activeGroupKey;
-
-    const pill=document.createElement('button');
-    pill.className='group-pill'+(isActive?' active':'')+(isNew?' newgrp':changed?' changed':'');
-    pill.title=grp.matDesc||key;
-    pill.textContent=key;
-    pill.dataset.key=key;
-    pill.onclick=()=>{activeGroupKey=key;renderEditor();};
-    nav.appendChild(pill);
-
-    const panel=document.createElement('div');
-    panel.style.display=isActive?'block':'none';
-    panel.id='grp-panel-'+i;
-    panel.dataset.groupKey=key;
-    panel.innerHTML=buildGroupHTML(key,grp);
-    container.appendChild(panel);
-  });
-}
-
-function buildGroupHTML(key,grp){
-  const activeRows=grp.rows.filter(r=>!r._deleted);
-  const sk=escJs(key);
-  return `<div class="grp-header">
-    <div class="grp-title-col">
-      <div class="grp-mat">${esc(key)}</div>
-      <div class="grp-fields">
-        <div class="grp-field" style="flex:1;min-width:180px;">
-          <label>Description</label>
-          <input type="text" value="${esc(grp.matDesc)}" style="flex:1;min-width:140px;"
-            oninput="updateGroupMeta('${sk}','matDesc',this.value)"
-            placeholder="Material description…">
-        </div>
-        <div class="grp-field">
-          <label>Plant</label>
-          <input type="text" value="${esc(grp.plant)}" style="width:80px;"
-            oninput="updateGroupMeta('${sk}','plant',this.value)">
-        </div>
-        <div class="grp-field">
-          <label>Alt</label>
-          <input type="text" value="${esc(grp.alt)}" style="width:36px;"
-            oninput="updateGroupMeta('${sk}','alt',this.value)">
-        </div>
-      </div>
-    </div>
-    <div class="grp-meta">
-      <div class="grp-stat">${activeRows.length}</div>
-      <div class="grp-stat-label">components</div>
-    </div>
-  </div>
-  <table class="bom-tbl">
-    <thead><tr>
-      <th>Component</th><th>Description</th><th>Mat Type</th>
-      <th>Quantity</th><th>UOM</th><th>Base Qty</th><th>Actions</th>
-    </tr></thead>
-    <tbody id="tbody-${esc(key)}">${grp.rows.map((r,ri)=>buildRowHTML(key,r,ri)).join('')}</tbody>
-  </table>
-  <button class="add-row-btn" onclick="addRow('${sk}')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Add component row
-  </button>`;
-}
-
-function buildRowHTML(groupKey,r,ri){
-  const isDeleted=r._deleted===true;
-  const isAdded=r._isNew===true;
-  const origRow=getOrigRow(groupKey,r.id);
-  const isModified=!isAdded&&!isDeleted&&origRow&&rowModified(r,origRow);
-  let rowClass='';
-  if(isDeleted)rowClass='row-deleted';
-  else if(isAdded)rowClass='row-added';
-  else if(isModified)rowClass='row-modified';
-
-  const sk=escJs(groupKey);const sid=r.id;
-
-  const isHalb=r.matType==='HALB';
-  const childExists=isHalb&&editedGroups&&editedGroups.has(r.component);
-  let halbBtn='';
-  if(isHalb&&!isDeleted){
-    if(childExists){
-      halbBtn=`<button class="row-btn goto-child" title="Go to child: ${esc(r.component)}" onclick="goToChildGroup('${escJs(r.component)}')">
-        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>${esc(r.component)}</button>`;
-    }else{
-      // FIX #3: use escJs for both component and desc in onclick to prevent broken strings
-      halbBtn=`<button class="row-btn goto-child missing" title="Create child group" onclick="createChildGroup('${escJs(r.component)}','${escJs(r.compDesc)}')">
-        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add children</button>`;
-    }
-  }
-
-  const actionCell=isDeleted
-    ?`<div class="row-actions"><button class="row-btn restore" onclick="restoreRow('${sk}','${sid}')">↩ Restore</button></div>`
-    :`<div class="row-actions">${halbBtn}<button class="row-btn del" title="Delete" onclick="deleteRow('${sk}','${sid}')">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-      </button></div>`;
-
-  function inp(field,val,width){
-    const origVal=origRow?(origRow[field]||''):val;
-    const changed=!isAdded&&String(val)!==String(origVal);
-    return`<input class="cell-input${changed?' changed':''}" style="min-width:${width||'80px'}" value="${esc(val)}"
-      oninput="cellChanged('${sk}','${sid}','${field}',this.value)"
-      title="${changed?'Original: '+esc(origVal):''}"
-      ${isDeleted?'disabled':''}>`;
-  }
-
-  const types=['ROH','HALB','FERT','HALB-SFG','ROH-SFG'];
-  const typeOpts=types.map(t=>`<option value="${t}"${r.matType===t?' selected':''}>${t}</option>`).join('');
-
-  return`<tr class="${rowClass}" id="row-${sid}">
-    <td>${inp('component',r.component,'120px')}</td>
-    <td>${inp('compDesc',r.compDesc,'190px')}</td>
-    <td><select class="cell-select" onchange="cellChanged('${sk}','${sid}','matType',this.value)" ${isDeleted?'disabled':''}>${typeOpts}</select></td>
-    <td>${inp('qty',r.qty,'75px')}</td>
-    <td>${inp('uom',r.uom,'50px')}</td>
-    <td>${inp('baseQty',r.baseQty,'75px')}</td>
-    <td>${actionCell}</td>
-  </tr>`;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// EDITOR — MUTATIONS
-// ═══════════════════════════════════════════════════════════════════════════
-
-// FIX #4: group-level metadata (plant, alt, matDesc) stored on group, NOT on rows
-function updateGroupMeta(groupKey,field,value){
-  const grp=editedGroups.get(groupKey);
-  if(!grp)return;
-  grp[field]=value;
-  updateGroupPill(groupKey);
+function updateGroupMeta(groupKey, field, value){
+  const grp = editedGroups.get(groupKey);
+  if(!grp) return;
+  grp[field] = value;
+  refreshTreeNode(groupKey);
   updateDiffBadge();
 }
 
-function cellChanged(groupKey,rowId,field,value){
-  const grp=editedGroups.get(groupKey);if(!grp)return;
-  const row=grp.rows.find(r=>r.id===rowId);if(!row)return;
-  row[field]=value;
-  refreshRowStyle(groupKey,rowId);
-  updateGroupPill(groupKey);
+function cellChanged(groupKey, rowId, field, value){
+  const grp = editedGroups.get(groupKey); if(!grp) return;
+  const row = grp.rows.find(r=>r.id===rowId); if(!row) return;
+  row[field] = value;
+  refreshRowStyle(groupKey, rowId);
+  refreshTreeNode(groupKey);
   updateDiffBadge();
+  // If matType changed to/from HALB, may affect tree
+  if(field === 'matType') renderTree();
 }
 
-function refreshRowStyle(groupKey,rowId){
-  const grp=editedGroups.get(groupKey);
-  const row=grp?.rows.find(r=>r.id===rowId);
-  if(!row)return;
-  const tr=document.getElementById('row-'+rowId);if(!tr)return;
-  const isDeleted=row._deleted===true;
-  const isAdded=row._isNew===true;
-  const origRow=getOrigRow(groupKey,rowId);
-  const isModified=!isAdded&&!isDeleted&&origRow&&rowModified(row,origRow);
-  tr.className=isDeleted?'row-deleted':isAdded?'row-added':isModified?'row-modified':'';
+function refreshRowStyle(groupKey, rowId){
+  const grp = editedGroups.get(groupKey);
+  const row = grp?.rows.find(r=>r.id===rowId);
+  if(!row) return;
+  const tr = document.getElementById('row-'+rowId); if(!tr) return;
+  const isDeleted  = row._deleted === true;
+  const isAdded    = row._isNew   === true;
+  const origRow    = getOrigRow(groupKey, rowId);
+  const isModified = !isAdded && !isDeleted && origRow && rowModified(row, origRow);
+  tr.className = isDeleted?'row-deleted':isAdded?'row-added':isModified?'row-modified':'';
   tr.querySelectorAll('.cell-input').forEach(inp=>{
-    const m=inp.getAttribute('oninput')?.match(/'(\w+)',this/);
-    const f=m?.[1];
-    if(f&&origRow&&!isAdded){
-      const ov=origRow[f]||'';
-      inp.classList.toggle('changed',inp.value!==ov);
-      inp.title=inp.value!==ov?'Original: '+ov:'';
+    const m = inp.getAttribute('oninput')?.match(/'(\w+)',this/);
+    const f = m?.[1];
+    if(f && origRow && !isAdded){
+      const ov = origRow[f] || '';
+      inp.classList.toggle('changed', inp.value !== ov);
+      inp.title = inp.value !== ov ? 'Original: '+ov : '';
     }
   });
 }
 
-function deleteRow(groupKey,rowId){
-  const grp=editedGroups.get(groupKey);
-  const row=grp?.rows.find(r=>r.id===rowId);if(!row)return;
-  if(row._isNew){grp.rows=grp.rows.filter(r=>r.id!==rowId);reRenderPanel(groupKey);}
-  else{
-    row._deleted=true;
-    const tr=document.getElementById('row-'+rowId);
-    if(tr){
-      tr.className='row-deleted';
-      tr.querySelectorAll('input,select').forEach(el=>el.disabled=true);
-      const ac=tr.querySelector('.row-actions');
-      if(ac)ac.innerHTML=`<button class="row-btn restore" onclick="restoreRow('${escJs(groupKey)}','${rowId}')">↩ Restore</button>`;
-    }
-  }
-  updateGroupPill(groupKey);updateDiffBadge();
+function refreshTreeNode(groupKey){
+  // Update just the change dot and count without full re-render
+  const changeDot  = getChangeDot(groupKey);
+  const grp        = editedGroups.get(groupKey);
+  const activeRows = grp ? grp.rows.filter(r=>!r._deleted).length : 0;
+  document.querySelectorAll(`.tree-node-row[data-key="${CSS.escape(groupKey)}"] .tn-badges`).forEach(el=>{
+    const dotHtml = changeDot ? `<span class="tn-change-dot ${changeDot}"></span>` : '';
+    el.innerHTML  = dotHtml + `<span class="tn-count">${activeRows}</span>`;
+  });
 }
 
-function restoreRow(groupKey,rowId){
-  const grp=editedGroups.get(groupKey);
-  const row=grp?.rows.find(r=>r.id===rowId);if(!row)return;
+function deleteRow(groupKey, rowId){
+  const grp = editedGroups.get(groupKey);
+  const row = grp?.rows.find(r=>r.id===rowId); if(!row) return;
+  if(row._isNew){
+    grp.rows = grp.rows.filter(r=>r.id!==rowId);
+    renderDetailPanel(groupKey);
+  } else {
+    row._deleted = true;
+    const tr = document.getElementById('row-'+rowId);
+    if(tr){
+      tr.className = 'row-deleted';
+      tr.querySelectorAll('input,select').forEach(el=>el.disabled=true);
+      const ac = tr.querySelector('.row-actions');
+      if(ac) ac.innerHTML = `<button class="row-btn restore" onclick="restoreRow('${escJs(groupKey)}','${rowId}')">↩ Restore</button>`;
+    }
+  }
+  refreshTreeNode(groupKey);
+  updateDiffBadge();
+  // If it was a HALB, tree structure may change
+  renderTree();
+  // Re-highlight active
+  document.querySelectorAll('.tree-node-row').forEach(el=>{
+    el.classList.toggle('active', el.dataset.key === activeGroupKey);
+  });
+}
+
+function restoreRow(groupKey, rowId){
+  const grp = editedGroups.get(groupKey);
+  const row = grp?.rows.find(r=>r.id===rowId); if(!row) return;
   delete row._deleted;
-  reRenderPanel(groupKey);updateGroupPill(groupKey);updateDiffBadge();
+  renderDetailPanel(groupKey);
+  refreshTreeNode(groupKey);
+  updateDiffBadge();
+  renderTree();
+  document.querySelectorAll('.tree-node-row').forEach(el=>{
+    el.classList.toggle('active', el.dataset.key === activeGroupKey);
+  });
+}
+
+function addRowToActive(){
+  if(!activeGroupKey) return;
+  addRow(activeGroupKey);
 }
 
 function addRow(groupKey){
-  const grp=editedGroups.get(groupKey);if(!grp)return;
-  grp.rows.push({id:newId(),component:'',compDesc:'',matType:'ROH',qty:'1,000',uom:'EA',baseQty:'1,000',_isNew:true});
-  reRenderPanel(groupKey);updateGroupPill(groupKey);updateDiffBadge();
+  const grp = editedGroups.get(groupKey); if(!grp) return;
+  const newRow = {id:newId(), component:'', compDesc:'', matType:'ROH', qty:'1,000', uom:'EA', baseQty:'1,000', _isNew:true};
+  grp.rows.push(newRow);
+  // Append row to table instead of full re-render
+  const tbody = document.getElementById('detailTbody');
+  if(tbody){
+    tbody.insertAdjacentHTML('beforeend', buildRowHTML(groupKey, newRow, grp.rows.length-1));
+  }
+  refreshTreeNode(groupKey);
+  updateDiffBadge();
+  // Focus new row
   setTimeout(()=>{
-    const tbody=document.getElementById('tbody-'+groupKey);
-    if(tbody){const li=tbody.querySelector('tr:last-child input.cell-input');if(li)li.focus();}
-  },50);
+    const tr = document.getElementById('row-'+newRow.id);
+    if(tr){ const inp = tr.querySelector('input.cell-input'); if(inp) inp.focus(); }
+  }, 40);
+  // Update count in toolbar
+  const ds = document.querySelector('.detail-stat-val');
+  if(ds) ds.textContent = grp.rows.filter(r=>!r._deleted).length;
 }
 
 function addNewGroup(){
-  const key=prompt('Enter new parent Material number:');
-  if(!key?.trim())return;
-  const k=key.trim().toUpperCase();
-  if(editedGroups.has(k)){toast('Group already exists: '+k,'err');return;}
-  const desc=prompt('Material Description (optional):')||'';
-  const first=editedGroups.values().next().value;
-  editedGroups.set(k,{matDesc:desc,plant:first?.plant||'5500/5600',alt:first?.alt||'1',rows:[],_isNew:true});
-  activeGroupKey=k;renderEditor();toast('Group added: '+k,'ok');
+  const key = prompt('Enter new parent Material number:');
+  if(!key?.trim()) return;
+  const k = key.trim().toUpperCase();
+  if(editedGroups.has(k)){ toast('Group already exists: '+k,'err'); return; }
+  const desc  = prompt('Material Description (optional):') || '';
+  const first = editedGroups.values().next().value;
+  editedGroups.set(k, {matDesc:desc, plant:first?.plant||'5500/5600', alt:first?.alt||'1', rows:[], _isNew:true});
+  treeExpanded[k] = true;
+  activeGroupKey = k;
+  renderTree();
+  renderDetailPanel(k);
+  toast('Group added: '+k, 'ok');
 }
 
-function goToChildGroup(childKey){
-  if(!editedGroups.has(childKey)){toast('Child group not found: '+childKey,'err');return;}
-  activeGroupKey=childKey;renderEditor();
-  setTimeout(()=>{
-    const pills=document.querySelectorAll('.group-pill');
-    const keys=[...editedGroups.keys()];const idx=keys.indexOf(childKey);
-    pills[idx]?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  },60);
-}
-
-function createChildGroup(childKey,childDesc){
-  if(editedGroups.has(childKey)){goToChildGroup(childKey);return;}
-  const first=editedGroups.values().next().value;
-  editedGroups.set(childKey,{matDesc:childDesc||'',plant:first?.plant||'5500/5600',alt:first?.alt||'1',rows:[],_isNew:true});
-  activeGroupKey=childKey;renderEditor();toast('Child group created: '+childKey,'ok');
-}
-
-function reRenderPanel(groupKey){
-  const keys=[...editedGroups.keys()];const i=keys.indexOf(groupKey);
-  const grp=editedGroups.get(groupKey);
-  const panel=document.getElementById('grp-panel-'+i);
-  if(panel)panel.innerHTML=buildGroupHTML(groupKey,grp);
-}
-
-function updateGroupPill(groupKey){
-  const keys=[...editedGroups.keys()];
-  const pills=document.querySelectorAll('.group-pill');
-  const idx=keys.indexOf(groupKey);const pill=pills[idx];if(!pill)return;
-  const grp=editedGroups.get(groupKey);
-  const isNew=grp?._isNew===true;const changed=groupHasChanges(groupKey);
-  const isActive=groupKey===activeGroupKey;
-  pill.className='group-pill'+(isActive?' active':'')+(isNew?' newgrp':changed?' changed':'');
-}
-
-function filterGroups(q){
-  const pills=document.querySelectorAll('.group-pill');
-  const norm=q.toLowerCase().trim();
-  pills.forEach(pill=>{
-    const key=pill.dataset.key;
-    const grp=editedGroups?.get(key);
-    const match=!norm||key.toLowerCase().includes(norm)||(grp?.matDesc||'').toLowerCase().includes(norm);
-    pill.classList.toggle('gpill-hidden',!match);
-  });
+function createChildGroup(childKey, childDesc){
+  if(editedGroups.has(childKey)){ selectGroup(childKey); return; }
+  const first = editedGroups.values().next().value;
+  editedGroups.set(childKey, {matDesc:childDesc||'', plant:first?.plant||'5500/5600', alt:first?.alt||'1', rows:[], _isNew:true});
+  treeExpanded[childKey] = true;
+  activeGroupKey = childKey;
+  renderTree();
+  renderDetailPanel(childKey);
+  toast('Child group created: '+childKey, 'ok');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CHANGE DETECTION
 // ═══════════════════════════════════════════════════════════════════════════
-function getOrigRow(groupKey,rowId){return originalGroups?.get(groupKey)?.rows.find(r=>r.id===rowId)||null;}
-function rowModified(e,o){return ROW_FIELDS.some(f=>(e[f]||'')!==(o[f]||''));}
-
+function getOrigRow(groupKey, rowId){
+  return originalGroups?.get(groupKey)?.rows.find(r=>r.id===rowId) || null;
+}
+function rowModified(e, o){
+  return ROW_FIELDS.some(f=>(e[f]||'') !== (o[f]||''));
+}
 function groupHasChanges(key){
-  if(!originalGroups)return false;
-  const eg=editedGroups.get(key);const og=originalGroups.get(key);
-  if(!og)return true;if(!eg)return false;
-  // FIX #5: check group-level field changes too
-  for(const f of GRP_FIELDS){if((eg[f]||'')!==(og[f]||''))return true;}
+  if(!originalGroups) return false;
+  const eg = editedGroups.get(key);
+  const og = originalGroups.get(key);
+  if(!og) return true;
+  if(!eg) return false;
+  for(const f of GRP_FIELDS){ if((eg[f]||'') !== (og[f]||'')) return true; }
   for(const r of eg.rows){
-    if(r._isNew||r._deleted)return true;
-    const o=og.rows.find(x=>x.id===r.id);
-    if(!o||rowModified(r,o))return true;
+    if(r._isNew || r._deleted) return true;
+    const o = og.rows.find(x=>x.id===r.id);
+    if(!o || rowModified(r,o)) return true;
   }
   return false;
 }
-
 function countAllChanges(){
-  if(!editedGroups||!originalGroups)return 0;
-  let total=0;
+  if(!editedGroups || !originalGroups) return 0;
+  let total = 0;
   editedGroups.forEach((eg,key)=>{
-    const og=originalGroups.get(key);
-    if(!og){total+=eg.rows.length;return;}
-    for(const f of GRP_FIELDS){if((eg[f]||'')!==(og[f]||''))total++;}
+    const og = originalGroups.get(key);
+    if(!og){ total += eg.rows.length; return; }
+    for(const f of GRP_FIELDS){ if((eg[f]||'') !== (og[f]||'')) total++; }
     eg.rows.forEach(r=>{
-      if(r._isNew||r._deleted){total++;return;}
-      const o=og.rows.find(x=>x.id===r.id);
-      if(!o||rowModified(r,o))total++;
+      if(r._isNew || r._deleted){ total++; return; }
+      const o = og.rows.find(x=>x.id===r.id);
+      if(!o || rowModified(r,o)) total++;
     });
-    og.rows.forEach(o=>{if(!eg.rows.find(r=>r.id===o.id))total++;});
+    og.rows.forEach(o=>{ if(!eg.rows.find(r=>r.id===o.id)) total++; });
   });
   return total;
 }
-
 function updateDiffBadge(){
-  const n=countAllChanges();
-  const badge=document.getElementById('diffBadge');
-  badge.classList.toggle('hidden',n===0);
-  badge.textContent=n>99?'99+':n;
+  const n = countAllChanges();
+  const badge = document.getElementById('diffBadge');
+  badge.classList.toggle('hidden', n===0);
+  badge.textContent = n>99?'99+':n;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DIFF ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
 function runDiff(){
-  if(!originalGroups||!editedGroups)return;
-  document.getElementById('diffEmpty').style.display='none';
+  if(!originalGroups || !editedGroups) return;
+  document.getElementById('diffEmpty').style.display = 'none';
   document.getElementById('diffContent').classList.remove('hidden');
-  const showUnchanged=document.getElementById('chkShowUnchanged').checked;
-  const allKeys=new Set([...originalGroups.keys(),...editedGroups.keys()]);
-  let totA=0,totR=0,totM=0,totU=0;
-  const groupDiffs=[];
+  const showUnchanged = document.getElementById('chkShowUnchanged').checked;
+  const allKeys = new Set([...originalGroups.keys(), ...editedGroups.keys()]);
+  let totA=0, totR=0, totM=0, totU=0;
+  const groupDiffs = [];
 
   allKeys.forEach(key=>{
-    const og=originalGroups.get(key);const eg=editedGroups.get(key);
-    const diffRows=[];
+    const og = originalGroups.get(key);
+    const eg = editedGroups.get(key);
+    const diffRows = [];
 
     if(!og){
-      (eg?.rows||[]).forEach(r=>{diffRows.push({type:'added',edited:r});totA++;});
+      (eg?.rows||[]).forEach(r=>{ diffRows.push({type:'added',edited:r}); totA++; });
     } else if(!eg){
-      og.rows.forEach(r=>{diffRows.push({type:'removed',orig:r});totR++;});
+      og.rows.forEach(r=>{ diffRows.push({type:'removed',orig:r}); totR++; });
     } else {
       eg.rows.forEach(r=>{
-        if(r._isNew){diffRows.push({type:'added',edited:r});totA++;return;}
-        if(r._deleted){diffRows.push({type:'removed',orig:og.rows.find(x=>x.id===r.id)||r,edited:r});totR++;return;}
-        const o=og.rows.find(x=>x.id===r.id);
-        if(!o){diffRows.push({type:'added',edited:r});totA++;return;}
-        if(rowModified(r,o)){diffRows.push({type:'modified',orig:o,edited:r});totM++;}
-        else{diffRows.push({type:'unchanged',orig:o,edited:r});totU++;}
+        if(r._isNew){  diffRows.push({type:'added',edited:r}); totA++; return; }
+        if(r._deleted){ diffRows.push({type:'removed',orig:og.rows.find(x=>x.id===r.id)||r,edited:r}); totR++; return; }
+        const o = og.rows.find(x=>x.id===r.id);
+        if(!o){ diffRows.push({type:'added',edited:r}); totA++; return; }
+        if(rowModified(r,o)){ diffRows.push({type:'modified',orig:o,edited:r}); totM++; }
+        else { diffRows.push({type:'unchanged',orig:o,edited:r}); totU++; }
       });
-      og.rows.forEach(o=>{if(!eg.rows.find(r=>r.id===o.id)){diffRows.push({type:'removed',orig:o});totR++;}});
+      og.rows.forEach(o=>{ if(!eg.rows.find(r=>r.id===o.id)){ diffRows.push({type:'removed',orig:o}); totR++; } });
     }
 
     if(diffRows.length){
-      const g=eg||og;
-      const ogGrp=og;const egGrp=eg;
-      // Detect group-level changes
-      const grpChanges=[];
-      if(og&&eg){
+      const g = eg||og;
+      const grpChanges = [];
+      if(og && eg){
         for(const f of GRP_FIELDS){
-          if((eg[f]||'')!==(og[f]||''))grpChanges.push(`${f}: "${og[f]}" → "${eg[f]}"`);
+          if((eg[f]||'') !== (og[f]||'')) grpChanges.push(`${f}: "${og[f]}" → "${eg[f]}"`);
         }
       }
-      groupDiffs.push({key,matDesc:g.matDesc,plant:g.plant,rows:diffRows,isNew:!og,grpChanges});
+      groupDiffs.push({key, matDesc:g.matDesc, plant:g.plant, rows:diffRows, isNew:!og, grpChanges});
     }
   });
 
-  // Summary
-  document.getElementById('diffStats').innerHTML=`
+  document.getElementById('diffStats').innerHTML = `
     <div class="diff-stat"><div class="diff-stat-num green">${totA}</div><div class="diff-stat-label">Added</div></div>
     <div class="diff-stat"><div class="diff-stat-num red">${totR}</div><div class="diff-stat-label">Removed</div></div>
     <div class="diff-stat"><div class="diff-stat-num amber">${totM}</div><div class="diff-stat-label">Modified</div></div>
     <div class="diff-stat"><div class="diff-stat-num muted">${totU}</div><div class="diff-stat-label">Unchanged</div></div>`;
 
-  const out=document.getElementById('diffOutput');out.innerHTML='';
+  const out = document.getElementById('diffOutput'); out.innerHTML = '';
 
-  if(totA+totR+totM===0&&!groupDiffs.some(g=>g.grpChanges.length)){
-    out.innerHTML=`<div class="empty"><div class="empty-icon">✅</div><h3>No changes detected</h3><p>The edited BOM matches the original exactly.</p></div>`;
+  if(totA+totR+totM===0 && !groupDiffs.some(g=>g.grpChanges.length)){
+    out.innerHTML = `<div class="editor-empty-state" style="min-height:200px;"><div class="ei">✅</div><h3>No changes detected</h3><p>The edited BOM matches the original exactly.</p></div>`;
     return;
   }
 
   groupDiffs.forEach(gd=>{
-    const visibleRows=gd.rows.filter(r=>r.type!=='unchanged'||(showUnchanged));
-    if(!visibleRows.length&&!gd.grpChanges.length)return;
-    const hasChange=gd.rows.some(r=>r.type!=='unchanged')||gd.grpChanges.length>0;
-    if(!hasChange&&!showUnchanged)return;
+    const visibleRows = gd.rows.filter(r=>r.type!=='unchanged'||(showUnchanged));
+    if(!visibleRows.length && !gd.grpChanges.length) return;
+    const hasChange = gd.rows.some(r=>r.type!=='unchanged') || gd.grpChanges.length > 0;
+    if(!hasChange && !showUnchanged) return;
 
-    const div=document.createElement('div');div.className='diff-group';
-    const newBadge=gd.isNew?`<span class="nb-tag">NEW GROUP</span>`:'';
-    const grpChgHtml=gd.grpChanges.length
-      ?`<div style="padding:6px 13px;background:#fefce8;border-bottom:1px solid var(--amber-border);font-size:11px;color:var(--amber);font-family:var(--mono);">
-          ⚠ Group header changed: ${gd.grpChanges.map(esc).join(' · ')}
-        </div>`:'';
+    const div = document.createElement('div'); div.className='diff-group';
+    const newBadge = gd.isNew ? `<span class="nb-tag">NEW GROUP</span>` : '';
+    const grpChgHtml = gd.grpChanges.length
+      ? `<div style="padding:5px 12px;background:#fefce8;border-bottom:1px solid var(--amber-border);font-size:10.5px;color:var(--amber);font-family:var(--mono);">
+          ⚠ Group header changed: ${gd.grpChanges.map(esc).join(' · ')}</div>` : '';
 
-    div.innerHTML=`<div class="diff-group-title">
+    div.innerHTML = `<div class="diff-group-title">
         <span>${esc(gd.key)}</span>
         <span style="font-weight:400;color:var(--text3)">${esc(gd.matDesc)}</span>
         ${newBadge}
@@ -1003,146 +1431,164 @@ function runDiff(){
 }
 
 function buildDiffRow(r){
-  const clsMap={added:'diff-added',removed:'diff-removed',modified:'diff-modified',unchanged:'diff-unchanged'};
-  const tagMap={added:'dt-a',removed:'dt-r',modified:'dt-m',unchanged:'dt-u'};
-  const labelMap={added:'+',removed:'−',modified:'~',unchanged:'='};
-  const cls=clsMap[r.type];
-  const tag=`<span class="diff-tag ${tagMap[r.type]}">${labelMap[r.type]}</span>`;
+  const clsMap  = {added:'diff-added',removed:'diff-removed',modified:'diff-modified',unchanged:'diff-unchanged'};
+  const tagMap  = {added:'dt-a',removed:'dt-r',modified:'dt-m',unchanged:'dt-u'};
+  const labelMap = {added:'+',removed:'−',modified:'~',unchanged:'='};
+  const cls = clsMap[r.type];
+  const tag = `<span class="diff-tag ${tagMap[r.type]}">${labelMap[r.type]}</span>`;
   function dc(field){
-    if(r.type==='added')return esc(r.edited[field]);
-    if(r.type==='removed')return`<span style="text-decoration:line-through;color:var(--red)">${esc(r.orig[field])}</span>`;
+    if(r.type==='added')   return esc(r.edited[field]);
+    if(r.type==='removed') return `<span style="text-decoration:line-through;color:var(--red)">${esc(r.orig[field])}</span>`;
     if(r.type==='modified'){
-      const ov=r.orig[field]||'',nv=r.edited[field]||'';
-      if(ov!==nv)return`<span class="cell-old">${esc(ov)}</span><span class="cell-new">${esc(nv)}</span>`;
+      const ov=r.orig[field]||'', nv=r.edited[field]||'';
+      if(ov!==nv) return `<span class="cell-old">${esc(ov)}</span><span class="cell-new">${esc(nv)}</span>`;
       return esc(nv);
     }
     return esc((r.edited||r.orig)[field]);
   }
-  return`<tr class="${cls}"><td>${tag}</td><td>${dc('component')}</td><td>${dc('compDesc')}</td><td>${dc('matType')}</td><td>${dc('qty')}</td><td>${dc('uom')}</td><td>${dc('baseQty')}</td></tr>`;
+  return `<tr class="${cls}"><td>${tag}</td><td>${dc('component')}</td><td>${dc('compDesc')}</td><td>${dc('matType')}</td><td>${dc('qty')}</td><td>${dc('uom')}</td><td>${dc('baseQty')}</td></tr>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // EXPORT
 // ═══════════════════════════════════════════════════════════════════════════
 function exportTSV(){
-  if(!editedGroups)return;
-  const lines=[SHEET2_COLS.join('\t')];
+  if(!editedGroups) return;
+  const lines = [SHEET2_COLS.join('\t')];
   editedGroups.forEach((grp,key)=>{
-    const active=grp.rows.filter(r=>!r._deleted);if(!active.length)return;
+    const active = grp.rows.filter(r=>!r._deleted); if(!active.length) return;
     active.forEach(r=>{
       lines.push([key,grp.matDesc,grp.plant,'1',grp.alt,r.baseQty,r.component,r.compDesc,r.matType,'',r.qty,r.uom,''].join('\t'));
     });
     lines.push('');
   });
-  navigator.clipboard.writeText(lines.join('\n')).then(()=>toast('Copied! Paste into Excel','ok')).catch(()=>{
-    triggerDownload(lines.join('\n'),'bom_sheet2.tsv','text/tab-separated-values');
-  });
+  navigator.clipboard.writeText(lines.join('\n'))
+    .then(()=>toast('Copied! Paste into Excel','ok'))
+    .catch(()=>{ triggerDownload(lines.join('\n'), 'bom_sheet2.tsv', 'text/tab-separated-values'); });
 }
 
 function exportDiffCSV(){
-  if(!editedGroups||!originalGroups){toast('No data','err');return;}
-  const lines=['Status,Group,Material Description,Component,Component Description,Mat Type,Qty Orig,Qty New,UOM Orig,UOM New,BaseQty Orig,BaseQty New'];
-  const allKeys=new Set([...originalGroups.keys(),...editedGroups.keys()]);
-  const cv=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-
+  if(!editedGroups || !originalGroups){ toast('No data','err'); return; }
+  const lines = ['Status,Group,Material Description,Component,Component Description,Mat Type,Qty Orig,Qty New,UOM Orig,UOM New,BaseQty Orig,BaseQty New'];
+  const allKeys = new Set([...originalGroups.keys(), ...editedGroups.keys()]);
+  const cv = v => `"${String(v||'').replace(/"/g,'""')}"`;
   allKeys.forEach(key=>{
-    const og=originalGroups.get(key);const eg=editedGroups.get(key);
-    const g=eg||og;
+    const og=originalGroups.get(key); const eg=editedGroups.get(key); const g=eg||og;
     (eg?.rows||[]).forEach(r=>{
-      if(r._isNew){lines.push(['ADDED',key,g.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty].map(cv).join(','));return;}
-      if(r._deleted){const o=og?.rows.find(x=>x.id===r.id)||r;lines.push(['REMOVED',key,g.matDesc,o.component,o.compDesc,o.matType,o.qty,'',o.uom,'',o.baseQty,''].map(cv).join(','));return;}
+      if(r._isNew){  lines.push(['ADDED',key,g.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty].map(cv).join(',')); return; }
+      if(r._deleted){ const o=og?.rows.find(x=>x.id===r.id)||r; lines.push(['REMOVED',key,g.matDesc,o.component,o.compDesc,o.matType,o.qty,'',o.uom,'',o.baseQty,''].map(cv).join(',')); return; }
       const o=og?.rows.find(x=>x.id===r.id);
-      if(!o){lines.push(['ADDED',key,g.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty].map(cv).join(','));}
-      else if(rowModified(r,o)){lines.push(['MODIFIED',key,g.matDesc,r.component,r.compDesc,o.matType===r.matType?r.matType:o.matType+'→'+r.matType,o.qty,r.qty,o.uom,r.uom,o.baseQty,r.baseQty].map(cv).join(','));}
+      if(!o){ lines.push(['ADDED',key,g.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty].map(cv).join(','));}
+      else if(rowModified(r,o)){ lines.push(['MODIFIED',key,g.matDesc,r.component,r.compDesc,o.matType===r.matType?r.matType:o.matType+'→'+r.matType,o.qty,r.qty,o.uom,r.uom,o.baseQty,r.baseQty].map(cv).join(','));}
     });
   });
-  triggerDownload(lines.join('\n'),'bom_diff.csv','text/csv');
+  triggerDownload(lines.join('\n'), 'bom_diff.csv', 'text/csv');
 }
 
 function exportExcel(){
-  if(!editedGroups||!originalGroups){toast('No data to export','err');return;}
-  const wb=XLSX.utils.book_new();
+  if(!editedGroups || !originalGroups){ toast('No data to export','err'); return; }
+  const wb = XLSX.utils.book_new();
 
-  // Sheet 1: New BOM
-  const bomH=['Material','Material Description','Plant','Usage','Alternative','Base quantity','Component','Component Description','Material Type','Alt Text','Quantity','Component unit','Prod. Stor.Loc.'];
-  const bomRows=[bomH];let lastPar=null;
+  const bomH = ['Material','Material Description','Plant','Usage','Alternative','Base quantity','Component','Component Description','Material Type','Alt Text','Quantity','Component unit','Prod. Stor.Loc.'];
+  const bomRows = [bomH]; let lastPar=null;
   editedGroups.forEach((grp,key)=>{
-    const active=grp.rows.filter(r=>!r._deleted);if(!active.length)return;
-    if(lastPar!==null)bomRows.push(new Array(bomH.length).fill(''));
-    lastPar=key;
-    active.forEach(r=>{bomRows.push([key,grp.matDesc,grp.plant,1,grp.alt,r.baseQty,r.component,r.compDesc,r.matType,'',r.qty,r.uom,'']);});
+    const active = grp.rows.filter(r=>!r._deleted); if(!active.length) return;
+    if(lastPar!==null) bomRows.push(new Array(bomH.length).fill(''));
+    lastPar = key;
+    active.forEach(r=>{ bomRows.push([key,grp.matDesc,grp.plant,1,grp.alt,r.baseQty,r.component,r.compDesc,r.matType,'',r.qty,r.uom,'']); });
   });
-  const wsNew=XLSX.utils.aoa_to_sheet(bomRows);
-  wsNew['!cols']=[{wch:18},{wch:42},{wch:12},{wch:7},{wch:11},{wch:12},{wch:18},{wch:42},{wch:12},{wch:9},{wch:10},{wch:14},{wch:14}];
-  styleHeaderRow(wsNew,'2563A8');
-  XLSX.utils.book_append_sheet(wb,wsNew,'New BOM');
+  const wsNew = XLSX.utils.aoa_to_sheet(bomRows);
+  wsNew['!cols'] = [{wch:18},{wch:42},{wch:12},{wch:7},{wch:11},{wch:12},{wch:18},{wch:42},{wch:12},{wch:9},{wch:10},{wch:14},{wch:14}];
+  styleHeaderRow(wsNew, '2563A8');
+  XLSX.utils.book_append_sheet(wb, wsNew, 'New BOM');
 
-  // Sheet 2: Diff
-  const dH=['Status','Group','Material Description','Component','Component Description','Mat Type','Qty (Orig)','Qty (New)','UOM (Orig)','UOM (New)','BaseQty (Orig)','BaseQty (New)'];
-  const dRows=[dH];
-  const allKeys=new Set([...originalGroups.keys(),...editedGroups.keys()]);
+  const dH = ['Status','Group','Material Description','Component','Component Description','Mat Type','Qty (Orig)','Qty (New)','UOM (Orig)','UOM (New)','BaseQty (Orig)','BaseQty (New)'];
+  const dRows = [dH];
+  const allKeys = new Set([...originalGroups.keys(), ...editedGroups.keys()]);
   allKeys.forEach(key=>{
-    const og=originalGroups.get(key);const eg=editedGroups.get(key);const grp=eg||og;
-    if(!og){(eg?.rows||[]).forEach(r=>dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty]));return;}
+    const og=originalGroups.get(key); const eg=editedGroups.get(key); const grp=eg||og;
+    if(!og){ (eg?.rows||[]).forEach(r=>dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty])); return; }
     (eg?.rows||[]).forEach(r=>{
-      if(r._isNew){dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty]);return;}
-      if(r._deleted){const o=og.rows.find(x=>x.id===r.id)||r;dRows.push(['REMOVED',key,grp.matDesc,o.component,o.compDesc,o.matType,o.qty,'',o.uom,'',o.baseQty,'']);return;}
+      if(r._isNew){  dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty]); return; }
+      if(r._deleted){ const o=og.rows.find(x=>x.id===r.id)||r; dRows.push(['REMOVED',key,grp.matDesc,o.component,o.compDesc,o.matType,o.qty,'',o.uom,'',o.baseQty,'']); return; }
       const o=og.rows.find(x=>x.id===r.id);
-      if(!o){dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty]);}
-      else if(rowModified(r,o)){dRows.push(['MODIFIED',key,grp.matDesc,r.component,r.compDesc,o.matType===r.matType?r.matType:o.matType+'→'+r.matType,o.qty,r.qty,o.uom,r.uom,o.baseQty,r.baseQty]);}
-      else{dRows.push(['UNCHANGED',key,grp.matDesc,r.component,r.compDesc,r.matType,r.qty,r.qty,r.uom,r.uom,r.baseQty,r.baseQty]);}
+      if(!o){       dRows.push(['ADDED',key,grp.matDesc,r.component,r.compDesc,r.matType,'',r.qty,'',r.uom,'',r.baseQty]); }
+      else if(rowModified(r,o)){ dRows.push(['MODIFIED',key,grp.matDesc,r.component,r.compDesc,o.matType===r.matType?r.matType:o.matType+'→'+r.matType,o.qty,r.qty,o.uom,r.uom,o.baseQty,r.baseQty]); }
+      else{ dRows.push(['UNCHANGED',key,grp.matDesc,r.component,r.compDesc,r.matType,r.qty,r.qty,r.uom,r.uom,r.baseQty,r.baseQty]); }
     });
   });
-  const wsDiff=XLSX.utils.aoa_to_sheet(dRows);
-  wsDiff['!cols']=[{wch:11},{wch:18},{wch:38},{wch:18},{wch:38},{wch:10},{wch:12},{wch:12},{wch:10},{wch:10},{wch:13},{wch:13}];
-  styleHeaderRow(wsDiff,'374151');
-  const colorsMap={ADDED:{bg:'DCFCE7',fg:'166534'},REMOVED:{bg:'FEE2E2',fg:'991B1B'},MODIFIED:{bg:'FEF9C3',fg:'92400E'},UNCHANGED:{bg:'F9FAFB',fg:'6B7280'}};
-  const dRange=XLSX.utils.decode_range(wsDiff['!ref']);
-  for(let R=1;R<=dRange.e.r;R++){
-    const sc=wsDiff[XLSX.utils.encode_cell({r:R,c:0})];if(!sc)continue;
-    const col=colorsMap[sc.v];if(!col)continue;
-    sc.s={font:{bold:true,color:{rgb:col.fg}},fill:{fgColor:{rgb:col.bg}},alignment:{horizontal:'center'}};
-    for(let CC=1;CC<=dRange.e.c;CC++){const c=wsDiff[XLSX.utils.encode_cell({r:R,c:CC})];if(c)c.s={fill:{fgColor:{rgb:col.bg}}};}
+  const wsDiff = XLSX.utils.aoa_to_sheet(dRows);
+  wsDiff['!cols'] = [{wch:11},{wch:18},{wch:38},{wch:18},{wch:38},{wch:10},{wch:12},{wch:12},{wch:10},{wch:10},{wch:13},{wch:13}];
+  styleHeaderRow(wsDiff, '374151');
+  const colorsMap = {ADDED:{bg:'DCFCE7',fg:'166534'},REMOVED:{bg:'FEE2E2',fg:'991B1B'},MODIFIED:{bg:'FEF9C3',fg:'92400E'},UNCHANGED:{bg:'F9FAFB',fg:'6B7280'}};
+  const dRange = XLSX.utils.decode_range(wsDiff['!ref']);
+  for(let R=1; R<=dRange.e.r; R++){
+    const sc = wsDiff[XLSX.utils.encode_cell({r:R,c:0})]; if(!sc) continue;
+    const col = colorsMap[sc.v]; if(!col) continue;
+    sc.s = {font:{bold:true,color:{rgb:col.fg}},fill:{fgColor:{rgb:col.bg}},alignment:{horizontal:'center'}};
+    for(let CC=1; CC<=dRange.e.c; CC++){ const c=wsDiff[XLSX.utils.encode_cell({r:R,c:CC})]; if(c) c.s={fill:{fgColor:{rgb:col.bg}}}; }
   }
-  XLSX.utils.book_append_sheet(wb,wsDiff,'Changes (Diff)');
+  XLSX.utils.book_append_sheet(wb, wsDiff, 'Changes (Diff)');
 
-  const ts=new Date();const tsStr=ts.getFullYear()+pad(ts.getMonth()+1)+pad(ts.getDate());
-  const fn='BOM_Export_'+tsStr+'.xlsx';
-  XLSX.writeFile(wb,fn,{bookType:'xlsx',type:'binary',cellStyles:true});
-  toast('Downloaded '+fn,'ok');
+  const ts = new Date();
+  const tsStr = ts.getFullYear()+pad(ts.getMonth()+1)+pad(ts.getDate());
+  const fn = 'BOM_Export_'+tsStr+'.xlsx';
+  XLSX.writeFile(wb, fn, {bookType:'xlsx', type:'binary', cellStyles:true});
+  toast('Downloaded '+fn, 'ok');
 }
 
-function styleHeaderRow(ws,color){
-  const range=XLSX.utils.decode_range(ws['!ref']);
-  for(let C2=range.s.c;C2<=range.e.c;C2++){
-    const cell=ws[XLSX.utils.encode_cell({r:0,c:C2})];
-    if(cell)cell.s={font:{bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:color}},alignment:{horizontal:'center'}};
+function styleHeaderRow(ws, color){
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for(let C2=range.s.c; C2<=range.e.c; C2++){
+    const cell = ws[XLSX.utils.encode_cell({r:0,c:C2})];
+    if(cell) cell.s = {font:{bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:color}},alignment:{horizontal:'center'}};
   }
 }
 
-function pad(n){return String(n).padStart(2,'0');}
-function triggerDownload(text,filename,mime){
-  const blob=new Blob([text],{type:mime});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
-  toast('Downloaded: '+filename,'ok');
+function pad(n){ return String(n).padStart(2,'0'); }
+function triggerDownload(text, filename, mime){
+  const blob = new Blob([text], {type:mime});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click();
+  toast('Downloaded: '+filename, 'ok');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// UI UTILS
+// UI — PAGE SWITCHING
 // ═══════════════════════════════════════════════════════════════════════════
 function switchPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-  if(page==='diff'&&editedGroups&&originalGroups)runDiff();
+  if(page==='diff' && editedGroups && originalGroups) runDiff();
 }
 
-function toast(msg,type='ok'){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.className='show '+type;
-  clearTimeout(el._t);el._t=setTimeout(()=>{el.className='';},2800);
+function toast(msg, type='ok'){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className='show '+type;
+  clearTimeout(el._t); el._t=setTimeout(()=>{ el.className=''; }, 2800);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TREE PANEL RESIZE
+// ═══════════════════════════════════════════════════════════════════════════
+(function(){
+  const handle = document.getElementById('treeResizeHandle');
+  const sidebar = document.getElementById('treeSidebar');
+  let dragging = false, startX = 0, startW = 0;
+  handle.addEventListener('mousedown', e=>{
+    dragging = true; startX = e.clientX; startW = sidebar.offsetWidth;
+    document.body.classList.add('resizing'); e.preventDefault();
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!dragging) return;
+    const newW = Math.max(200, Math.min(520, startW + e.clientX - startX));
+    sidebar.style.width = newW+'px';
+  });
+  document.addEventListener('mouseup', ()=>{
+    if(dragging){ dragging=false; document.body.classList.remove('resizing'); }
+  });
+})();
 </script>
 </body>
 </html>
